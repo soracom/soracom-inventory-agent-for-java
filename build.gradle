@@ -1,0 +1,33 @@
+subprojects {
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+    apply plugin: 'java'
+
+    def defaultEncoding = 'UTF-8'
+    tasks.withType(JavaCompile) {
+        options.encoding = defaultEncoding
+    }
+
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
+
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+
+    dependencies {
+        testCompile 'junit:junit:4.12'
+    }
+}
+
+project(':soracom-inventory-agent-for-java-core') {
+}
+
+project(':soracom-inventory-agent-for-java-example') {
+    dependencies {
+        compile project(':soracom-inventory-agent-for-java-core')
+    }
+}
