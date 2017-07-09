@@ -24,10 +24,51 @@ subprojects {
 }
 
 project(':soracom-inventory-agent-for-java-core') {
+    dependencies {
+        compile "org.eclipse.leshan:leshan-client-core:1.0.0-M3"
+        compile "org.eclipse.leshan:leshan-client-cf:1.0.0-M3"
+        compile 'org.slf4j:slf4j-api:1.7.22'
+        compile 'org.slf4j:slf4j-simple:1.7.22'
+    }
 }
 
 project(':soracom-inventory-agent-for-java-example') {
+    apply plugin: 'application'
+    distZip {
+        baseName = "soracom-inventory-agent-example"
+    }
+    distTar {
+        baseName = "soracom-inventory-agent-example"
+    }
     dependencies {
+       	compile "commons-cli:commons-cli:1.3.1"
+    	compile group: 'com.google.inject', name: 'guice', version: '4.0'
         compile project(':soracom-inventory-agent-for-java-core')
     }
+    startScripts.enabled = false
+    run.enabled = false
+    createScript(project, 'io.soracom.inventory.agent.example.SORACOMInventoryAgent', 'soracom-inventory-agent-example-start')
 }
+
+def createScript(project, mainClass, name) {
+    project.tasks.create(name: name, type: CreateStartScripts) {
+        outputDir = new File(project.buildDir, 'scripts')
+        mainClassName   = mainClass
+        applicationName = name
+        classpath = project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files + project.configurations.runtime
+    }
+    project.tasks[name].dependsOn(project.jar)
+    project.applicationDistribution.with {
+        into("bin") {
+            from(project.tasks[name])
+            fileMode = 0755
+        }
+        into("bin/script") {
+            from("script")
+        }
+        into("bin") {
+            from("object-config.properties")
+        }    
+    } 
+}
+
