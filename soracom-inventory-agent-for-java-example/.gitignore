@@ -4,3 +4,4 @@
 /bin/
 /.soracom-inventory-credentials.dat
 /Californium.properties
+/build/
