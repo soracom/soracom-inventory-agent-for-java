@@ -1,13 +1,6 @@
 package io.soracom.inventory.agent.core.lwm2m.base_object;
-import org.eclipse.leshan.core.response.ExecuteResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.response.WriteResponse;
-
-import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
-import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
-import io.soracom.inventory.agent.core.lwm2m.Operation;
-import io.soracom.inventory.agent.core.lwm2m.Resource;
-import io.soracom.inventory.agent.core.lwm2m.ResourceContext;
+import io.soracom.inventory.agent.core.lwm2m.*;
+import org.eclipse.leshan.core.response.*;
 
 /**
  * This LwM2M objects provides the resources needed to perform software management on the device. Each software component is managed via a dedicated Software Management Object instance.
@@ -18,7 +11,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	/**
 	 * Name of the software package
 	 **/
-	@Resource(resourceId = 0, operation = Operation.Read)
+	@Resource(resourceId = 0, operation = Operation.Read, type = "STRING")
 	public ReadResponse readPkgName(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -30,7 +23,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	/**
 	 * Version of the software package
 	 **/
-	@Resource(resourceId = 1, operation = Operation.Read)
+	@Resource(resourceId = 1, operation = Operation.Read, type = "STRING")
 	public ReadResponse readPkgVersion(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -65,7 +58,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	/**
 	 * Link to a Checkpoint“ object which allows to specify conditions/dependencies for a software update. E.g. power connected, sufficient memory, target system.
 	 **/
-	@Resource(resourceId = 5, operation = Operation.Read)
+	@Resource(resourceId = 5, operation = Operation.Read, type = "OBJLNK")
 	public ReadResponse readCheckpoint(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -101,7 +94,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * In that state the software is correctly installed and can be activated or deactivated according to the Activation State Machine.
 	 * (see 5.1.2.5)
 	 **/
-	@Resource(resourceId = 7, operation = Operation.Read)
+	@Resource(resourceId = 7, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readUpdateState(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -115,7 +108,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * If false, Objects and Object Instances parameter MUST be reported at the next periodic Update message.
 	 * The default value is false.
 	 **/
-	@Resource(resourceId = 8, operation = Operation.Read)
+	@Resource(resourceId = 8, operation = Operation.Read, type = "BOOLEAN")
 	public ReadResponse readUpdateSupportedObjects(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -147,7 +140,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * 60-200 : (for expansion, selection to be in blocks depending on new introduction of features)
 	 * This Resource MAY be reported by sending Observe operation.
 	 **/
-	@Resource(resourceId = 9, operation = Operation.Read)
+	@Resource(resourceId = 9, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readUpdateResult(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -171,7 +164,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * 1: ENABLED
 	 * Activation State is ENABLED only if the Software Activation State Machine is in the ACTIVE state
 	 **/
-	@Resource(resourceId = 12, operation = Operation.Read)
+	@Resource(resourceId = 12, operation = Operation.Read, type = "BOOLEAN")
 	public ReadResponse readActivationState(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -184,7 +177,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * Link to “Package Settings” object which allows to modify at any time software configuration settings. This is an application specific object. 
 	 * Note: OMA might provide a template for a Package Settings object in a future release of this specification.
 	 **/
-	@Resource(resourceId = 13, operation = Operation.Read)
+	@Resource(resourceId = 13, operation = Operation.Read, type = "OBJLNK")
 	public ReadResponse readPackageSettings(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}

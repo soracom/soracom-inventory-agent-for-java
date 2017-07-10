@@ -14,4 +14,6 @@ public @interface Resource {
 	Operation operation();
 
 	boolean multiple() default false;
+	
+	String type() default "";
 }

@@ -1,13 +1,6 @@
 package io.soracom.inventory.agent.core.lwm2m.base_object;
-import org.eclipse.leshan.core.response.ExecuteResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.response.WriteResponse;
-
-import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
-import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
-import io.soracom.inventory.agent.core.lwm2m.Operation;
-import io.soracom.inventory.agent.core.lwm2m.Resource;
-import io.soracom.inventory.agent.core.lwm2m.ResourceContext;
+import io.soracom.inventory.agent.core.lwm2m.*;
+import org.eclipse.leshan.core.response.*;
 
 /**
  * This LwM2M Objects enables client to collect statistical information and enables the LwM2M Server to retrieve these information, set the collection duration and reset the statistical parameters.
@@ -18,7 +11,7 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	/**
 	 * Indicate the total number of SMS successfully transmitted during the collection period.
 	 **/
-	@Resource(resourceId = 0, operation = Operation.Read)
+	@Resource(resourceId = 0, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readSMSTxCounter(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -30,7 +23,7 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	/**
 	 * Indicate the total number of SMS successfully received during the collection period.
 	 **/
-	@Resource(resourceId = 1, operation = Operation.Read)
+	@Resource(resourceId = 1, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readSMSRxCounter(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -42,7 +35,7 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	/**
 	 * Indicate the total amount of data transmitted during the collection period.
 	 **/
-	@Resource(resourceId = 2, operation = Operation.Read)
+	@Resource(resourceId = 2, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readTxData(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -54,7 +47,7 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	/**
 	 * Indicate the total amount of data received during the collection period.
 	 **/
-	@Resource(resourceId = 3, operation = Operation.Read)
+	@Resource(resourceId = 3, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readRxData(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -66,7 +59,7 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	/**
 	 * The maximum message size that is used during the collection period.
 	 **/
-	@Resource(resourceId = 4, operation = Operation.Read)
+	@Resource(resourceId = 4, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readMaxMessageSize(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -78,7 +71,7 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	/**
 	 * The average message size that is used during the collection period.
 	 **/
-	@Resource(resourceId = 5, operation = Operation.Read)
+	@Resource(resourceId = 5, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readAverageMessageSize(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -98,7 +91,7 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	/**
 	 * The default collection period in seconds. The value 0 indicates that the collection period is not set.
 	 **/
-	@Resource(resourceId = 8, operation = Operation.Read)
+	@Resource(resourceId = 8, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readCollectionPeriod(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}

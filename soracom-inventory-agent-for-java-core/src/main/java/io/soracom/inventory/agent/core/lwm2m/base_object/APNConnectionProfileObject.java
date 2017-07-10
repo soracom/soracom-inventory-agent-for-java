@@ -1,13 +1,6 @@
 package io.soracom.inventory.agent.core.lwm2m.base_object;
-import org.eclipse.leshan.core.response.ExecuteResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.response.WriteResponse;
-
-import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
-import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
-import io.soracom.inventory.agent.core.lwm2m.Operation;
-import io.soracom.inventory.agent.core.lwm2m.Resource;
-import io.soracom.inventory.agent.core.lwm2m.ResourceContext;
+import io.soracom.inventory.agent.core.lwm2m.*;
+import org.eclipse.leshan.core.response.*;
 
 /**
  * This object specifies resources to enable a device to connect to an APN.
@@ -18,7 +11,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Human-readable identifier. Multiple connection profiles can share the same APN value but e.g. have different credentials.
 	 **/
-	@Resource(resourceId = 0, operation = Operation.Read)
+	@Resource(resourceId = 0, operation = Operation.Read, type = "STRING")
 	public ReadResponse readProfileName(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -36,7 +29,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	 * This resource is not included in case ‘Auto select APN by device’ resource has the value TRUE.
 	 * If the APN resource is present but contains an empty string, then the device shall not provide an APN in the connection request (invoking default APN procedures in the network).
 	 **/
-	@Resource(resourceId = 1, operation = Operation.Read)
+	@Resource(resourceId = 1, operation = Operation.Read, type = "STRING")
 	public ReadResponse readAPN(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -52,7 +45,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * If this resource is present for a connection profile, it enables the device to choose an APN according to a device specific algorithm. It provides a fall-back mechanism e.g. for some MVNO SIMs the configured APN may not work.  Resource not included in case the ‘APN’ resource is specified.
 	 **/
-	@Resource(resourceId = 2, operation = Operation.Read)
+	@Resource(resourceId = 2, operation = Operation.Read, type = "BOOLEAN")
 	public ReadResponse readAutoSelectAPNByDevice(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -70,7 +63,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	 * False: connection is de-activated.
 	 * Allows the profile to be remotely activated or deactivated.
 	 **/
-	@Resource(resourceId = 3, operation = Operation.Read)
+	@Resource(resourceId = 3, operation = Operation.Read, type = "BOOLEAN")
 	public ReadResponse readEnableStatus(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -90,7 +83,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	 * 2: PAP or CHAP
 	 * 3: None
 	 **/
-	@Resource(resourceId = 4, operation = Operation.Read)
+	@Resource(resourceId = 4, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readAuthenticationType(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -106,7 +99,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Used with e.g. PAP.
 	 **/
-	@Resource(resourceId = 5, operation = Operation.Read)
+	@Resource(resourceId = 5, operation = Operation.Read, type = "STRING")
 	public ReadResponse readUserName(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -122,7 +115,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Used with e.g. PAP.
 	 **/
-	@Resource(resourceId = 6, operation = Operation.Read)
+	@Resource(resourceId = 6, operation = Operation.Read, type = "STRING")
 	public ReadResponse readSecret(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -138,7 +131,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Comma separated list of retry delay values in seconds to be used in case of unsuccessful connection establishment attempts. e.g. “10,60,600,3600,86400”
 	 **/
-	@Resource(resourceId = 7, operation = Operation.Read)
+	@Resource(resourceId = 7, operation = Operation.Read, type = "STRING")
 	public ReadResponse readReconnectSchedule(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -154,7 +147,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Coma separated mobile country code, then mobile network code – for which this APN is valid.
 	 **/
-	@Resource(resourceId = 8, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 8, operation = Operation.Read, multiple = true, type = "STRING")
 	public ReadResponse readValidity_MCC_MNC(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -170,7 +163,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * UTC time of connection request. See note (1)
 	 **/
-	@Resource(resourceId = 9, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 9, operation = Operation.Read, multiple = true, type = "TIME")
 	public ReadResponse readConnectionEstablishmentTime(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -183,7 +176,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	 * 0 = accepted
 	 * 1 = rejected
 	 **/
-	@Resource(resourceId = 10, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 10, operation = Operation.Read, multiple = true, type = "INTEGER")
 	public ReadResponse readConnectionEstablishmentResult(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -195,7 +188,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Reject cause, see [3GPP-TS_24.008, 3GPP-TS_24.301]
 	 **/
-	@Resource(resourceId = 11, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 11, operation = Operation.Read, multiple = true, type = "INTEGER")
 	public ReadResponse readConnectionEstablishmentRejectCause(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -207,7 +200,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * UTC time of connection end.
 	 **/
-	@Resource(resourceId = 12, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 12, operation = Operation.Read, multiple = true, type = "TIME")
 	public ReadResponse readConnectionEndTime(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -219,7 +212,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Rolling counter for total number of bytes sent via this interface since last device reset.
 	 **/
-	@Resource(resourceId = 13, operation = Operation.Read)
+	@Resource(resourceId = 13, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readTotalBytesSent(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -231,7 +224,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Rolling counter for total number of bytes received via this interface since last device reset.
 	 **/
-	@Resource(resourceId = 14, operation = Operation.Read)
+	@Resource(resourceId = 14, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readTotalBytesReceived(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -243,7 +236,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * May be IPv4 or IPv6 address.
 	 **/
-	@Resource(resourceId = 15, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 15, operation = Operation.Read, multiple = true, type = "STRING")
 	public ReadResponse readIPAddress(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -259,7 +252,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Associated with IPv6 address.
 	 **/
-	@Resource(resourceId = 16, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 16, operation = Operation.Read, multiple = true, type = "STRING")
 	public ReadResponse readPrefixLength(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -275,7 +268,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Subnet mask.
 	 **/
-	@Resource(resourceId = 17, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 17, operation = Operation.Read, multiple = true, type = "STRING")
 	public ReadResponse readSubnetMask(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -291,7 +284,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Gateway.
 	 **/
-	@Resource(resourceId = 18, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 18, operation = Operation.Read, multiple = true, type = "STRING")
 	public ReadResponse readGateway(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -307,7 +300,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Primary DNS address.
 	 **/
-	@Resource(resourceId = 19, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 19, operation = Operation.Read, multiple = true, type = "STRING")
 	public ReadResponse readPrimaryDNSAddress(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -323,7 +316,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Secondary DNS address.
 	 **/
-	@Resource(resourceId = 20, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 20, operation = Operation.Read, multiple = true, type = "STRING")
 	public ReadResponse readSecondaryDNSAddress(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -342,7 +335,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	 * This resource enables the LWM2M server to signal the LWM2M client which QCI it shall request from the network.
 	 * See [3GPP-TS_23.203, and 3GPP-TS_24.301] for a description of QCI values. See note (3).
 	 **/
-	@Resource(resourceId = 21, operation = Operation.Read)
+	@Resource(resourceId = 21, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readQCI(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -354,7 +347,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Links to a vendor specific object.
 	 **/
-	@Resource(resourceId = 22, operation = Operation.Read)
+	@Resource(resourceId = 22, operation = Operation.Read, type = "OBJLNK")
 	public ReadResponse readVendorSpecificExtensions(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -366,7 +359,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	/**
 	 * Rolling counter for total number of packets sent via this interface since last device reset.
 	 **/
-	@Resource(resourceId = 23, operation = Operation.Read)
+	@Resource(resourceId = 23, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readTotalPacketsSent(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -381,7 +374,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	 * 2=IPv6
 	 * 3=IPv4v6
 	 **/
-	@Resource(resourceId = 24, operation = Operation.Read)
+	@Resource(resourceId = 24, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readPDNType(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -398,7 +391,7 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	 * Determines the number of allowed uplink PDU transmissions per time interval per APN.
 	 * Rate Control information is part of the Protocol Configuration Options (PCO) according to [3GPP-TS_24.008 and 3GPP-TS_27.060]
 	 **/
-	@Resource(resourceId = 25, operation = Operation.Read)
+	@Resource(resourceId = 25, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readAPNRateControl(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}

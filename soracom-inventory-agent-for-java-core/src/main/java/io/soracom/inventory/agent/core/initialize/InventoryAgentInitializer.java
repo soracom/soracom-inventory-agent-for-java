@@ -12,6 +12,7 @@ import org.eclipse.leshan.LwM2mId;
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
 import org.eclipse.leshan.client.object.Security;
+import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;
 import org.eclipse.leshan.core.model.LwM2mModel;
@@ -24,10 +25,11 @@ import io.soracom.inventory.agent.core.credential.Credentials;
 import io.soracom.inventory.agent.core.credential.PreSharedKey;
 import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
 import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
+import io.soracom.inventory.agent.core.lwm2m.ObservableInventoryObjectEnabler;
 
-public class InventoryObjectInitializer {
+public class InventoryAgentInitializer {
 
-	private static final Logger log = LoggerFactory.getLogger(InventoryObjectInitializer.class);
+	private static final Logger log = LoggerFactory.getLogger(InventoryAgentInitializer.class);
 
 	protected String serverUri;
 	protected PreSharedKey preSharedKey;
@@ -38,7 +40,7 @@ public class InventoryObjectInitializer {
 	protected LwM2mModel lwM2mModel;
 	protected Map<Integer, List<AnnotatedLwM2mInstanceEnabler>> objectInstanceMap = new HashMap<>();
 
-	public InventoryObjectInitializer() {
+	public InventoryAgentInitializer() {
 
 	}
 
@@ -69,9 +71,9 @@ public class InventoryObjectInitializer {
 	public void setLwM2mModel(LwM2mModel lwM2mModel) {
 		this.lwM2mModel = lwM2mModel;
 	}
-
+	
 	public void addInstancesForObject(AnnotatedLwM2mInstanceEnabler objectInstance) {
-		final LWM2MObject lwm2mObjectAnnotation = getClass().getAnnotationsByType(LWM2MObject.class)[0];
+		final LWM2MObject lwm2mObjectAnnotation = InventoryAgentHelper.findLWM2MObjectAnnotation(objectInstance.getClass());
 		final int objectId = lwm2mObjectAnnotation.objectId();
 		List<AnnotatedLwM2mInstanceEnabler> instanceList = objectInstanceMap.get(objectId);
 		if (instanceList == null) {
@@ -87,7 +89,16 @@ public class InventoryObjectInitializer {
 
 	public LeshanClient buildClient() {
 		final LwM2mModel lwM2mModel = initLwM2mModel();
-		final ObjectsInitializer initializer = new ObjectsInitializer(lwM2mModel);
+		final ObjectsInitializer initializer = new ObjectsInitializer(lwM2mModel) {
+			protected org.eclipse.leshan.client.resource.ObjectEnabler createNodeEnabler(org.eclipse.leshan.core.model.ObjectModel objectModel) {
+		        Map<Integer, LwM2mInstanceEnabler> instances = new HashMap<>();
+		        LwM2mInstanceEnabler[] newInstances = createInstances(objectModel);
+		        for (int i = 0; i < newInstances.length; i++) {
+		            instances.put(i, newInstances[i]);
+		        }
+				return new ObservableInventoryObjectEnabler(objectModel.id, objectModel, instances, getFactoryFor(objectModel));
+			};
+		};
 		initSecurity(initializer);
 		initServer(initializer);
 		initObjects(initializer);

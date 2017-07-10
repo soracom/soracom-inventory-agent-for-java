@@ -1,13 +1,6 @@
 package io.soracom.inventory.agent.core.lwm2m.base_object;
-import org.eclipse.leshan.core.response.ExecuteResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.response.WriteResponse;
-
-import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
-import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
-import io.soracom.inventory.agent.core.lwm2m.Operation;
-import io.soracom.inventory.agent.core.lwm2m.Resource;
-import io.soracom.inventory.agent.core.lwm2m.ResourceContext;
+import io.soracom.inventory.agent.core.lwm2m.*;
+import org.eclipse.leshan.core.response.*;
 
 /**
  * This LWM2M Object is dedicated to manage the device capabilities of a device e.g. sensors, communication, etc.
@@ -21,7 +14,7 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * The list of capabilities per Group is given in Appendix B: Device Capabilities Vocabulary
 	 * executable Resource can work with.
 	 **/
-	@Resource(resourceId = 0, operation = Operation.Read)
+	@Resource(resourceId = 0, operation = Operation.Read, type = "STRING")
 	public ReadResponse readProperty(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -43,7 +36,7 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * 8: ANALOG_OUTPUT: generic output
 	 * 9-15: reserved
 	 **/
-	@Resource(resourceId = 1, operation = Operation.Read)
+	@Resource(resourceId = 1, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readGroup(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -56,7 +49,7 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * Device Capability Description
 	 * (manufacturer specified string)
 	 **/
-	@Resource(resourceId = 2, operation = Operation.Read)
+	@Resource(resourceId = 2, operation = Operation.Read, type = "STRING")
 	public ReadResponse readDescription(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -71,7 +64,7 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * When this resource is “True”, it means the associated Device Capability – if removable – is currently attached to the Device.
 	 * When a Device Capability is not removable, and the “Attached” Resource is present, the “Attached” value but be set to “True”.
 	 **/
-	@Resource(resourceId = 3, operation = Operation.Read)
+	@Resource(resourceId = 3, operation = Operation.Read, type = "BOOLEAN")
 	public ReadResponse readAttached(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -84,7 +77,7 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * This resource indicates whether the Device Capability is enabled regardless whether the Device Capability is attached or not. If the value of this resource is “True” the Device Capability is in Enabled State. If the value is “False” the Device Capability is in Disabled State;
 	 * The ‘Attached’ and ‘Enabled’ resources are independent. A Device Capability MAY have ‘True’ as value for ‘Enabled’ Resource while having ‘False’ as value for the ‘Attached’ Resource. That means the Device Capability is still not available and can’t be used until it is attached to the Device, but will be useable once the Device Capability is attached.
 	 **/
-	@Resource(resourceId = 4, operation = Operation.Read)
+	@Resource(resourceId = 4, operation = Operation.Read, type = "BOOLEAN")
 	public ReadResponse readEnabled(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -106,7 +99,7 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	/**
 	 * When the Resources “Enabled” or “Attached” are under “Observation”, this resource specifies whether the LWM2M Server MUST be notified when the value of the Resource on “Observation” changed. If the Resource “NotifyEn” is not present or the value is ‘False’, the LWM2M Server will be not notified about this change. If the “NotifyEn” Resource is present and the value is ‘True’, the LWM2M Server will be notified.
 	 **/
-	@Resource(resourceId = 7, operation = Operation.Read)
+	@Resource(resourceId = 7, operation = Operation.Read, type = "BOOLEAN")
 	public ReadResponse readNotifyEn(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}

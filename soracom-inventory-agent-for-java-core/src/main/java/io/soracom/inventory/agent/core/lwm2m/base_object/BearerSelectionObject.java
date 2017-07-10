@@ -1,13 +1,6 @@
 package io.soracom.inventory.agent.core.lwm2m.base_object;
-import org.eclipse.leshan.core.response.ExecuteResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.response.WriteResponse;
-
-import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
-import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
-import io.soracom.inventory.agent.core.lwm2m.Operation;
-import io.soracom.inventory.agent.core.lwm2m.Resource;
-import io.soracom.inventory.agent.core.lwm2m.ResourceContext;
+import io.soracom.inventory.agent.core.lwm2m.*;
+import org.eclipse.leshan.core.response.*;
 
 /**
  * This object specifies resources to enable a device to choose a PLMN/network on which to attach/register and what type of bearer to then connect. 
@@ -36,7 +29,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	 * 16-100: Reserved for future use
 	 * The Preferred Communications Bearer resource specifies the preferred communications bearer that the LWM2M Client is requested to use for connecting to the LWM2M Server. If multiple preferred communications bearers are specified, the priority order is reflected by the resource instance order. E.g. the bearer which appears first in the list of resource instances is to have higher priority over the rest of available bearers. The LWM2M Client SHOULD use the preferred bearers with higher priority first if they are available. If none of indicated preferred bearers is available, the LWM2M Client SHOULD wait until one of them becomes available. 
 	 **/
-	@Resource(resourceId = 0, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 0, operation = Operation.Read, multiple = true, type = "INTEGER")
 	public ReadResponse readPreferredCommunicationsBearer(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -52,7 +45,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	/**
 	 * Provides guide to the application when performing manual network selection.
 	 **/
-	@Resource(resourceId = 1, operation = Operation.Read)
+	@Resource(resourceId = 1, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readAcceptableRSSI_GSM(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -68,7 +61,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	/**
 	 * Provides guide to the application when performing manual network selection.
 	 **/
-	@Resource(resourceId = 2, operation = Operation.Read)
+	@Resource(resourceId = 2, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readAcceptableRSCP_UMTS(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -84,7 +77,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	/**
 	 * Provides guide to the application when performing manual network selection.
 	 **/
-	@Resource(resourceId = 3, operation = Operation.Read)
+	@Resource(resourceId = 3, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readAcceptableRSRP_LTE(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -100,7 +93,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	/**
 	 * Provides guide to the application when performing manual network selection.
 	 **/
-	@Resource(resourceId = 4, operation = Operation.Read)
+	@Resource(resourceId = 4, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readAcceptableRSSI_1xEV_DO(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -116,7 +109,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	/**
 	 * Comma separated list of allowed Global Cell Identities.
 	 **/
-	@Resource(resourceId = 5, operation = Operation.Read)
+	@Resource(resourceId = 5, operation = Operation.Read, type = "STRING")
 	public ReadResponse readCellLockList(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -133,7 +126,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	 * Comma separated list of MCC+MNC of operators, in priority order.
 	 * Resource “operator list mode” indicates how to process this list.
 	 **/
-	@Resource(resourceId = 6, operation = Operation.Read)
+	@Resource(resourceId = 6, operation = Operation.Read, type = "STRING")
 	public ReadResponse readOperatorList(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -151,7 +144,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	 * 0=preferred
 	 * 1=allowed
 	 **/
-	@Resource(resourceId = 7, operation = Operation.Read)
+	@Resource(resourceId = 7, operation = Operation.Read, type = "BOOLEAN")
 	public ReadResponse readOperatorListMode(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -167,7 +160,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	/**
 	 * Allows server to see results of network scan (e.g. result of AT+COPS=?)
 	 **/
-	@Resource(resourceId = 8, operation = Operation.Read)
+	@Resource(resourceId = 8, operation = Operation.Read, type = "STRING")
 	public ReadResponse readListOfAvailablePLMNs(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -179,7 +172,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	/**
 	 * Links to a vendor specific object.
 	 **/
-	@Resource(resourceId = 9, operation = Operation.Read)
+	@Resource(resourceId = 9, operation = Operation.Read, type = "OBJLNK")
 	public ReadResponse readVendorSpecificExtensions(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -191,7 +184,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	/**
 	 * Provides guide to the application when performing manual network selection.
 	 **/
-	@Resource(resourceId = 10, operation = Operation.Read)
+	@Resource(resourceId = 10, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readAcceptableRSRP_NB_IoT(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -207,7 +200,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	/**
 	 * Interval between periodic searches for higher priority PLMNs of the same country when camped on a visited PLMN, i.e. roaming scenario; based on SIM configuration, EFHPPLMN [3GPP-TS_31.102, section 4.2.6]
 	 **/
-	@Resource(resourceId = 11, operation = Operation.Read)
+	@Resource(resourceId = 11, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readHigherPriorityPLMNSearchTimer(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -224,7 +217,7 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	 * 0=attach with PDN connection
 	 * 1=attach without PDN connection
 	 **/
-	@Resource(resourceId = 12, operation = Operation.Read)
+	@Resource(resourceId = 12, operation = Operation.Read, type = "BOOLEAN")
 	public ReadResponse readAttachWithoutPDNConnection(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}

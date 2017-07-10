@@ -1,13 +1,6 @@
 package io.soracom.inventory.agent.core.lwm2m.base_object;
-import org.eclipse.leshan.core.response.ExecuteResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.response.WriteResponse;
-
-import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
-import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
-import io.soracom.inventory.agent.core.lwm2m.Operation;
-import io.soracom.inventory.agent.core.lwm2m.Resource;
-import io.soracom.inventory.agent.core.lwm2m.ResourceContext;
+import io.soracom.inventory.agent.core.lwm2m.*;
+import org.eclipse.leshan.core.response.*;
 
 /**
  * This LWM2M objects provides the resources needed to perform the lock and wipe operations.
@@ -23,7 +16,7 @@ public abstract class LockAndWipeObject extends AnnotatedLwM2mInstanceEnabler {
 	 * 2: fully locked state
 	 * To render the device fully inoperable the device has been fully locked.
 	 **/
-	@Resource(resourceId = 0, operation = Operation.Read)
+	@Resource(resourceId = 0, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readState(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -47,7 +40,7 @@ public abstract class LockAndWipeObject extends AnnotatedLwM2mInstanceEnabler {
 	/**
 	 * Indicates which data can be wiped from the device. This resource could be e.g. representing a directory.
 	 **/
-	@Resource(resourceId = 2, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 2, operation = Operation.Read, multiple = true, type = "STRING")
 	public ReadResponse readWipeItem(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -80,7 +73,7 @@ public abstract class LockAndWipeObject extends AnnotatedLwM2mInstanceEnabler {
 	 * 7: Unlock operation failed 8: Wipe operation failed
 	 * This Resource MAY be reported by sending Observe operation.
 	 **/
-	@Resource(resourceId = 5, operation = Operation.Read)
+	@Resource(resourceId = 5, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readLockOrWipeOperationResult(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}

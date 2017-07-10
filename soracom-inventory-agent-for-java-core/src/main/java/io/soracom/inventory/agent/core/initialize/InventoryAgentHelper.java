@@ -5,6 +5,7 @@ import static org.eclipse.leshan.client.object.Security.noSecBootstap;
 import static org.eclipse.leshan.client.object.Security.psk;
 import static org.eclipse.leshan.client.object.Security.pskBootstrap;
 
+import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
@@ -21,6 +22,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.soracom.inventory.agent.core.credential.Credentials;
+import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
+import io.soracom.inventory.agent.core.lwm2m.Resource;
 
 public class InventoryAgentHelper {
 
@@ -101,7 +104,39 @@ public class InventoryAgentHelper {
 		}
 		return null;
 	}
-	
+
+	public static Resource findResourceAnnotation(Class<?> clazz, Method m) {
+		Resource[] annotation = m.getAnnotationsByType(Resource.class);
+		if (annotation == null || annotation.length == 0) {
+			clazz = clazz.getSuperclass();
+			if (clazz == null || clazz == Object.class) {
+				return null;
+			}
+			try {
+				m = clazz.getMethod(m.getName(), m.getParameterTypes());
+			} catch (NoSuchMethodException e) {
+				return null;
+			}
+			return findResourceAnnotation(clazz, m);
+		} else {
+			return annotation[0];
+		}
+	}
+
+	public static LWM2MObject findLWM2MObjectAnnotation(Class<?> clazz) {
+		LWM2MObject[] lwm2mObjectAnnotation = clazz.getAnnotationsByType(LWM2MObject.class);
+		if (lwm2mObjectAnnotation == null || lwm2mObjectAnnotation.length == 0) {
+			clazz = clazz.getSuperclass();
+			if (clazz == null) {
+				return null;
+			} else {
+				return findLWM2MObjectAnnotation(clazz);
+			}
+		} else {
+			return lwm2mObjectAnnotation[0];
+		}
+	}
+
 	public static void addShutdownHoot(final LeshanClient client) {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override

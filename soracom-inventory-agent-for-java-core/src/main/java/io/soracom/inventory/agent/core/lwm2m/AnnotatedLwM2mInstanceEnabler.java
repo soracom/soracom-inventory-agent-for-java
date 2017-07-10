@@ -16,6 +16,8 @@ import org.eclipse.leshan.core.response.WriteResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.soracom.inventory.agent.core.initialize.InventoryAgentHelper;
+
 public class AnnotatedLwM2mInstanceEnabler implements LwM2mInstanceEnabler {
 
 	private static final Logger log = LoggerFactory.getLogger(AnnotatedLwM2mInstanceEnabler.class);
@@ -32,12 +34,12 @@ public class AnnotatedLwM2mInstanceEnabler implements LwM2mInstanceEnabler {
 	}
 
 	protected void initAnnotationCache() {
-		Method[] methods = getClass().getMethods();
+		Class<?> clazz = getClass();
+		Method[] methods = clazz.getMethods();
 		for (Method method : methods) {
-			Resource[] resourceAnnotation = method.getAnnotationsByType(Resource.class);
-			if (resourceAnnotation != null) {
+			Resource annotation = InventoryAgentHelper.findResourceAnnotation(clazz, method);
+			if (annotation != null) {
 				validateArgument(method);
-				Resource annotation = resourceAnnotation[0];
 				final int resourceId = annotation.resourceId();
 				final Operation operation = annotation.operation();
 				switch (operation) {
@@ -59,15 +61,15 @@ public class AnnotatedLwM2mInstanceEnabler implements LwM2mInstanceEnabler {
 	}
 
 	protected void validateTypeAnnotation() {
-		LWM2MObject[] lwm2mObjectAnnotation = getClass().getAnnotationsByType(LWM2MObject.class);
-		if (lwm2mObjectAnnotation == null || lwm2mObjectAnnotation.length == 0) {
+		LWM2MObject lwm2mObjectAnnotation = InventoryAgentHelper.findLWM2MObjectAnnotation(getClass());
+		if (lwm2mObjectAnnotation == null) {
 			throw new IllegalStateException("@LWM2MObject should be annotated to " + getClass().getSimpleName());
 		}
 	}
 
 	protected void validateArgument(Method m) {
 		Parameter[] parameters = m.getParameters();
-		if (parameters == null || parameters.length != 0) {
+		if (parameters == null || parameters.length != 1) {
 			throw new IllegalStateException("Method:" + m.getName() + " should have 0 or 1 argument.");
 		}
 		if (parameters[0].getType().equals(ResourceContext.class) == false) {
@@ -172,6 +174,8 @@ public class AnnotatedLwM2mInstanceEnabler implements LwM2mInstanceEnabler {
 	}
 
 	@Override
-	public void reset(int resourceid) {
+	public void reset(int resourceId) {
+		log.debug("invoke write method to do reset. resourceId:" + resourceId);
+		write(resourceId, null);
 	}
 }

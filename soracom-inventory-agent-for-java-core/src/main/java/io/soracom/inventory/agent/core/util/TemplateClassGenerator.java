@@ -47,10 +47,11 @@ public class TemplateClassGenerator {
 			final ResourceModel resourceModel = model.resources.get(resourceId);
 			final Operations operations = resourceModel.operations;
 			final String multipleResource = resourceModel.multiple ? ", multiple = true" : "";
+			final String type = resourceModel.type != null ? ", type = \"" + resourceModel.type.toString() + "\"" : "";
 			printComment(1, resourceModel.description);
 			if (operations.isReadable()) {
 				println(1, "@Resource(resourceId = " + resourceId.intValue() + ", operation = Operation.Read"
-						+ multipleResource + ")");
+						+ multipleResource + type + ")");
 				println(1, "public ReadResponse read" + toJavaName(resourceModel.name)
 						+ "(ResourceContext resourceContext){");
 				println(2, "return super.read(resourceContext);");

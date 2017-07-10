@@ -1,13 +1,6 @@
 package io.soracom.inventory.agent.core.lwm2m.base_object;
-import org.eclipse.leshan.core.response.ExecuteResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.response.WriteResponse;
-
-import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
-import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
-import io.soracom.inventory.agent.core.lwm2m.Operation;
-import io.soracom.inventory.agent.core.lwm2m.Resource;
-import io.soracom.inventory.agent.core.lwm2m.ResourceContext;
+import io.soracom.inventory.agent.core.lwm2m.*;
+import org.eclipse.leshan.core.response.*;
 
 /**
  * Access Control Object is used to check whether the LwM2M Server has access right for performing an operation.
@@ -18,7 +11,7 @@ public abstract class LwM2MAccessControlObject extends AnnotatedLwM2mInstanceEna
 	/**
 	 * The Object ID and The Object Instance ID are applied for.
 	 **/
-	@Resource(resourceId = 0, operation = Operation.Read)
+	@Resource(resourceId = 0, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readObjectID(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -30,7 +23,7 @@ public abstract class LwM2MAccessControlObject extends AnnotatedLwM2mInstanceEna
 	/**
 	 * See Table 20: LwM2M Identifiers.
 	 **/
-	@Resource(resourceId = 1, operation = Operation.Read)
+	@Resource(resourceId = 1, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readObjectInstanceID(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -51,7 +44,7 @@ public abstract class LwM2MAccessControlObject extends AnnotatedLwM2mInstanceEna
 	 * 5th LSB: C(Create)
 	 * Other bits are reserved for future use.
 	 **/
-	@Resource(resourceId = 2, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 2, operation = Operation.Read, multiple = true, type = "INTEGER")
 	public ReadResponse readACL(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -68,7 +61,7 @@ public abstract class LwM2MAccessControlObject extends AnnotatedLwM2mInstanceEna
 	 * Short Server ID of a certain LwM2M Server; only such an LwM2M Server can manage the Resources of this Object Instance. 
 	 * The specific value MAX_ID=65535 means this Access Control Object Instance is created and modified during a Bootstrap phase only.
 	 **/
-	@Resource(resourceId = 3, operation = Operation.Read)
+	@Resource(resourceId = 3, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readAccessControlOwner(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}

@@ -1,12 +1,6 @@
 package io.soracom.inventory.agent.core.lwm2m.base_object;
-import org.eclipse.leshan.core.response.ExecuteResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-
-import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
-import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
-import io.soracom.inventory.agent.core.lwm2m.Operation;
-import io.soracom.inventory.agent.core.lwm2m.Resource;
-import io.soracom.inventory.agent.core.lwm2m.ResourceContext;
+import io.soracom.inventory.agent.core.lwm2m.*;
+import org.eclipse.leshan.core.response.*;
 
 /**
  * If some Objects are not supported after software update, the LwM2M Client MUST delete all the Object Instances of the Objects that are not supported.
@@ -17,7 +11,7 @@ public abstract class LWM2MSoftwareComponentObject extends AnnotatedLwM2mInstanc
 	/**
 	 * Name or identifier of the software component
 	 **/
-	@Resource(resourceId = 0, operation = Operation.Read)
+	@Resource(resourceId = 0, operation = Operation.Read, type = "STRING")
 	public ReadResponse readComponentIdentity(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -29,7 +23,7 @@ public abstract class LWM2MSoftwareComponentObject extends AnnotatedLwM2mInstanc
 	/**
 	 * Software components is stored in this resource
 	 **/
-	@Resource(resourceId = 1, operation = Operation.Read)
+	@Resource(resourceId = 1, operation = Operation.Read, type = "OPAQUE")
 	public ReadResponse readComponentPack(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -41,7 +35,7 @@ public abstract class LWM2MSoftwareComponentObject extends AnnotatedLwM2mInstanc
 	/**
 	 * Version of the software component.
 	 **/
-	@Resource(resourceId = 2, operation = Operation.Read)
+	@Resource(resourceId = 2, operation = Operation.Read, type = "STRING")
 	public ReadResponse readComponentVersion(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -65,7 +59,7 @@ public abstract class LWM2MSoftwareComponentObject extends AnnotatedLwM2mInstanc
 	 * 1: ENABLED
 	 * Activation State is ENABLED only if the Software Component Activation State Machine is in the ACTIVE state.
 	 **/
-	@Resource(resourceId = 5, operation = Operation.Read)
+	@Resource(resourceId = 5, operation = Operation.Read, type = "BOOLEAN")
 	public ReadResponse readActivationState(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}

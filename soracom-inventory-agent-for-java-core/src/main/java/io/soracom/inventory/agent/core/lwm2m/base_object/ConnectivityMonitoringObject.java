@@ -1,12 +1,6 @@
 package io.soracom.inventory.agent.core.lwm2m.base_object;
-import org.eclipse.leshan.core.response.ExecuteResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-
-import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
-import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
-import io.soracom.inventory.agent.core.lwm2m.Operation;
-import io.soracom.inventory.agent.core.lwm2m.Resource;
-import io.soracom.inventory.agent.core.lwm2m.ResourceContext;
+import io.soracom.inventory.agent.core.lwm2m.*;
+import org.eclipse.leshan.core.response.*;
 
 /**
  * This LwM2M Object enables monitoring of parameters related to network connectivity.
@@ -38,7 +32,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	 * 43: PLC
 	 * 44~50: reserved for others type wireline networks.
 	 **/
-	@Resource(resourceId = 0, operation = Operation.Read)
+	@Resource(resourceId = 0, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readNetworkBearer(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -50,7 +44,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	/**
 	 * Indicates list of current available network bearer. Each Resource Instance has a value from the network bearer list.
 	 **/
-	@Resource(resourceId = 1, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 1, operation = Operation.Read, multiple = true, type = "INTEGER")
 	public ReadResponse readAvailableNetworkBearer(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -69,7 +63,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	 * standards. (e.g., for LTE Cellular Network
 	 * refer to ETSI TS 36.133 specification).
 	 **/
-	@Resource(resourceId = 2, operation = Operation.Read)
+	@Resource(resourceId = 2, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readRadioSignalStrength(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -82,7 +76,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	 * This contains received link quality  e.g., LQI for IEEE 802.15.4, (Range (0..255)), RxQual Downlink (for GSM range is 0…7).
 	 * Refer to [3GPP 44.018] for more details on Network Measurement Report encoding.
 	 **/
-	@Resource(resourceId = 3, operation = Operation.Read)
+	@Resource(resourceId = 3, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readLinkQuality(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -94,7 +88,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	/**
 	 * The IP addresses assigned to the connectivity interface. (e.g., IPv4, IPv6, etc.)
 	 **/
-	@Resource(resourceId = 4, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 4, operation = Operation.Read, multiple = true, type = "STRING")
 	public ReadResponse readIPAddresses(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -107,7 +101,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	 * The IP address of the next-hop IP router, on each of the interfaces specified in resource 4 (IP Addresses).
 	 * Note: This IP Address doesn’t indicate the Server IP address.
 	 **/
-	@Resource(resourceId = 5, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 5, operation = Operation.Read, multiple = true, type = "STRING")
 	public ReadResponse readRouterIPAddresses(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -119,7 +113,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	/**
 	 * The average utilization of the link to the next-hop IP router in %.
 	 **/
-	@Resource(resourceId = 6, operation = Operation.Read)
+	@Resource(resourceId = 6, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readLinkUtilization(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -131,7 +125,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	/**
 	 * Access Point Name in case Network Bearer Resource is a Cellular Network.
 	 **/
-	@Resource(resourceId = 7, operation = Operation.Read, multiple = true)
+	@Resource(resourceId = 7, operation = Operation.Read, multiple = true, type = "STRING")
 	public ReadResponse readAPN(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -148,7 +142,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	 * LTE Cell ID has a length of 28 bits.
 	 * Parameter definitions in [3GPP 25.331].
 	 **/
-	@Resource(resourceId = 8, operation = Operation.Read)
+	@Resource(resourceId = 8, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readCellID(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -161,7 +155,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	 * Serving Mobile Network Code. In case Network Bearer Resource has 0(cellular network). Range (0…999).
 	 * As specified in TS [3GPP 23.003].
 	 **/
-	@Resource(resourceId = 9, operation = Operation.Read)
+	@Resource(resourceId = 9, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readSMNC(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
@@ -174,7 +168,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	 * Serving Mobile Country Code. In case Network Bearer Resource has 0 (cellular network). Range (0…999).
 	 * As specified in TS [3GPP 23.003].
 	 **/
-	@Resource(resourceId = 10, operation = Operation.Read)
+	@Resource(resourceId = 10, operation = Operation.Read, type = "INTEGER")
 	public ReadResponse readSMCC(ResourceContext resourceContext){
 		return super.read(resourceContext);
 	}
