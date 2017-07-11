@@ -1,8 +1,6 @@
 package io.soracom.inventory.agent.example.object;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
@@ -41,21 +39,15 @@ public class ExampleSoftwareComponentObject extends LWM2MSoftwareComponentObject
 		if (runtimeCommand != null) {
 			runtimeCommand.killProcess();
 		}
-		try {
-			File scriptFile = new File("script/SoftwareComponent-Activate.sh");
-			String command = new String(Files.readAllBytes(scriptFile.toPath()));
-			String param = resourceContext.getExecuteParameter();
-			if (param != null) {
-				command = command + " " + param;
-			}
-			log.info("executeActivate command=" + command);
-			runtimeCommand = CommandExecutor.execute(command.split(" "));
-			activated = true;
-			return ExecuteResponse.success();
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-			return ExecuteResponse.internalServerError(e.getMessage());
+		File scriptFile = new File("script/SoftwareComponent-Activate.sh");
+		String param = resourceContext.getExecuteParameter();
+		if (param == null) {
+			param = "";
 		}
+		log.info("executeActivation command=" + scriptFile.getName() + " param=" + param);
+		runtimeCommand = CommandExecutor.execute(new String[] { scriptFile.getAbsolutePath(), param });
+		activated = true;
+		return ExecuteResponse.success();
 	}
 
 	@Override

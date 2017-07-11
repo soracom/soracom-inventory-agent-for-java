@@ -16,8 +16,6 @@
 package io.soracom.inventory.agent.example.object;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -100,19 +98,14 @@ public class ExampleDeviceObject extends DeviceObject {
 
 	@Override
 	public ExecuteResponse executeReboot(ResourceContext resourceContext) {
-		try {
-			File scriptFile = new File("script/DeviceObject-Reboot.sh");
-			String command = new String(Files.readAllBytes(scriptFile.toPath()));
-			String param = resourceContext.getExecuteParameter();
-			if (param != null) {
-				command = command + " " + param;
-			}
-			log.info("executeReboot command=" + command);
-			CommandExecutor.execute(command.split(" "));
-			return ExecuteResponse.success();
-		} catch (IOException e) {
-			log.error(e.getMessage(), e);
-			return ExecuteResponse.internalServerError(e.getMessage());
+
+		File scriptFile = new File("script/DeviceObject-Reboot.sh");
+		String param = resourceContext.getExecuteParameter();
+		if (param == null) {
+			param = "";
 		}
+		log.info("executeReboot command=" + scriptFile.getName() + " param=" + param);
+		CommandExecutor.execute(new String[] { scriptFile.getAbsolutePath(), param });
+		return ExecuteResponse.success();
 	}
 }

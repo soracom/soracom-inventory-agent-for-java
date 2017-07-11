@@ -42,7 +42,6 @@ project(':soracom-inventory-agent-for-java-example') {
     }
     dependencies {
        	compile "commons-cli:commons-cli:1.3.1"
-    	compile group: 'com.google.inject', name: 'guice', version: '4.0'
         compile project(':soracom-inventory-agent-for-java-core')
     }
     startScripts.enabled = false
