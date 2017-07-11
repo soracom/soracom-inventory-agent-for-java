@@ -55,13 +55,13 @@ public class ExampleDeviceObject extends DeviceObject {
 
 	@Override
 	public ReadResponse readMemoryFree(ResourceContext resourceContext) {
-		int freeMemory = (int) Runtime.getRuntime().freeMemory();
+		int freeMemory = (int) Runtime.getRuntime().freeMemory() / 1024;
 		return ReadResponse.success(resourceContext.getResourceId(), freeMemory);
 	}
 
 	@Override
 	public ReadResponse readMemoryTotal(ResourceContext resourceContext) {
-		int totalMemory = (int) Runtime.getRuntime().totalMemory();
+		int totalMemory = (int) Runtime.getRuntime().totalMemory() / 1024;
 		return ReadResponse.success(resourceContext.getResourceId(), totalMemory);
 	}
 
