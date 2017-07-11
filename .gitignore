@@ -6,4 +6,5 @@
 /Californium.properties
 /build/
 /.gradle/
+/.gradle
 /.DS_Store
