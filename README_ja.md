@@ -1,14 +1,19 @@
 ## SORACOM Inventory agent for Java
 SORACOM Inventory agent for Java は、SORACOM Inventory用のエージェント実装を提供します。
-このクライアントには、SIM経由のブートストラップ、取得したキーの保存、基本的なLWM2Mのオブジェクト定義が入っています
+このエージェントには、SIM経由のブートストラップ、取得したキーの保存、基本的なLWM2Mのオブジェクト定義が入っています
 
 ##セットアップ
 Eclipseの場合、以下のコマンドでEclipse用のプロジェクトファイルを生成できます。
 ```
 ./gradrew eclipse
 ```
+なお、IntelliJの場合は、"./gradrew idea"で同様にファイルを生成できます。
+
 実行後、Eclipseにプロジェクトをインポートします。
-IntelliJの場合は、"./gradrew idea"で同様にファイルを生成できます。
+soracom-inventory-agent-for-java-coreプロジェクトは、Inventoryエージェントを作成するのに便利なクラス群を提供する
+ためのライブラリプロジェクトです。
+soracom-inventory-agent-for-java-exampleプロジェクトは、Inventoryエージェントを作成するためのサンプルが入った
+プロジェクトです。基本的にこちらに変更をおこなって頂き、デバイスに合ったエージェントを作成します。
 
 ##ビルド
 ビルドは以下のコマンドで実行できます。 
@@ -22,20 +27,29 @@ IntelliJの場合は、"./gradrew idea"で同様にファイルを生成でき�
 ```
 ./gradrew distZip
 ```
+生成されたzip/tarを解凍したあとにできるbinディレクトリに、実行用のシェルが同梱されています。
+デバイス上で動作させる場合は、このシェルを利用してください。
 
 ##動作
 初回通信時は、SIM経由のブートストラップを実施します。一度bootstrapに成功すると、.soracom-inventory-credentials.datというファイルが作成されます。
 次回以降はこのファイルを使ってbootstrapなしでSORACOM Inventoryと通信できるため、wifiなどSIM以外経由でも通信を行うことが出来ます。
 再度ブートストラップしたい場合は、ファイルを消して再度実行するか、実行時に -b オプションをつけてください。
 
-##実装
-SORACOMInventoryAgentExampleが、mainクラスとなります。このクラスの中で、Inventoryとやりとりをする
-オブジェクト(io.soracom.inventory.client.lwm2m_objectパッケージ以下のオブジェクト）を
-登録しています。
-任意のオブジェクト実装を使いたい場合は、上記パッケージを参考にして、import org.eclipse.leshan.client.resource.BaseInstanceEnabler
-インターフェースを実装したクラスをつくり、mainクラスに登録します。
+##実装方法
+SORACOMInventoryAgentExampleが、mainクラスとなります。このクラスが実行のメインクラスとなります。
+環境に応じて、適宜変更してください。
 
-また外部シェルを実行する場合のサンプル実装が、SoftwareComponentObjectとSoftwareManagementObjectのActivate/Deactivateに
-入ってます。これらのExecuteをサーバ側から呼ぶと、scriptフォルダ内のシェルが実行されます。
-各Objectクラスとシェルスクリプトのひも付けは、object-config.propertiesに記載しています。
+実装する必要があるクラスは、io.soracom.inventory.agent.core.lwm2m.base_object パッケージに入っているオブジェクト群です。
+このオブジェクトは、LWM2M v1.0で規定された定義XMLから生成されたクラスとなっています。
+
+実際にサーバとやりとりをするためには、このクラスを継承したクラスを作成して、実装したいメソッドをオーバーライドして
+実装を行ってください。
+exampleのプロジェクトでは、"DeviceObject"と"LWM2MSoftwareComponent"を実装したサンプルが入っています。
+
+実装後、InventoryAgentInitializer#addInstancesForObjectメソッドを使用して、登録を行います。
+
+また外部シェルを実行する場合のサンプル実装が、DeviceObjectのRebootとSoftwareComponentObjectのActivate/Deactivateに
+実装されています。
+これらのExecuteをサーバ側から呼ぶと、scriptフォルダ内のシェルが実行されます。
+
 実行するシェルスクリプトを変えたり、種類を増やす場合はこれらを参考にしてください。
