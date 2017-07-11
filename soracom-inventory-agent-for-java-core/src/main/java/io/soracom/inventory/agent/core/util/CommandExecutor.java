@@ -106,13 +106,18 @@ public class CommandExecutor {
 		}
 	}
 
-	public static CommandProcess execute(List<String> commands) {
+	public static CommandProcess execute(String[] commands) {
 		try {
 			CommandProcess cmd = new CommandProcess();
-			cmd.execCmd(commands.toArray(new String[] {}));
+			cmd.execCmd(commands);
 			return cmd;
 		} catch (IOException ioe) {
 			throw new SORACOMInventoryAgentRuntimeException(ioe);
 		}
+
+	}
+
+	public static CommandProcess execute(List<String> commands) {
+		return execute(commands.toArray(new String[] {}));
 	}
 }

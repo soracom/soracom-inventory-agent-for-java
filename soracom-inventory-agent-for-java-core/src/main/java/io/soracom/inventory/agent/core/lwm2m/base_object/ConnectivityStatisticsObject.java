@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2017 SORACOM, Inc. and others.
- * 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
- * 
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- *    http://www.eclipse.org/org/documents/edl-v10.html.
- * 
- * Contributors:
- *     SORACOM,Inc. - initial API and implementation
- *******************************************************************************/
 package io.soracom.inventory.agent.core.lwm2m.base_object;
 import io.soracom.inventory.agent.core.lwm2m.*;
 import org.eclipse.leshan.core.response.*;
@@ -27,95 +12,71 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	 * Indicate the total number of SMS successfully transmitted during the collection period.
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readSMSTxCounter(ResourceContext resourceContext){
+	public ReadResponse readSMSTxCounter(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 0, operation = Operation.Execute)
-	public ExecuteResponse executeSMSTxCounter(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Indicate the total number of SMS successfully received during the collection period.
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readSMSRxCounter(ResourceContext resourceContext){
+	public ReadResponse readSMSRxCounter(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 1, operation = Operation.Execute)
-	public ExecuteResponse executeSMSRxCounter(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Indicate the total amount of data transmitted during the collection period.
 	 **/
 	@Resource(resourceId = 2, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readTxData(ResourceContext resourceContext){
+	public ReadResponse readTxData(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 2, operation = Operation.Execute)
-	public ExecuteResponse executeTxData(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Indicate the total amount of data received during the collection period.
 	 **/
 	@Resource(resourceId = 3, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readRxData(ResourceContext resourceContext){
+	public ReadResponse readRxData(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 3, operation = Operation.Execute)
-	public ExecuteResponse executeRxData(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * The maximum message size that is used during the collection period.
 	 **/
 	@Resource(resourceId = 4, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readMaxMessageSize(ResourceContext resourceContext){
+	public ReadResponse readMaxMessageSize(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 4, operation = Operation.Execute)
-	public ExecuteResponse executeMaxMessageSize(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * The average message size that is used during the collection period.
 	 **/
 	@Resource(resourceId = 5, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readAverageMessageSize(ResourceContext resourceContext){
+	public ReadResponse readAverageMessageSize(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 5, operation = Operation.Execute)
-	public ExecuteResponse executeAverageMessageSize(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Reset resources 0-5 to 0 and start to collect information, If resource 8 (Collection Period) value is 0, the client will keep collecting information until resource 7 (Stop) is executed, otherwise the client will stop collecting information after specified period ended.
 	 **/
+	@Resource(resourceId = 6, operation = Operation.Execute)
+	public abstract ExecuteResponse executeStart(ResourceContext resourceContext)	;
 
 	/**
 	 * Stop collecting information, but do not reset resources 0-5.
 	 **/
+	@Resource(resourceId = 7, operation = Operation.Execute)
+	public abstract ExecuteResponse executeStop(ResourceContext resourceContext)	;
 
 	/**
 	 * The default collection period in seconds. The value 0 indicates that the collection period is not set.
 	 **/
 	@Resource(resourceId = 8, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readCollectionPeriod(ResourceContext resourceContext){
+	public ReadResponse readCollectionPeriod(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 8, operation = Operation.Write)
-	public WriteResponse writeCollectionPeriod(ResourceContext resourceContext){
+	public WriteResponse writeCollectionPeriod(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 8, operation = Operation.Execute)
-	public ExecuteResponse executeCollectionPeriod(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 }

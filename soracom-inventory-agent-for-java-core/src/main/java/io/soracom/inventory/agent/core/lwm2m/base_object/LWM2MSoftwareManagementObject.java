@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2017 SORACOM, Inc. and others.
- * 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
- * 
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- *    http://www.eclipse.org/org/documents/edl-v10.html.
- * 
- * Contributors:
- *     SORACOM,Inc. - initial API and implementation
- *******************************************************************************/
 package io.soracom.inventory.agent.core.lwm2m.base_object;
 import io.soracom.inventory.agent.core.lwm2m.*;
 import org.eclipse.leshan.core.response.*;
@@ -27,25 +12,13 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * Name of the software package
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read, type = "STRING")
-	public ReadResponse readPkgName(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 0, operation = Operation.Execute)
-	public ExecuteResponse executePkgName(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readPkgName(ResourceContext resourceContext)	;
 
 	/**
 	 * Version of the software package
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read, type = "STRING")
-	public ReadResponse readPkgVersion(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 1, operation = Operation.Execute)
-	public ExecuteResponse executePkgVersion(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readPkgVersion(ResourceContext resourceContext)	;
 
 	/**
 	 * Software package
@@ -53,7 +26,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * Can be archive file, executable, manifest. This resource to be used when it is single block of delivery.
 	 **/
 	@Resource(resourceId = 2, operation = Operation.Write)
-	public WriteResponse writePackage(ResourceContext resourceContext){
+	public WriteResponse writePackage(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
 	}
 
@@ -62,24 +35,22 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * Can be direct link to a single software component or link to archive file, executable, or manifest, used by the Device to determine, then access to the software component(s). This resource to be used when it is single block of delivery.
 	 **/
 	@Resource(resourceId = 3, operation = Operation.Write)
-	public WriteResponse writePackageURI(ResourceContext resourceContext){
+	public WriteResponse writePackageURI(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
 	}
 
 	/**
 	 * Installs software from the package either stored in Package resource, or, downloaded from the Package URI. This Resource is only executable when the value of the State Resource is DELIVERED.
 	 **/
+	@Resource(resourceId = 4, operation = Operation.Execute)
+	public abstract ExecuteResponse executeInstall(ResourceContext resourceContext)	;
 
 	/**
 	 * Link to a Checkpoint“ object which allows to specify conditions/dependencies for a software update. E.g. power connected, sufficient memory, target system.
 	 **/
 	@Resource(resourceId = 5, operation = Operation.Read, type = "OBJLNK")
-	public ReadResponse readCheckpoint(ResourceContext resourceContext){
+	public ReadResponse readCheckpoint(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 5, operation = Operation.Execute)
-	public ExecuteResponse executeCheckpoint(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
@@ -87,6 +58,8 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * This executable resource may have one argument.
 	 * If used with no argument or argument is 0, the Package is removed i from the Device. If the argument is 1 (“ForUpdate”), the Client MUST prepare itself for receiving a Package used to upgrade the Software already in place. Update State is set back to INITIAL state.
 	 **/
+	@Resource(resourceId = 6, operation = Operation.Execute)
+	public abstract ExecuteResponse executeUninstall(ResourceContext resourceContext)	;
 
 	/**
 	 * Indicates current state with respect to this software update. This value is set by the LwM2M Client.
@@ -110,13 +83,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * (see 5.1.2.5)
 	 **/
 	@Resource(resourceId = 7, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readUpdateState(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 7, operation = Operation.Execute)
-	public ExecuteResponse executeUpdateState(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readUpdateState(ResourceContext resourceContext)	;
 
 	/**
 	 * If this value is true, the LwM2M Client MUST inform the registered LwM2M Servers of Objects and Object Instances parameter by sending an Update or Registration message after the software update operation at the next practical opportunity if supported Objects in the LwM2M Client have changed, in order for the LwM2M Servers to promptly manage newly installed Objects. 
@@ -124,16 +91,12 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * The default value is false.
 	 **/
 	@Resource(resourceId = 8, operation = Operation.Read, type = "BOOLEAN")
-	public ReadResponse readUpdateSupportedObjects(ResourceContext resourceContext){
+	public ReadResponse readUpdateSupportedObjects(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 8, operation = Operation.Write)
-	public WriteResponse writeUpdateSupportedObjects(ResourceContext resourceContext){
+	public WriteResponse writeUpdateSupportedObjects(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 8, operation = Operation.Execute)
-	public ExecuteResponse executeUpdateSupportedObjects(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
@@ -156,21 +119,19 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * This Resource MAY be reported by sending Observe operation.
 	 **/
 	@Resource(resourceId = 9, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readUpdateResult(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 9, operation = Operation.Execute)
-	public ExecuteResponse executeUpdateResult(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readUpdateResult(ResourceContext resourceContext)	;
 
 	/**
 	 * This action activates the software previously successfully installed (the Package Installation State Machine is currently in the INSTALLED state)
 	 **/
+	@Resource(resourceId = 10, operation = Operation.Execute)
+	public abstract ExecuteResponse executeActivate(ResourceContext resourceContext)	;
 
 	/**
 	 * This action deactivates softwareif the Package Installation State Machine is currently in the INSTALLED state.
 	 **/
+	@Resource(resourceId = 11, operation = Operation.Execute)
+	public abstract ExecuteResponse executeDeactivate(ResourceContext resourceContext)	;
 
 	/**
 	 * Indicates the current activation state of this software:
@@ -180,29 +141,19 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * Activation State is ENABLED only if the Software Activation State Machine is in the ACTIVE state
 	 **/
 	@Resource(resourceId = 12, operation = Operation.Read, type = "BOOLEAN")
-	public ReadResponse readActivationState(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 12, operation = Operation.Execute)
-	public ExecuteResponse executeActivationState(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readActivationState(ResourceContext resourceContext)	;
 
 	/**
 	 * Link to “Package Settings” object which allows to modify at any time software configuration settings. This is an application specific object. 
 	 * Note: OMA might provide a template for a Package Settings object in a future release of this specification.
 	 **/
 	@Resource(resourceId = 13, operation = Operation.Read, type = "OBJLNK")
-	public ReadResponse readPackageSettings(ResourceContext resourceContext){
+	public ReadResponse readPackageSettings(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 13, operation = Operation.Write)
-	public WriteResponse writePackageSettings(ResourceContext resourceContext){
+	public WriteResponse writePackageSettings(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 13, operation = Operation.Execute)
-	public ExecuteResponse executePackageSettings(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
@@ -210,7 +161,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * Key based mechanism can alternatively use for talking to the component server instead of user name and password combination.
 	 **/
 	@Resource(resourceId = 14, operation = Operation.Write)
-	public WriteResponse writeUserName(ResourceContext resourceContext){
+	public WriteResponse writeUserName(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
 	}
 
@@ -218,7 +169,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * Password for access to SW Update Package in pull mode.
 	 **/
 	@Resource(resourceId = 15, operation = Operation.Write)
-	public WriteResponse writePassword(ResourceContext resourceContext){
+	public WriteResponse writePassword(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
 	}
 }

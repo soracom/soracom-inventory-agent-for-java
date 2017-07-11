@@ -39,15 +39,19 @@ public class ObservableInventoryObjectEnabler extends ObjectEnabler {
 
 	private static final Logger log = LoggerFactory.getLogger(ObservableInventoryObjectEnabler.class);
 
-	protected Timer timer = new Timer();
-	{
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				log.debug("fire resource change for observation");
-				fireResourcesChange();
-			}
-		}, 10000, 60000);
+	private int observeStartDelayMillis = 10000;
+	private int observeInternalMillis = 60000;
+
+	protected Timer timer;
+
+	public void setObserveInternalMillis(int observeInternalMillis) {
+		this.observeInternalMillis = observeInternalMillis;
+		initObserve();
+	}
+
+	public void setObserveStartDelayMillis(int observeStartDelayMillis) {
+		this.observeStartDelayMillis = observeStartDelayMillis;
+		initObserve();
 	}
 
 	private Set<LwM2mPath> observePathSet = new ConcurrentSet<>();
@@ -57,9 +61,28 @@ public class ObservableInventoryObjectEnabler extends ObjectEnabler {
 		super(id, objectModel, instances, instanceFactory);
 	}
 
+	protected void initObserve() {
+		if (timer != null) {
+			timer.cancel();
+		}
+		timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				log.info("fire resource change for observation.");
+				fireResourcesChange();
+			}
+		}, observeStartDelayMillis, observeInternalMillis);
+		log.info("observe start. observeStartDelayMillis:" + observeStartDelayMillis + " observeInternalMillis:"
+				+ observeInternalMillis);
+	}
+
 	@Override
 	public synchronized ObserveResponse observe(ServerIdentity identity, ObserveRequest request) {
 		observePathSet.add(request.getPath());
+		if (timer == null) {
+			initObserve();
+		}
 		return super.observe(identity, request);
 	}
 

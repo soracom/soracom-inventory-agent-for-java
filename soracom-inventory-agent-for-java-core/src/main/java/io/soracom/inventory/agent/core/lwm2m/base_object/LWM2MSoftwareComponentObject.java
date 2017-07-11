@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2017 SORACOM, Inc. and others.
- * 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
- * 
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- *    http://www.eclipse.org/org/documents/edl-v10.html.
- * 
- * Contributors:
- *     SORACOM,Inc. - initial API and implementation
- *******************************************************************************/
 package io.soracom.inventory.agent.core.lwm2m.base_object;
 import io.soracom.inventory.agent.core.lwm2m.*;
 import org.eclipse.leshan.core.response.*;
@@ -27,45 +12,41 @@ public abstract class LWM2MSoftwareComponentObject extends AnnotatedLwM2mInstanc
 	 * Name or identifier of the software component
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read, type = "STRING")
-	public ReadResponse readComponentIdentity(ResourceContext resourceContext){
+	public ReadResponse readComponentIdentity(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 0, operation = Operation.Execute)
-	public ExecuteResponse executeComponentIdentity(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Software components is stored in this resource
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read, type = "OPAQUE")
-	public ReadResponse readComponentPack(ResourceContext resourceContext){
+	public ReadResponse readComponentPack(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 1, operation = Operation.Execute)
-	public ExecuteResponse executeComponentPack(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Version of the software component.
 	 **/
 	@Resource(resourceId = 2, operation = Operation.Read, type = "STRING")
-	public ReadResponse readComponentVersion(ResourceContext resourceContext){
+	public ReadResponse readComponentVersion(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 2, operation = Operation.Execute)
-	public ExecuteResponse executeComponentVersion(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * This action activates the software previously successfully installed (the SW Update Package Installation State Machine is currently in the INSTALLED state).
 	 **/
+	@Resource(resourceId = 3, operation = Operation.Execute)
+	public ExecuteResponse executeActivate(ResourceContext resourceContext)	{
+		return super.execute(resourceContext);
+	}
 
 	/**
 	 * This action deactivates software if the SW Update Package Installation State Machine is currently in the INSTALLED state.
 	 **/
+	@Resource(resourceId = 4, operation = Operation.Execute)
+	public ExecuteResponse executeDeactivate(ResourceContext resourceContext)	{
+		return super.execute(resourceContext);
+	}
 
 	/**
 	 * Indicates the current activation state of this software component:
@@ -75,11 +56,7 @@ public abstract class LWM2MSoftwareComponentObject extends AnnotatedLwM2mInstanc
 	 * Activation State is ENABLED only if the Software Component Activation State Machine is in the ACTIVE state.
 	 **/
 	@Resource(resourceId = 5, operation = Operation.Read, type = "BOOLEAN")
-	public ReadResponse readActivationState(ResourceContext resourceContext){
+	public ReadResponse readActivationState(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 5, operation = Operation.Execute)
-	public ExecuteResponse executeActivationState(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 }

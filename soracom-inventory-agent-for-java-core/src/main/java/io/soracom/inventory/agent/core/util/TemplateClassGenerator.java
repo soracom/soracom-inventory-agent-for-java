@@ -63,30 +63,47 @@ public class TemplateClassGenerator {
 			final Operations operations = resourceModel.operations;
 			final String multipleResource = resourceModel.multiple ? ", multiple = true" : "";
 			final String type = resourceModel.type != null ? ", type = \"" + resourceModel.type.toString() + "\"" : "";
+			final boolean mondatory = resourceModel.mandatory;
+			final String modifire = (mondatory == true) ? "public abstract" : "public";
 			printComment(1, resourceModel.description);
 			if (operations.isReadable()) {
 				println(1, "@Resource(resourceId = " + resourceId.intValue() + ", operation = Operation.Read"
 						+ multipleResource + type + ")");
-				println(1, "public ReadResponse read" + toJavaName(resourceModel.name)
-						+ "(ResourceContext resourceContext){");
-				println(2, "return super.read(resourceContext);");
-				println(1, "}");
+				print(1, modifire + " ReadResponse read" + toJavaName(resourceModel.name)
+						+ "(ResourceContext resourceContext)");
+				if (mondatory) {
+					println(1, ";");
+				} else {
+					println(1, "{");
+					println(2, "return super.read(resourceContext);");
+					println(1, "}");
+				}
 			}
 			if (operations.isWritable()) {
 				println(1, "@Resource(resourceId = " + resourceId.intValue() + ", operation = Operation.Write"
 						+ multipleResource + ")");
-				println(1, "public WriteResponse write" + toJavaName(resourceModel.name)
-						+ "(ResourceContext resourceContext){");
-				println(2, "return super.write(resourceContext);");
-				println(1, "}");
+				print(1, modifire + " WriteResponse write" + toJavaName(resourceModel.name)
+						+ "(ResourceContext resourceContext)");
+				if (mondatory) {
+					println(1, ";");
+				} else {
+					println(1, "{");
+					println(2, "return super.write(resourceContext);");
+					println(1, "}");
+				}
 			}
-			if (operations.isReadable()) {
+			if (operations.isExecutable()) {
 				println(1, "@Resource(resourceId = " + resourceId.intValue() + ", operation = Operation.Execute"
 						+ multipleResource + ")");
-				println(1, "public ExecuteResponse execute" + toJavaName(resourceModel.name)
-						+ "(ResourceContext resourceContext){");
-				println(2, "return super.execute(resourceContext);");
-				println(1, "}");
+				print(1, modifire + " ExecuteResponse execute" + toJavaName(resourceModel.name)
+						+ "(ResourceContext resourceContext)");
+				if (mondatory) {
+					println(1, ";");
+				} else {
+					println(1, "{");
+					println(2, "return super.execute(resourceContext);");
+					println(1, "}");
+				}
 			}
 		}
 		println(0, "}");

@@ -5,7 +5,6 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.eclipse.californium.core.CoapResource;
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,13 +15,14 @@ import io.soracom.inventory.agent.core.credential.PreSharedKey;
 import io.soracom.inventory.agent.core.initialize.InventoryAgentHelper;
 import io.soracom.inventory.agent.core.initialize.InventoryAgentInitializer;
 import io.soracom.inventory.agent.example.object.ExampleDeviceObject;
+import io.soracom.inventory.agent.example.object.ExampleSoftwareComponentObject;
 
 public class SORACOMInventoryAgentExample {
 
 	private static final Logger log = LoggerFactory.getLogger(SORACOMInventoryAgentExample.class);
 
 	public static void main(String[] args) {
-
+		// command line option
 		Options options = new Options();
 		options.addOption("h", "help", false, "Display help information.");
 		options.addOption("e", "endpoint", true,
@@ -89,14 +89,17 @@ public class SORACOMInventoryAgentExample {
 
 		final boolean forceBootstrap = cl.hasOption("b");
 
-		InventoryAgentInitializer initializer = new InventoryAgentInitializer();
+		// start inventory agent
+		final InventoryAgentInitializer initializer = new InventoryAgentInitializer();
 		initializer.setEndpoint(endpoint);
 		initializer.setServerUri(serverURI);
 		initializer.setForceBootstrap(forceBootstrap);
 		initializer.setPreSharedKey(psk);
 		initializer.setCredentialStore(new FileCredentialStore());
 
+		/** add supporting objects here **/
 		initializer.addInstancesForObject(new ExampleDeviceObject());
+		initializer.addInstancesForObject(new ExampleSoftwareComponentObject());
 
 		final LeshanClient client = initializer.buildClient();
 		client.start();

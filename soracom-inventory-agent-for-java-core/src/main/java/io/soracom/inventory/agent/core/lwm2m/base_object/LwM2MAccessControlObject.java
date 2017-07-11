@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2017 SORACOM, Inc. and others.
- * 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
- * 
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- *    http://www.eclipse.org/org/documents/edl-v10.html.
- * 
- * Contributors:
- *     SORACOM,Inc. - initial API and implementation
- *******************************************************************************/
 package io.soracom.inventory.agent.core.lwm2m.base_object;
 import io.soracom.inventory.agent.core.lwm2m.*;
 import org.eclipse.leshan.core.response.*;
@@ -27,25 +12,13 @@ public abstract class LwM2MAccessControlObject extends AnnotatedLwM2mInstanceEna
 	 * The Object ID and The Object Instance ID are applied for.
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readObjectID(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 0, operation = Operation.Execute)
-	public ExecuteResponse executeObjectID(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readObjectID(ResourceContext resourceContext)	;
 
 	/**
 	 * See Table 20: LwM2M Identifiers.
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readObjectInstanceID(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 1, operation = Operation.Execute)
-	public ExecuteResponse executeObjectInstanceID(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readObjectInstanceID(ResourceContext resourceContext)	;
 
 	/**
 	 * The Resource Instance ID MUST be the Short Server ID of a certain LwM2M Server for which associated access rights are contained in the Resource Instance value.
@@ -60,16 +33,12 @@ public abstract class LwM2MAccessControlObject extends AnnotatedLwM2mInstanceEna
 	 * Other bits are reserved for future use.
 	 **/
 	@Resource(resourceId = 2, operation = Operation.Read, multiple = true, type = "INTEGER")
-	public ReadResponse readACL(ResourceContext resourceContext){
+	public ReadResponse readACL(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 2, operation = Operation.Write, multiple = true)
-	public WriteResponse writeACL(ResourceContext resourceContext){
+	public WriteResponse writeACL(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 2, operation = Operation.Execute, multiple = true)
-	public ExecuteResponse executeACL(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
@@ -77,15 +46,7 @@ public abstract class LwM2MAccessControlObject extends AnnotatedLwM2mInstanceEna
 	 * The specific value MAX_ID=65535 means this Access Control Object Instance is created and modified during a Bootstrap phase only.
 	 **/
 	@Resource(resourceId = 3, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readAccessControlOwner(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
+	public abstract ReadResponse readAccessControlOwner(ResourceContext resourceContext)	;
 	@Resource(resourceId = 3, operation = Operation.Write)
-	public WriteResponse writeAccessControlOwner(ResourceContext resourceContext){
-		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 3, operation = Operation.Execute)
-	public ExecuteResponse executeAccessControlOwner(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract WriteResponse writeAccessControlOwner(ResourceContext resourceContext)	;
 }

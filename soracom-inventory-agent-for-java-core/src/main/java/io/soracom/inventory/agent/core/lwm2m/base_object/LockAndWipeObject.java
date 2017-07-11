@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2017 SORACOM, Inc. and others.
- * 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
- * 
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- *    http://www.eclipse.org/org/documents/edl-v10.html.
- * 
- * Contributors:
- *     SORACOM,Inc. - initial API and implementation
- *******************************************************************************/
 package io.soracom.inventory.agent.core.lwm2m.base_object;
 import io.soracom.inventory.agent.core.lwm2m.*;
 import org.eclipse.leshan.core.response.*;
@@ -32,49 +17,35 @@ public abstract class LockAndWipeObject extends AnnotatedLwM2mInstanceEnabler {
 	 * To render the device fully inoperable the device has been fully locked.
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readState(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
+	public abstract ReadResponse readState(ResourceContext resourceContext)	;
 	@Resource(resourceId = 0, operation = Operation.Write)
-	public WriteResponse writeState(ResourceContext resourceContext){
-		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 0, operation = Operation.Execute)
-	public ExecuteResponse executeState(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract WriteResponse writeState(ResourceContext resourceContext)	;
 
 	/**
 	 * To specify one or several targets for the lock operation. This allows partially locking the device by selecting specific components or interfaces to be locked.
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Write, multiple = true)
-	public WriteResponse writeLockTarget(ResourceContext resourceContext){
-		return super.write(resourceContext);
-	}
+	public abstract WriteResponse writeLockTarget(ResourceContext resourceContext)	;
 
 	/**
 	 * Indicates which data can be wiped from the device. This resource could be e.g. representing a directory.
 	 **/
 	@Resource(resourceId = 2, operation = Operation.Read, multiple = true, type = "STRING")
-	public ReadResponse readWipeItem(ResourceContext resourceContext){
+	public ReadResponse readWipeItem(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 2, operation = Operation.Execute, multiple = true)
-	public ExecuteResponse executeWipeItem(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * To permanently erase data from the device.
 	 **/
+	@Resource(resourceId = 3, operation = Operation.Execute)
+	public abstract ExecuteResponse executeWipe(ResourceContext resourceContext)	;
 
 	/**
 	 * To specify one or several targets for the wipe operation. This allows selecting specific data, or, memory areas for the wipe operation.
 	 **/
 	@Resource(resourceId = 4, operation = Operation.Write, multiple = true)
-	public WriteResponse writeWipeTarget(ResourceContext resourceContext){
-		return super.write(resourceContext);
-	}
+	public abstract WriteResponse writeWipeTarget(ResourceContext resourceContext)	;
 
 	/**
 	 * Contains the result of a lock and wipe operation
@@ -89,11 +60,5 @@ public abstract class LockAndWipeObject extends AnnotatedLwM2mInstanceEnabler {
 	 * This Resource MAY be reported by sending Observe operation.
 	 **/
 	@Resource(resourceId = 5, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readLockOrWipeOperationResult(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 5, operation = Operation.Execute)
-	public ExecuteResponse executeLockOrWipeOperationResult(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readLockOrWipeOperationResult(ResourceContext resourceContext)	;
 }

@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2017 SORACOM, Inc. and others.
- * 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
- * 
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- *    http://www.eclipse.org/org/documents/edl-v10.html.
- * 
- * Contributors:
- *     SORACOM,Inc. - initial API and implementation
- *******************************************************************************/
 package io.soracom.inventory.agent.core.lwm2m.base_object;
 import io.soracom.inventory.agent.core.lwm2m.*;
 import org.eclipse.leshan.core.response.*;
@@ -28,16 +13,12 @@ public abstract class CellularConnectivityObject extends AnnotatedLwM2mInstanceE
 	 * Applicable for 3GPP2 networks where SMSC is not available from a smart card, or for 3GPP/3GPP2 networks to provide the application with a customer specific SMSC.  The application decides how to use this parameter, e.g. precedence over UICC based SMSC address.
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read, type = "STRING")
-	public ReadResponse readSMSCAddress(ResourceContext resourceContext){
+	public ReadResponse readSMSCAddress(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 0, operation = Operation.Write)
-	public WriteResponse writeSMSCAddress(ResourceContext resourceContext){
+	public WriteResponse writeSMSCAddress(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 0, operation = Operation.Execute)
-	public ExecuteResponse executeSMSCAddress(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
@@ -47,44 +28,32 @@ public abstract class CellularConnectivityObject extends AnnotatedLwM2mInstanceE
 	 * As soon the server writes a value which is >0 the device SHALL disconnect. When the period has elapsed the device MAY reconnect.
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readDisableRadioPeriod(ResourceContext resourceContext){
+	public ReadResponse readDisableRadioPeriod(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 1, operation = Operation.Write)
-	public WriteResponse writeDisableRadioPeriod(ResourceContext resourceContext){
+	public WriteResponse writeDisableRadioPeriod(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 1, operation = Operation.Execute)
-	public ExecuteResponse executeDisableRadioPeriod(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Configurable in case the application needs to issue a code (e.g. via AT command) to activate the module. e.g. “*98”.
 	 **/
 	@Resource(resourceId = 2, operation = Operation.Read, type = "STRING")
-	public ReadResponse readModuleActivationCode(ResourceContext resourceContext){
+	public ReadResponse readModuleActivationCode(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 2, operation = Operation.Write)
-	public WriteResponse writeModuleActivationCode(ResourceContext resourceContext){
+	public WriteResponse writeModuleActivationCode(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 2, operation = Operation.Execute)
-	public ExecuteResponse executeModuleActivationCode(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Links to a vendor specific object.
 	 **/
 	@Resource(resourceId = 3, operation = Operation.Read, type = "OBJLNK")
-	public ReadResponse readVendorSpecificExtensions(ResourceContext resourceContext){
+	public ReadResponse readVendorSpecificExtensions(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 3, operation = Operation.Execute)
-	public ExecuteResponse executeVendorSpecificExtensions(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
@@ -93,16 +62,12 @@ public abstract class CellularConnectivityObject extends AnnotatedLwM2mInstanceE
 	 * Max interval between periodic TAU if there is no other transmission from the device. During most of this time the device is considered as unreachable and can therefore go into a deep sleep mode while keeping the PDN connection(s) active.
 	 **/
 	@Resource(resourceId = 4, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readPSMTimer(ResourceContext resourceContext){
+	public ReadResponse readPSMTimer(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 4, operation = Operation.Write)
-	public WriteResponse writePSMTimer(ResourceContext resourceContext){
+	public WriteResponse writePSMTimer(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 4, operation = Operation.Execute)
-	public ExecuteResponse executePSMTimer(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
@@ -110,103 +75,73 @@ public abstract class CellularConnectivityObject extends AnnotatedLwM2mInstanceE
 	 * The time the UE has to remain reachable after transitioning to idle state in case there is pending data from the NW to send out. At the end of T3324 UE can go into a deep sleep mode while keeping the PDN connection(s) active.
 	 **/
 	@Resource(resourceId = 5, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readActiveTimer(ResourceContext resourceContext){
+	public ReadResponse readActiveTimer(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 5, operation = Operation.Write)
-	public WriteResponse writeActiveTimer(ResourceContext resourceContext){
+	public WriteResponse writeActiveTimer(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 5, operation = Operation.Execute)
-	public ExecuteResponse executeActiveTimer(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Only for when using Signalling Radio Bearers (c.f. Data over NAS), it indicates the maximum the number of allowed uplink PDU transmissions per 6 minute interval aggregated across all PDN connections. See [3GPP-TS_23.401], octet 3 to 4 of the Serving PLMN rate control IE.
 	 **/
 	@Resource(resourceId = 6, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readServingPLMNRateControl(ResourceContext resourceContext){
+	public ReadResponse readServingPLMNRateControl(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 6, operation = Operation.Execute)
-	public ExecuteResponse executeServingPLMNRateControl(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Extended DRX parameters (Paging Time Window and eDRX value) for Iu mode which the UE can request from the network. This resource is encoded as octet 3 in [3GPP-TS_24.008, clause 10.5.5.32].
 	 **/
 	@Resource(resourceId = 7, operation = Operation.Read, type = "OPAQUE")
-	public ReadResponse readEDRXParametersForIuMode(ResourceContext resourceContext){
+	public ReadResponse readEDRXParametersForIuMode(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 7, operation = Operation.Write)
-	public WriteResponse writeEDRXParametersForIuMode(ResourceContext resourceContext){
+	public WriteResponse writeEDRXParametersForIuMode(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 7, operation = Operation.Execute)
-	public ExecuteResponse executeEDRXParametersForIuMode(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Extended DRX parameters (Paging Time Window and eDRX value) for WB-S1 mode which the UE can request from the network. This resource is encoded as octet 3 in [3GPP-TS_24.008, clause 10.5.5.32].
 	 **/
 	@Resource(resourceId = 8, operation = Operation.Read, type = "OPAQUE")
-	public ReadResponse readEDRXParametersForWB_S1Mode(ResourceContext resourceContext){
+	public ReadResponse readEDRXParametersForWB_S1Mode(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 8, operation = Operation.Write)
-	public WriteResponse writeEDRXParametersForWB_S1Mode(ResourceContext resourceContext){
+	public WriteResponse writeEDRXParametersForWB_S1Mode(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 8, operation = Operation.Execute)
-	public ExecuteResponse executeEDRXParametersForWB_S1Mode(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Extended DRX parameters (Paging Time Window and eDRX value) for NB-S1 mode which the UE can request from the network. This resource is encoded as octet 3 in [3GPP-TS_24.008, clause 10.5.5.32].
 	 **/
 	@Resource(resourceId = 9, operation = Operation.Read, type = "OPAQUE")
-	public ReadResponse readEDRXParametersForNB_S1Mode(ResourceContext resourceContext){
+	public ReadResponse readEDRXParametersForNB_S1Mode(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 9, operation = Operation.Write)
-	public WriteResponse writeEDRXParametersForNB_S1Mode(ResourceContext resourceContext){
+	public WriteResponse writeEDRXParametersForNB_S1Mode(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 9, operation = Operation.Execute)
-	public ExecuteResponse executeEDRXParametersForNB_S1Mode(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Extended DRX parameters (Paging Time Window and eDRX value) for A/Gb mode which the UE can request from the network. This resource is encoded as octet 3 in [3GPP-TS_24.008, clause 10.5.5.32].
 	 **/
 	@Resource(resourceId = 10, operation = Operation.Read, type = "OPAQUE")
-	public ReadResponse readEDRXParametersForA_GbMode(ResourceContext resourceContext){
+	public ReadResponse readEDRXParametersForA_GbMode(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 10, operation = Operation.Write)
-	public WriteResponse writeEDRXParametersForA_GbMode(ResourceContext resourceContext){
+	public WriteResponse writeEDRXParametersForA_GbMode(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 10, operation = Operation.Execute)
-	public ExecuteResponse executeEDRXParametersForA_GbMode(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Links to instances of the “APN connection profile” object representing every APN connection profile that has an activated connection to a PDN.
 	 **/
 	@Resource(resourceId = 11, operation = Operation.Read, multiple = true, type = "STRING")
-	public ReadResponse readActivatedProfileNames(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 11, operation = Operation.Execute, multiple = true)
-	public ExecuteResponse executeActivatedProfileNames(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readActivatedProfileNames(ResourceContext resourceContext)	;
 }

@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2017 SORACOM, Inc. and others.
- * 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
- * 
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- *    http://www.eclipse.org/org/documents/edl-v10.html.
- * 
- * Contributors:
- *     SORACOM,Inc. - initial API and implementation
- *******************************************************************************/
 package io.soracom.inventory.agent.core.lwm2m.base_object;
 import io.soracom.inventory.agent.core.lwm2m.*;
 import org.eclipse.leshan.core.response.*;
@@ -30,13 +15,7 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * executable Resource can work with.
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read, type = "STRING")
-	public ReadResponse readProperty(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 0, operation = Operation.Execute)
-	public ExecuteResponse executeProperty(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readProperty(ResourceContext resourceContext)	;
 
 	/**
 	 * Group name of Device Capabilities
@@ -52,25 +31,15 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * 9-15: reserved
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readGroup(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 1, operation = Operation.Execute)
-	public ExecuteResponse executeGroup(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readGroup(ResourceContext resourceContext)	;
 
 	/**
 	 * Device Capability Description
 	 * (manufacturer specified string)
 	 **/
 	@Resource(resourceId = 2, operation = Operation.Read, type = "STRING")
-	public ReadResponse readDescription(ResourceContext resourceContext){
+	public ReadResponse readDescription(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 2, operation = Operation.Execute)
-	public ExecuteResponse executeDescription(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
@@ -80,12 +49,8 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * When a Device Capability is not removable, and the “Attached” Resource is present, the “Attached” value but be set to “True”.
 	 **/
 	@Resource(resourceId = 3, operation = Operation.Read, type = "BOOLEAN")
-	public ReadResponse readAttached(ResourceContext resourceContext){
+	public ReadResponse readAttached(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 3, operation = Operation.Execute)
-	public ExecuteResponse executeAttached(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
@@ -93,37 +58,31 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * The ‘Attached’ and ‘Enabled’ resources are independent. A Device Capability MAY have ‘True’ as value for ‘Enabled’ Resource while having ‘False’ as value for the ‘Attached’ Resource. That means the Device Capability is still not available and can’t be used until it is attached to the Device, but will be useable once the Device Capability is attached.
 	 **/
 	@Resource(resourceId = 4, operation = Operation.Read, type = "BOOLEAN")
-	public ReadResponse readEnabled(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 4, operation = Operation.Execute)
-	public ExecuteResponse executeEnabled(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readEnabled(ResourceContext resourceContext)	;
 
 	/**
 	 * This command is used to enable the Device Capability to transfer the Device Capability from Disabled State to Enabled state.
 	 * In Enabled State, the Device Capability is allowed to work when it is attached to the Device.
 	 **/
+	@Resource(resourceId = 5, operation = Operation.Execute)
+	public abstract ExecuteResponse executeOpEnable(ResourceContext resourceContext)	;
 
 	/**
 	 * This command is used to disable the Device Capability to transfer the Device Capability from Enabled State to Disabled State.
 	 * In Disabled state the Device Capability is not allowed to work.
 	 **/
+	@Resource(resourceId = 6, operation = Operation.Execute, multiple = true)
+	public abstract ExecuteResponse executeOpDisable(ResourceContext resourceContext)	;
 
 	/**
 	 * When the Resources “Enabled” or “Attached” are under “Observation”, this resource specifies whether the LWM2M Server MUST be notified when the value of the Resource on “Observation” changed. If the Resource “NotifyEn” is not present or the value is ‘False’, the LWM2M Server will be not notified about this change. If the “NotifyEn” Resource is present and the value is ‘True’, the LWM2M Server will be notified.
 	 **/
 	@Resource(resourceId = 7, operation = Operation.Read, type = "BOOLEAN")
-	public ReadResponse readNotifyEn(ResourceContext resourceContext){
+	public ReadResponse readNotifyEn(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 7, operation = Operation.Write)
-	public WriteResponse writeNotifyEn(ResourceContext resourceContext){
+	public WriteResponse writeNotifyEn(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 7, operation = Operation.Execute)
-	public ExecuteResponse executeNotifyEn(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 }

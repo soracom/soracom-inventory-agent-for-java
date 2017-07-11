@@ -47,7 +47,7 @@ project(':soracom-inventory-agent-for-java-example') {
     }
     startScripts.enabled = false
     run.enabled = false
-    createScript(project, 'io.soracom.inventory.agent.example.SORACOMInventoryAgent', 'soracom-inventory-agent-example-start')
+    createScript(project, 'io.soracom.inventory.agent.example.SORACOMInventoryAgentExample', 'soracom-inventory-agent-example-start')
 }
 
 def createScript(project, mainClass, name) {

@@ -1,18 +1,3 @@
-/*******************************************************************************
- * Copyright (c) 2017 SORACOM, Inc. and others.
- * 
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * and Eclipse Distribution License v1.0 which accompany this distribution.
- * 
- * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
- *    http://www.eclipse.org/org/documents/edl-v10.html.
- * 
- * Contributors:
- *     SORACOM,Inc. - initial API and implementation
- *******************************************************************************/
 package io.soracom.inventory.agent.core.lwm2m.base_object;
 import io.soracom.inventory.agent.core.lwm2m.*;
 import org.eclipse.leshan.core.response.*;
@@ -27,58 +12,48 @@ public abstract class DeviceObject extends AnnotatedLwM2mInstanceEnabler {
 	 * Human readable manufacturer name
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read, type = "STRING")
-	public ReadResponse readManufacturer(ResourceContext resourceContext){
+	public ReadResponse readManufacturer(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 0, operation = Operation.Execute)
-	public ExecuteResponse executeManufacturer(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * A model identifier (manufacturer specified string)
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read, type = "STRING")
-	public ReadResponse readModelNumber(ResourceContext resourceContext){
+	public ReadResponse readModelNumber(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 1, operation = Operation.Execute)
-	public ExecuteResponse executeModelNumber(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Serial Number
 	 **/
 	@Resource(resourceId = 2, operation = Operation.Read, type = "STRING")
-	public ReadResponse readSerialNumber(ResourceContext resourceContext){
+	public ReadResponse readSerialNumber(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 2, operation = Operation.Execute)
-	public ExecuteResponse executeSerialNumber(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Current firmware version of the Device.The Firmware Management function could rely on this resource.
 	 **/
 	@Resource(resourceId = 3, operation = Operation.Read, type = "STRING")
-	public ReadResponse readFirmwareVersion(ResourceContext resourceContext){
+	public ReadResponse readFirmwareVersion(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 3, operation = Operation.Execute)
-	public ExecuteResponse executeFirmwareVersion(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Reboot the LwM2M Device to restore the Device from unexpected firmware failure.
 	 **/
+	@Resource(resourceId = 4, operation = Operation.Execute)
+	public abstract ExecuteResponse executeReboot(ResourceContext resourceContext)	;
 
 	/**
 	 * Perform factory reset of the LwM2M Device to make the LwM2M Device to go through initial deployment sequence where provisioning and bootstrap sequence is performed. This requires client ensuring post factory reset to have minimal information to allow it to carry out one of the bootstrap methods specified in section 5.2.3. 
 	 * When this Resource is executed, “De-register” operation MAY be sent to the LwM2M Server(s) before factory reset of the LwM2M Device.
 	 **/
+	@Resource(resourceId = 5, operation = Operation.Execute)
+	public ExecuteResponse executeFactoryReset(ResourceContext resourceContext)	{
+		return super.execute(resourceContext);
+	}
 
 	/**
 	 * 0 – DC power
@@ -91,60 +66,40 @@ public abstract class DeviceObject extends AnnotatedLwM2mInstanceEnabler {
 	 * The same Resource Instance ID MUST be used to associate a given Power Source (Resource ID:6) with its Present Voltage (Resource ID:7) and its Present Current (Resource ID:8)
 	 **/
 	@Resource(resourceId = 6, operation = Operation.Read, multiple = true, type = "INTEGER")
-	public ReadResponse readAvailablePowerSources(ResourceContext resourceContext){
+	public ReadResponse readAvailablePowerSources(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 6, operation = Operation.Execute, multiple = true)
-	public ExecuteResponse executeAvailablePowerSources(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Present voltage for each Available Power Sources Resource Instance.
 	 **/
 	@Resource(resourceId = 7, operation = Operation.Read, multiple = true, type = "INTEGER")
-	public ReadResponse readPowerSourceVoltage(ResourceContext resourceContext){
+	public ReadResponse readPowerSourceVoltage(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 7, operation = Operation.Execute, multiple = true)
-	public ExecuteResponse executePowerSourceVoltage(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Present current for each Available Power Source.
 	 **/
 	@Resource(resourceId = 8, operation = Operation.Read, multiple = true, type = "INTEGER")
-	public ReadResponse readPowerSourceCurrent(ResourceContext resourceContext){
+	public ReadResponse readPowerSourceCurrent(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 8, operation = Operation.Execute, multiple = true)
-	public ExecuteResponse executePowerSourceCurrent(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Contains the current battery level as a percentage (with a range from 0 to 100). This value is only valid for the Device internal Battery if present (one Available Power Sources Resource Instance is 1).
 	 **/
 	@Resource(resourceId = 9, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readBatteryLevel(ResourceContext resourceContext){
+	public ReadResponse readBatteryLevel(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 9, operation = Operation.Execute)
-	public ExecuteResponse executeBatteryLevel(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Estimated current available amount of storage space which can store data and software in the LwM2M Device (expressed in kilobytes).
 	 **/
 	@Resource(resourceId = 10, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readMemoryFree(ResourceContext resourceContext){
+	public ReadResponse readMemoryFree(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 10, operation = Operation.Execute)
-	public ExecuteResponse executeMemoryFree(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
@@ -162,17 +117,15 @@ public abstract class DeviceObject extends AnnotatedLwM2mInstanceEnabler {
 	 * This error code Resource MAY be observed by the LwM2M Server. How to deal with LwM2M Client’s error report depends on the policy of the LwM2M Server.
 	 **/
 	@Resource(resourceId = 11, operation = Operation.Read, multiple = true, type = "INTEGER")
-	public ReadResponse readErrorCode(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 11, operation = Operation.Execute, multiple = true)
-	public ExecuteResponse executeErrorCode(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readErrorCode(ResourceContext resourceContext)	;
 
 	/**
 	 * Delete all error code Resource Instances and create only one zero-value error code that implies no error.
 	 **/
+	@Resource(resourceId = 12, operation = Operation.Execute)
+	public ExecuteResponse executeResetErrorCode(ResourceContext resourceContext)	{
+		return super.execute(resourceContext);
+	}
 
 	/**
 	 * Current UNIX time of the LwM2M Client.
@@ -180,84 +133,58 @@ public abstract class DeviceObject extends AnnotatedLwM2mInstanceEnabler {
 	 * The LwM2M Server is able to write this Resource to make the LwM2M Client synchronized with the LwM2M Server.
 	 **/
 	@Resource(resourceId = 13, operation = Operation.Read, type = "TIME")
-	public ReadResponse readCurrentTime(ResourceContext resourceContext){
+	public ReadResponse readCurrentTime(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 13, operation = Operation.Write)
-	public WriteResponse writeCurrentTime(ResourceContext resourceContext){
+	public WriteResponse writeCurrentTime(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 13, operation = Operation.Execute)
-	public ExecuteResponse executeCurrentTime(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Indicates the UTC offset currently in effect for this LwM2M Device. UTC+X [ISO 8601].
 	 **/
 	@Resource(resourceId = 14, operation = Operation.Read, type = "STRING")
-	public ReadResponse readUTCOffset(ResourceContext resourceContext){
+	public ReadResponse readUTCOffset(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 14, operation = Operation.Write)
-	public WriteResponse writeUTCOffset(ResourceContext resourceContext){
+	public WriteResponse writeUTCOffset(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 14, operation = Operation.Execute)
-	public ExecuteResponse executeUTCOffset(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Indicates in which time zone the LwM2M Device is located, in IANA Timezone (TZ) database format.
 	 **/
 	@Resource(resourceId = 15, operation = Operation.Read, type = "STRING")
-	public ReadResponse readTimezone(ResourceContext resourceContext){
+	public ReadResponse readTimezone(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
 	}
 	@Resource(resourceId = 15, operation = Operation.Write)
-	public WriteResponse writeTimezone(ResourceContext resourceContext){
+	public WriteResponse writeTimezone(ResourceContext resourceContext)	{
 		return super.write(resourceContext);
-	}
-	@Resource(resourceId = 15, operation = Operation.Execute)
-	public ExecuteResponse executeTimezone(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Indicates which bindings and modes are supported in the LwM2M Client. The possible values of Resource are combination of "U" or "UQ" and "S" or "SQ".
 	 **/
 	@Resource(resourceId = 16, operation = Operation.Read, type = "STRING")
-	public ReadResponse readSupportedBindingAndModes(ResourceContext resourceContext){
-		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 16, operation = Operation.Execute)
-	public ExecuteResponse executeSupportedBindingAndModes(ResourceContext resourceContext){
-		return super.execute(resourceContext);
-	}
+	public abstract ReadResponse readSupportedBindingAndModes(ResourceContext resourceContext)	;
 
 	/**
 	 * Type of the device (manufacturer specified string: e.g., smart meters / dev Class…)
 	 **/
 	@Resource(resourceId = 17, operation = Operation.Read, type = "STRING")
-	public ReadResponse readDeviceType(ResourceContext resourceContext){
+	public ReadResponse readDeviceType(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 17, operation = Operation.Execute)
-	public ExecuteResponse executeDeviceType(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Current hardware version of the device
 	 **/
 	@Resource(resourceId = 18, operation = Operation.Read, type = "STRING")
-	public ReadResponse readHardwareVersion(ResourceContext resourceContext){
+	public ReadResponse readHardwareVersion(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 18, operation = Operation.Execute)
-	public ExecuteResponse executeHardwareVersion(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
@@ -265,12 +192,8 @@ public abstract class DeviceObject extends AnnotatedLwM2mInstanceEnabler {
 	 * Both pieces of Software are together managed by LwM2M Firmware Update Object (Object ID 5)
 	 **/
 	@Resource(resourceId = 19, operation = Operation.Read, type = "STRING")
-	public ReadResponse readSoftwareVersion(ResourceContext resourceContext){
+	public ReadResponse readSoftwareVersion(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 19, operation = Operation.Execute)
-	public ExecuteResponse executeSoftwareVersion(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
@@ -286,35 +209,23 @@ public abstract class DeviceObject extends AnnotatedLwM2mInstanceEnabler {
 	 * 6	Unknown	The battery information is not available.
 	 **/
 	@Resource(resourceId = 20, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readBatteryStatus(ResourceContext resourceContext){
+	public ReadResponse readBatteryStatus(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 20, operation = Operation.Execute)
-	public ExecuteResponse executeBatteryStatus(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Total amount of storage space which can store data and software in the LwM2M Device (expressed in kilobytes).
 	 **/
 	@Resource(resourceId = 21, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readMemoryTotal(ResourceContext resourceContext){
+	public ReadResponse readMemoryTotal(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 21, operation = Operation.Execute)
-	public ExecuteResponse executeMemoryTotal(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 
 	/**
 	 * Reference to external “Device” object instance containing information. For example, such an external device can be a Host Device, which is a device into which the Device containing the LwM2M client is embedded. This Resource may be used to retrieve information about the Host Device.
 	 **/
 	@Resource(resourceId = 22, operation = Operation.Read, multiple = true, type = "OBJLNK")
-	public ReadResponse readExtDevInfo(ResourceContext resourceContext){
+	public ReadResponse readExtDevInfo(ResourceContext resourceContext)	{
 		return super.read(resourceContext);
-	}
-	@Resource(resourceId = 22, operation = Operation.Execute, multiple = true)
-	public ExecuteResponse executeExtDevInfo(ResourceContext resourceContext){
-		return super.execute(resourceContext);
 	}
 }
