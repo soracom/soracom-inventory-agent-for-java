@@ -1,0 +1,9 @@
+/.classpath
+/.project
+/.settings/
+/bin/
+/.soracom-inventory-credentials.dat
+/Californium.properties
+/build/
+/.gradle/
+/.DS_Store
