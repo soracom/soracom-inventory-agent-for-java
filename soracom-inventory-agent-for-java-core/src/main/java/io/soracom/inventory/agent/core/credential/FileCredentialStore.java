@@ -19,8 +19,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +34,9 @@ public class FileCredentialStore implements CredentialStore {
 	private static final Logger log = LoggerFactory.getLogger(FileCredentialStore.class);
 
 	private static final String DEFAULT_CREDENTIALS_PATH = ".soracom-inventory-credentials.dat";
-	
+
 	private String credentialsPath = DEFAULT_CREDENTIALS_PATH;
-	
+
 	public void setCredentialsPath(String credentialsPath) {
 		this.credentialsPath = credentialsPath;
 	}
@@ -49,11 +51,15 @@ public class FileCredentialStore implements CredentialStore {
 
 	public void saveCredentials(Credentials c) {
 		File datFile = new File(credentialsPath);
-		try (ObjectOutputStream objOut = new ObjectOutputStream(new FileOutputStream(datFile))) {
+		ObjectOutputStream objOut = null;
+		try {
+			objOut = new ObjectOutputStream(new FileOutputStream(datFile));
 			objOut.writeObject(c);
 			log.info("save credential to " + credentialsPath);
 		} catch (IOException ioe) {
 			throw new SORACOMInventoryAgentRuntimeException(ioe);
+		} finally {
+			close(objOut);
 		}
 	}
 
@@ -63,12 +69,30 @@ public class FileCredentialStore implements CredentialStore {
 		if (datFile.exists() == false) {
 			return null;
 		}
-		try (ObjectInputStream objIn = new ObjectInputStream(new FileInputStream(datFile))) {
+		ObjectInputStream objIn = null;
+		try {
+			objIn = new ObjectInputStream(new FileInputStream(datFile));
 			Credentials credential = (Credentials) objIn.readObject();
 			log.info("load credential from " + credentialsPath);
 			return credential;
 		} catch (Exception e) {
 			throw new SORACOMInventoryAgentRuntimeException(e);
+		} finally {
+			close(objIn);
+		}
+	}
+
+	protected void close(OutputStream os) {
+		try {
+			os.close();
+		} catch (Exception e) {
+		}
+	}
+
+	protected void close(InputStream is) {
+		try {
+			is.close();
+		} catch (Exception e) {
 		}
 	}
 }
