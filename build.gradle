@@ -65,9 +65,6 @@ def createScript(project, mainClass, name) {
         into("bin/script") {
             from("script")
         }
-        into("bin") {
-            from("object-config.properties")
-        }    
     } 
 }
 
