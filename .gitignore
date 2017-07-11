@@ -8,3 +8,5 @@
 /.gradle/
 /.gradle
 /.DS_Store
+.gradle
+.gradle/
