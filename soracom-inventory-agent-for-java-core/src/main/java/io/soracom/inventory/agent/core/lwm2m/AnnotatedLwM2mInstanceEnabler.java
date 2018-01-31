@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
+import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.resource.ResourceChangedListener;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.response.ExecuteResponse;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import io.soracom.inventory.agent.core.initialize.InventoryAgentHelper;
 
-public class AnnotatedLwM2mInstanceEnabler implements LwM2mInstanceEnabler {
+public class AnnotatedLwM2mInstanceEnabler extends BaseInstanceEnabler {
 
 	private static final Logger log = LoggerFactory.getLogger(AnnotatedLwM2mInstanceEnabler.class);
 
@@ -186,11 +186,5 @@ public class AnnotatedLwM2mInstanceEnabler implements LwM2mInstanceEnabler {
 			log.error(e.getMessage(), e);
 			return ExecuteResponse.internalServerError(e.getMessage());
 		}
-	}
-
-	@Override
-	public void reset(int resourceId) {
-		log.debug("invoke write method to do reset. resourceId:" + resourceId);
-		write(resourceId, null);
 	}
 }

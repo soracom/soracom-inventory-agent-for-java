@@ -15,6 +15,7 @@
  *******************************************************************************/
 package io.soracom.inventory.agent.core.lwm2m;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -32,8 +33,6 @@ import org.eclipse.leshan.core.request.ObserveRequest;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.netty.util.internal.ConcurrentSet;
 
 public class ObservableInventoryObjectEnabler extends ObjectEnabler {
 
@@ -54,7 +53,7 @@ public class ObservableInventoryObjectEnabler extends ObjectEnabler {
 		initObserve();
 	}
 
-	private Set<LwM2mPath> observePathSet = new ConcurrentSet<>();
+	private Set<LwM2mPath> observePathSet = Collections.synchronizedSet(new HashSet<LwM2mPath>());
 
 	public ObservableInventoryObjectEnabler(int id, ObjectModel objectModel,
 			Map<Integer, LwM2mInstanceEnabler> instances, LwM2mInstanceEnablerFactory instanceFactory) {
