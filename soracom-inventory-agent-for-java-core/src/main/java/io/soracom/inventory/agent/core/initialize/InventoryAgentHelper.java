@@ -24,15 +24,12 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.util.Enumeration;
-import java.util.List;
 import java.util.UUID;
 
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.object.Security;
 import org.eclipse.leshan.client.object.Server;
 import org.eclipse.leshan.core.model.LwM2mModel;
-import org.eclipse.leshan.core.model.ObjectLoader;
-import org.eclipse.leshan.core.model.ObjectModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,12 +41,7 @@ public class InventoryAgentHelper {
 
 	private static final Logger log = LoggerFactory.getLogger(InventoryAgentHelper.class);
 
-	public static String[] DEFAULT_LWM2M_MODELS = new String[] { "LWM2M_Access_Control-v1_0.xml",
-			"LWM2M_Connectivity_Monitoring-v1_0.xml", "LWM2M_Connectivity_Statistics-v1_0.xml", "LWM2M_Device-v1_0.xml",
-			"LWM2M_Firmware_Update-v1_0.xml", "LWM2M_Location-v1_0.xml", "LWM2M_APN_connection_profile-v1_0.xml",
-			"LWM2M_Bearer_selection-v1_0.xml", "LWM2M_Cellular_connectivity-v1_0.xml", "LWM2M_DevCapMgmt-v1_0.xml",
-			"LWM2M_Lock_and_Wipe-V1_0.xml", "LWM2M_Portfolio-v1_0.xml", "LWM2M_Software_Component-v1_0.xml",
-			"LWM2M_Software_Management-v1_0.xml", "LWM2M_WLAN_connectivity4-v1_0.xml" };
+	public static String[] DEFAULT_LWM2M_MODELS = LwM2mModelBuilder.PRESET_LWM2M_MODELS;
 
 	public static Security getSecurityInfo(Credentials c) {
 		if (c.getPskId() != null && c.getPskKey() != null) {
@@ -91,10 +83,7 @@ public class InventoryAgentHelper {
 	}
 
 	public static LwM2mModel createDefaultLwM2mModel() {
-		List<ObjectModel> objectModelList = ObjectLoader.loadDefault();
-		objectModelList.addAll(ObjectLoader.loadDdfResources("/models/", DEFAULT_LWM2M_MODELS));
-		LwM2mModel model = new LwM2mModel(objectModelList);
-		return model;
+		return new LwM2mModelBuilder().addPresetObjectModels().build();
 	}
 
 	private static String detectHardwareAddress() {

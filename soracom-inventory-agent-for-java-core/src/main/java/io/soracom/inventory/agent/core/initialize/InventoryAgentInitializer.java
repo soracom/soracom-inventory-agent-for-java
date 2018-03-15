@@ -86,9 +86,10 @@ public class InventoryAgentInitializer {
 	public void setLwM2mModel(LwM2mModel lwM2mModel) {
 		this.lwM2mModel = lwM2mModel;
 	}
-	
+
 	public void addInstancesForObject(AnnotatedLwM2mInstanceEnabler objectInstance) {
-		final LWM2MObject lwm2mObjectAnnotation = InventoryAgentHelper.findLWM2MObjectAnnotation(objectInstance.getClass());
+		final LWM2MObject lwm2mObjectAnnotation = InventoryAgentHelper
+				.findLWM2MObjectAnnotation(objectInstance.getClass());
 		final int objectId = lwm2mObjectAnnotation.objectId();
 		List<AnnotatedLwM2mInstanceEnabler> instanceList = objectInstanceMap.get(objectId);
 		if (instanceList == null) {
@@ -105,13 +106,15 @@ public class InventoryAgentInitializer {
 	public LeshanClient buildClient() {
 		final LwM2mModel lwM2mModel = initLwM2mModel();
 		final ObjectsInitializer initializer = new ObjectsInitializer(lwM2mModel) {
-			protected org.eclipse.leshan.client.resource.ObjectEnabler createNodeEnabler(org.eclipse.leshan.core.model.ObjectModel objectModel) {
-		        Map<Integer, LwM2mInstanceEnabler> instances = new HashMap<>();
-		        LwM2mInstanceEnabler[] newInstances = createInstances(objectModel);
-		        for (int i = 0; i < newInstances.length; i++) {
-		            instances.put(i, newInstances[i]);
-		        }
-				return new ObservableInventoryObjectEnabler(objectModel.id, objectModel, instances, getFactoryFor(objectModel));
+			protected org.eclipse.leshan.client.resource.ObjectEnabler createNodeEnabler(
+					org.eclipse.leshan.core.model.ObjectModel objectModel) {
+				Map<Integer, LwM2mInstanceEnabler> instances = new HashMap<>();
+				LwM2mInstanceEnabler[] newInstances = createInstances(objectModel);
+				for (int i = 0; i < newInstances.length; i++) {
+					instances.put(i, newInstances[i]);
+				}
+				return new ObservableInventoryObjectEnabler(objectModel.id, objectModel, instances,
+						getFactoryFor(objectModel));
 			};
 		};
 		initSecurity(initializer);
