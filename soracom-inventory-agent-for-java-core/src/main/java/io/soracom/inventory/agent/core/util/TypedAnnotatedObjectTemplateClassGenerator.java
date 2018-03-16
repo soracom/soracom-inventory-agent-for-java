@@ -19,21 +19,29 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.Authenticator.RequestorType;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Operations;
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+import org.eclipse.leshan.core.node.ObjectLink;
 
-public class TemplateClassGenerator {
+import io.soracom.inventory.agent.core.lwm2m.LwM2mInstanceResponseException;
+
+public class TypedAnnotatedObjectTemplateClassGenerator {
 
 	protected String indentChar = "\t";
 
 	protected PrintStream pw;
 
-	public TemplateClassGenerator() {
+	public TypedAnnotatedObjectTemplateClassGenerator() {
 		pw = System.out;
 	}
 
@@ -44,18 +52,27 @@ public class TemplateClassGenerator {
 	public void setIndentChar(String indentChar) {
 		this.indentChar = indentChar;
 	}
+	
+	private Map<ResourceModel.Type,String> resourceModel2TypeMap = new HashMap<>();
+	{
+		resourceModel2TypeMap.put(ResourceModel.Type.BOOLEAN,Boolean.class.getSimpleName());
+		resourceModel2TypeMap.put(ResourceModel.Type.FLOAT,Float.class.getSimpleName());
+		resourceModel2TypeMap.put(ResourceModel.Type.INTEGER,Integer.class.getSimpleName());
+		resourceModel2TypeMap.put(ResourceModel.Type.OBJLNK,ObjectLink.class.getSimpleName());
+		resourceModel2TypeMap.put(ResourceModel.Type.OPAQUE,"byte[]");
+		resourceModel2TypeMap.put(ResourceModel.Type.STRING,String.class.getSimpleName());
+		resourceModel2TypeMap.put(ResourceModel.Type.TIME,Date.class.getName());
+	}
 
 	public void generateTemplateClassFromObjectModel(String javaPackage, ObjectModel model) {
 		println("package " + javaPackage + ";");
 		println("import io.soracom.inventory.agent.core.lwm2m.*;");
-		println("import org.eclipse.leshan.core.response.*;");
+		println("import java.util.Date;");
+		println("import " + ObjectLink.class.getName()+";");
 		println("");
 		printComment(0, model.description);
 		final String className = toJavaName(model.name + "Object");
 		final String multipleObject = model.multiple ? ", multiple = true" : "";
-		
-		println(0, "//typed_object package is recommended.");
-		println(0, "@Deprecated");
 		println(0, "@LWM2MObject(objectId = " + model.id + ", name = \"" + model.name + "\"" + multipleObject + ")");
 		println(0, "public abstract class " + className + " extends AnnotatedLwM2mInstanceEnabler {");
 		List<Integer> keyList = new ArrayList<Integer>(model.resources.keySet());
@@ -65,46 +82,48 @@ public class TemplateClassGenerator {
 			final ResourceModel resourceModel = model.resources.get(resourceId);
 			final Operations operations = resourceModel.operations;
 			final String multipleResource = resourceModel.multiple ? ", multiple = true" : "";
-			final String type = resourceModel.type != null ? ", type = \"" + resourceModel.type.toString() + "\"" : "";
 			final boolean mondatory = resourceModel.mandatory;
 			final String modifire = (mondatory == true) ? "public abstract" : "public";
-			printComment(1, resourceModel.description);
+			final Type type = resourceModel.type;
+			printComment(1, resourceModel.description);			
 			if (operations.isReadable()) {
+				final String responseValue = resourceModel2TypeMap.get(type);
 				println(1, "@Resource(resourceId = " + resourceId.intValue() + ", operation = Operation.Read"
-						+ multipleResource + type + ")");
-				print(1, modifire + " ReadResponse read" + toJavaName(resourceModel.name)
-						+ "(ResourceContext resourceContext)");
+						+ multipleResource + ")");
+				print(1, modifire + " " + responseValue+ " read" + toJavaName(resourceModel.name)
+						+ "()");
 				if (mondatory) {
 					println(1, ";");
 				} else {
 					println(1, "{");
-					println(2, "return super.read(resourceContext);");
+					println(2, "throw LwM2mInstanceResponseException.notFound();");
 					println(1, "}");
 				}
 			}
 			if (operations.isWritable()) {
+				final String paramValue = resourceModel2TypeMap.get(type);
 				println(1, "@Resource(resourceId = " + resourceId.intValue() + ", operation = Operation.Write"
 						+ multipleResource + ")");
-				print(1, modifire + " WriteResponse write" + toJavaName(resourceModel.name)
-						+ "(ResourceContext resourceContext)");
+				print(1, modifire + " void write" + toJavaName(resourceModel.name)
+						+ "(" + paramValue +" writeValue)");
 				if (mondatory) {
 					println(1, ";");
 				} else {
 					println(1, "{");
-					println(2, "return super.write(resourceContext);");
+					println(2, "throw LwM2mInstanceResponseException.notFound();");
 					println(1, "}");
 				}
 			}
 			if (operations.isExecutable()) {
 				println(1, "@Resource(resourceId = " + resourceId.intValue() + ", operation = Operation.Execute"
 						+ multipleResource + ")");
-				print(1, modifire + " ExecuteResponse execute" + toJavaName(resourceModel.name)
-						+ "(ResourceContext resourceContext)");
+				print(1, modifire + " void execute" + toJavaName(resourceModel.name)
+						+ "(String executeParameter)");
 				if (mondatory) {
 					println(1, ";");
 				} else {
 					println(1, "{");
-					println(2, "return super.execute(resourceContext);");
+					println(2, "throw LwM2mInstanceResponseException.notFound();");
 					println(1, "}");
 				}
 			}

@@ -14,8 +14,11 @@ import io.soracom.inventory.agent.core.credential.FileCredentialStore;
 import io.soracom.inventory.agent.core.credential.PreSharedKey;
 import io.soracom.inventory.agent.core.initialize.InventoryAgentHelper;
 import io.soracom.inventory.agent.core.initialize.InventoryAgentInitializer;
+import io.soracom.inventory.agent.core.initialize.LwM2mModelBuilder;
 import io.soracom.inventory.agent.example.object.ExampleDeviceObject;
+import io.soracom.inventory.agent.example.object.ExampleLocationObject;
 import io.soracom.inventory.agent.example.object.ExampleSoftwareComponentObject;
+import io.soracom.inventory.agent.example.object.System2Object;
 
 public class SORACOMInventoryAgentExample {
 
@@ -96,10 +99,14 @@ public class SORACOMInventoryAgentExample {
 		initializer.setForceBootstrap(forceBootstrap);
 		initializer.setPreSharedKey(psk);
 		initializer.setCredentialStore(new FileCredentialStore());
+		initializer.setLwM2mModel(
+				new LwM2mModelBuilder().addPresetObjectModels().addObjectModelFromClassPath("/26241.xml").build());
 
 		/** add supporting objects here **/
 		initializer.addInstancesForObject(new ExampleDeviceObject());
+		initializer.addInstancesForObject(new ExampleLocationObject());
 		initializer.addInstancesForObject(new ExampleSoftwareComponentObject());
+		initializer.addInstancesForObject(new System2Object());
 
 		final LeshanClient client = initializer.buildClient();
 		client.start();

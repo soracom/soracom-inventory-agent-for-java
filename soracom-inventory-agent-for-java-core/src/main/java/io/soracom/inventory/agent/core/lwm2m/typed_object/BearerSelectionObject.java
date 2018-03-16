@@ -1,13 +1,12 @@
-package io.soracom.inventory.agent.core.lwm2m.base_object;
+package io.soracom.inventory.agent.core.lwm2m.typed_object;
 import io.soracom.inventory.agent.core.lwm2m.*;
-import org.eclipse.leshan.core.response.*;
+import java.util.Date;
+import org.eclipse.leshan.core.node.ObjectLink;
 
 /**
  * This object specifies resources to enable a device to choose a PLMN/network on which to attach/register and what type of bearer to then connect. 
  * This object allows via remote bearer and network configuration to overwrite automatic network and bearer selection e.g. as supported by the UICC. An equivalent example for overwriting automatic selection is a user doing manual network and bearer selection on a smart phone.
  **/
-//typed_object package is recommended.
-@Deprecated
 @LWM2MObject(objectId = 13, name = "Bearer selection")
 public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnabler {
 
@@ -31,86 +30,86 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	 * 16-100: Reserved for future use
 	 * The Preferred Communications Bearer resource specifies the preferred communications bearer that the LWM2M Client is requested to use for connecting to the LWM2M Server. If multiple preferred communications bearers are specified, the priority order is reflected by the resource instance order. E.g. the bearer which appears first in the list of resource instances is to have higher priority over the rest of available bearers. The LWM2M Client SHOULD use the preferred bearers with higher priority first if they are available. If none of indicated preferred bearers is available, the LWM2M Client SHOULD wait until one of them becomes available. 
 	 **/
-	@Resource(resourceId = 0, operation = Operation.Read, multiple = true, type = "INTEGER")
-	public ReadResponse readPreferredCommunicationsBearer(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 0, operation = Operation.Read, multiple = true)
+	public Integer readPreferredCommunicationsBearer()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 	@Resource(resourceId = 0, operation = Operation.Write, multiple = true)
-	public WriteResponse writePreferredCommunicationsBearer(ResourceContext resourceContext)	{
-		return super.write(resourceContext);
+	public void writePreferredCommunicationsBearer(Integer writeValue)	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 
 	/**
 	 * Provides guide to the application when performing manual network selection.
 	 **/
-	@Resource(resourceId = 1, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readAcceptableRSSI_GSM(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 1, operation = Operation.Read)
+	public Integer readAcceptableRSSI_GSM()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 	@Resource(resourceId = 1, operation = Operation.Write)
-	public WriteResponse writeAcceptableRSSI_GSM(ResourceContext resourceContext)	{
-		return super.write(resourceContext);
+	public void writeAcceptableRSSI_GSM(Integer writeValue)	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 
 	/**
 	 * Provides guide to the application when performing manual network selection.
 	 **/
-	@Resource(resourceId = 2, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readAcceptableRSCP_UMTS(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 2, operation = Operation.Read)
+	public Integer readAcceptableRSCP_UMTS()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 	@Resource(resourceId = 2, operation = Operation.Write)
-	public WriteResponse writeAcceptableRSCP_UMTS(ResourceContext resourceContext)	{
-		return super.write(resourceContext);
+	public void writeAcceptableRSCP_UMTS(Integer writeValue)	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 
 	/**
 	 * Provides guide to the application when performing manual network selection.
 	 **/
-	@Resource(resourceId = 3, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readAcceptableRSRP_LTE(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 3, operation = Operation.Read)
+	public Integer readAcceptableRSRP_LTE()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 	@Resource(resourceId = 3, operation = Operation.Write)
-	public WriteResponse writeAcceptableRSRP_LTE(ResourceContext resourceContext)	{
-		return super.write(resourceContext);
+	public void writeAcceptableRSRP_LTE(Integer writeValue)	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 
 	/**
 	 * Provides guide to the application when performing manual network selection.
 	 **/
-	@Resource(resourceId = 4, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readAcceptableRSSI_1xEV_DO(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 4, operation = Operation.Read)
+	public Integer readAcceptableRSSI_1xEV_DO()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 	@Resource(resourceId = 4, operation = Operation.Write)
-	public WriteResponse writeAcceptableRSSI_1xEV_DO(ResourceContext resourceContext)	{
-		return super.write(resourceContext);
+	public void writeAcceptableRSSI_1xEV_DO(Integer writeValue)	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 
 	/**
 	 * Comma separated list of allowed Global Cell Identities.
 	 **/
-	@Resource(resourceId = 5, operation = Operation.Read, type = "STRING")
-	public ReadResponse readCellLockList(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 5, operation = Operation.Read)
+	public String readCellLockList()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 	@Resource(resourceId = 5, operation = Operation.Write)
-	public WriteResponse writeCellLockList(ResourceContext resourceContext)	{
-		return super.write(resourceContext);
+	public void writeCellLockList(String writeValue)	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 
 	/**
 	 * Comma separated list of MCC+MNC of operators, in priority order.
 	 * Resource “operator list mode” indicates how to process this list.
 	 **/
-	@Resource(resourceId = 6, operation = Operation.Read, type = "STRING")
-	public ReadResponse readOperatorList(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 6, operation = Operation.Read)
+	public String readOperatorList()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 	@Resource(resourceId = 6, operation = Operation.Write)
-	public WriteResponse writeOperatorList(ResourceContext resourceContext)	{
-		return super.write(resourceContext);
+	public void writeOperatorList(String writeValue)	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 
 	/**
@@ -118,65 +117,65 @@ public abstract class BearerSelectionObject extends AnnotatedLwM2mInstanceEnable
 	 * 0=preferred
 	 * 1=allowed
 	 **/
-	@Resource(resourceId = 7, operation = Operation.Read, type = "BOOLEAN")
-	public ReadResponse readOperatorListMode(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 7, operation = Operation.Read)
+	public Boolean readOperatorListMode()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 	@Resource(resourceId = 7, operation = Operation.Write)
-	public WriteResponse writeOperatorListMode(ResourceContext resourceContext)	{
-		return super.write(resourceContext);
+	public void writeOperatorListMode(Boolean writeValue)	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 
 	/**
 	 * Allows server to see results of network scan (e.g. result of AT+COPS=?)
 	 **/
-	@Resource(resourceId = 8, operation = Operation.Read, type = "STRING")
-	public ReadResponse readListOfAvailablePLMNs(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 8, operation = Operation.Read)
+	public String readListOfAvailablePLMNs()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 
 	/**
 	 * Links to a vendor specific object.
 	 **/
-	@Resource(resourceId = 9, operation = Operation.Read, type = "OBJLNK")
-	public ReadResponse readVendorSpecificExtensions(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 9, operation = Operation.Read)
+	public ObjectLink readVendorSpecificExtensions()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 
 	/**
 	 * Provides guide to the application when performing manual network selection.
 	 **/
-	@Resource(resourceId = 10, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readAcceptableRSRP_NB_IoT(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 10, operation = Operation.Read)
+	public Integer readAcceptableRSRP_NB_IoT()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 	@Resource(resourceId = 10, operation = Operation.Write)
-	public WriteResponse writeAcceptableRSRP_NB_IoT(ResourceContext resourceContext)	{
-		return super.write(resourceContext);
+	public void writeAcceptableRSRP_NB_IoT(Integer writeValue)	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 
 	/**
 	 * Interval between periodic searches for higher priority PLMNs of the same country when camped on a visited PLMN, i.e. roaming scenario; based on SIM configuration, EFHPPLMN [3GPP-TS_31.102, section 4.2.6]
 	 **/
-	@Resource(resourceId = 11, operation = Operation.Read, type = "INTEGER")
-	public ReadResponse readHigherPriorityPLMNSearchTimer(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 11, operation = Operation.Read)
+	public Integer readHigherPriorityPLMNSearchTimer()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 	@Resource(resourceId = 11, operation = Operation.Write)
-	public WriteResponse writeHigherPriorityPLMNSearchTimer(ResourceContext resourceContext)	{
-		return super.write(resourceContext);
+	public void writeHigherPriorityPLMNSearchTimer(Integer writeValue)	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 
 	/**
 	 * 0=attach with PDN connection
 	 * 1=attach without PDN connection
 	 **/
-	@Resource(resourceId = 12, operation = Operation.Read, type = "BOOLEAN")
-	public ReadResponse readAttachWithoutPDNConnection(ResourceContext resourceContext)	{
-		return super.read(resourceContext);
+	@Resource(resourceId = 12, operation = Operation.Read)
+	public Boolean readAttachWithoutPDNConnection()	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 	@Resource(resourceId = 12, operation = Operation.Write)
-	public WriteResponse writeAttachWithoutPDNConnection(ResourceContext resourceContext)	{
-		return super.write(resourceContext);
+	public void writeAttachWithoutPDNConnection(Boolean writeValue)	{
+		throw LwM2mInstanceResponseException.notFound();
 	}
 }

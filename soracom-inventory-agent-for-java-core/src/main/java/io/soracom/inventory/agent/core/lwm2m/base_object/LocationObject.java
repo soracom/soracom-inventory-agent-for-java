@@ -5,6 +5,8 @@ import org.eclipse.leshan.core.response.*;
 /**
  * This LwM2M Objects provide a range of device related information which can be queried by the LwM2M Server, and a device reboot and factory reset function.
  **/
+//typed_object package is recommended.
+@Deprecated
 @LWM2MObject(objectId = 6, name = "Location")
 public abstract class LocationObject extends AnnotatedLwM2mInstanceEnabler {
 

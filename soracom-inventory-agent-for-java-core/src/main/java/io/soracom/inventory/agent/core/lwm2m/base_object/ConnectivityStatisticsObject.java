@@ -5,6 +5,8 @@ import org.eclipse.leshan.core.response.*;
 /**
  * This LwM2M Objects enables client to collect statistical information and enables the LwM2M Server to retrieve these information, set the collection duration and reset the statistical parameters.
  **/
+//typed_object package is recommended.
+@Deprecated
 @LWM2MObject(objectId = 7, name = "Connectivity Statistics")
 public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanceEnabler {
 

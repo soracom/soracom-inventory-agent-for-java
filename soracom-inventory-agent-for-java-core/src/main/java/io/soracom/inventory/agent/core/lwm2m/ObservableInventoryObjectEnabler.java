@@ -84,6 +84,7 @@ public class ObservableInventoryObjectEnabler extends ObjectEnabler {
 		}
 		return super.observe(identity, request);
 	}
+	
 
 	protected void fireResourcesChange() {
 		NotifySender sender = getNotifySender();

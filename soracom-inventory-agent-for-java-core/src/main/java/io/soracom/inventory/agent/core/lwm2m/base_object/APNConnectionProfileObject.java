@@ -5,6 +5,8 @@ import org.eclipse.leshan.core.response.*;
 /**
  * This object specifies resources to enable a device to connect to an APN.
  **/
+//typed_object package is recommended.
+@Deprecated
 @LWM2MObject(objectId = 11, name = "APN connection profile", multiple = true)
 public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceEnabler {
 
