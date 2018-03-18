@@ -24,6 +24,7 @@ public class TypedAnnotatedLwM2mInstanceTemplateClassGeneratorMain {
 		outputDir.mkdirs();
 		for (ObjectModel model : rdfResource) {
 			TypedAnnotatedObjectTemplateClassGenerator generator = new TypedAnnotatedObjectTemplateClassGenerator();
+			generator.setGenerateAbstractTemplate(true);
 			String fileName = generator.toJavaClassName(model);
 			File outputFile = new File(outputDir, fileName + ".java");
 			generator.setOutput(outputFile);

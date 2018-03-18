@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.Authenticator.RequestorType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -33,13 +32,13 @@ import org.eclipse.leshan.core.model.ResourceModel.Operations;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.node.ObjectLink;
 
-import io.soracom.inventory.agent.core.lwm2m.LwM2mInstanceResponseException;
-
 public class TypedAnnotatedObjectTemplateClassGenerator {
 
 	protected String indentChar = "\t";
 
 	protected PrintStream pw;
+
+	protected boolean abstractTemplate = false;
 
 	public TypedAnnotatedObjectTemplateClassGenerator() {
 		pw = System.out;
@@ -52,29 +51,34 @@ public class TypedAnnotatedObjectTemplateClassGenerator {
 	public void setIndentChar(String indentChar) {
 		this.indentChar = indentChar;
 	}
-	
-	private Map<ResourceModel.Type,String> resourceModel2TypeMap = new HashMap<>();
+
+	public void setGenerateAbstractTemplate(boolean abstractTemplate) {
+		this.abstractTemplate = abstractTemplate;
+	}
+
+	private Map<ResourceModel.Type, String> resourceModel2TypeMap = new HashMap<>();
 	{
-		resourceModel2TypeMap.put(ResourceModel.Type.BOOLEAN,Boolean.class.getSimpleName());
-		resourceModel2TypeMap.put(ResourceModel.Type.FLOAT,Float.class.getSimpleName());
-		resourceModel2TypeMap.put(ResourceModel.Type.INTEGER,Integer.class.getSimpleName());
-		resourceModel2TypeMap.put(ResourceModel.Type.OBJLNK,ObjectLink.class.getSimpleName());
-		resourceModel2TypeMap.put(ResourceModel.Type.OPAQUE,"byte[]");
-		resourceModel2TypeMap.put(ResourceModel.Type.STRING,String.class.getSimpleName());
-		resourceModel2TypeMap.put(ResourceModel.Type.TIME,Date.class.getName());
+		resourceModel2TypeMap.put(ResourceModel.Type.BOOLEAN, Boolean.class.getSimpleName());
+		resourceModel2TypeMap.put(ResourceModel.Type.FLOAT, Float.class.getSimpleName());
+		resourceModel2TypeMap.put(ResourceModel.Type.INTEGER, Integer.class.getSimpleName());
+		resourceModel2TypeMap.put(ResourceModel.Type.OBJLNK, ObjectLink.class.getSimpleName());
+		resourceModel2TypeMap.put(ResourceModel.Type.OPAQUE, "byte[]");
+		resourceModel2TypeMap.put(ResourceModel.Type.STRING, String.class.getSimpleName());
+		resourceModel2TypeMap.put(ResourceModel.Type.TIME, Date.class.getName());
 	}
 
 	public void generateTemplateClassFromObjectModel(String javaPackage, ObjectModel model) {
 		println("package " + javaPackage + ";");
 		println("import io.soracom.inventory.agent.core.lwm2m.*;");
 		println("import java.util.Date;");
-		println("import " + ObjectLink.class.getName()+";");
+		println("import " + ObjectLink.class.getName() + ";");
 		println("");
 		printComment(0, model.description);
 		final String className = toJavaName(model.name + "Object");
 		final String multipleObject = model.multiple ? ", multiple = true" : "";
 		println(0, "@LWM2MObject(objectId = " + model.id + ", name = \"" + model.name + "\"" + multipleObject + ")");
-		println(0, "public abstract class " + className + " extends AnnotatedLwM2mInstanceEnabler {");
+		final String defaultModifier = getModifier();
+		println(0, "public" + defaultModifier + " class " + className + " extends AnnotatedLwM2mInstanceEnabler {");
 		List<Integer> keyList = new ArrayList<Integer>(model.resources.keySet());
 		Collections.sort(keyList);
 		for (Integer resourceId : keyList) {
@@ -82,16 +86,15 @@ public class TypedAnnotatedObjectTemplateClassGenerator {
 			final ResourceModel resourceModel = model.resources.get(resourceId);
 			final Operations operations = resourceModel.operations;
 			final String multipleResource = resourceModel.multiple ? ", multiple = true" : "";
-			final boolean mondatory = resourceModel.mandatory;
-			final String modifire = (mondatory == true) ? "public abstract" : "public";
+			final boolean mondatory = (abstractTemplate) ? resourceModel.mandatory : false;
+			final String modifire = (mondatory == true) ? "public" + defaultModifier : "public";
 			final Type type = resourceModel.type;
-			printComment(1, resourceModel.description);			
+			printComment(1, resourceModel.description);
 			if (operations.isReadable()) {
 				final String responseValue = resourceModel2TypeMap.get(type);
 				println(1, "@Resource(resourceId = " + resourceId.intValue() + ", operation = Operation.Read"
 						+ multipleResource + ")");
-				print(1, modifire + " " + responseValue+ " read" + toJavaName(resourceModel.name)
-						+ "()");
+				print(1, modifire + " " + responseValue + " read" + toJavaName(resourceModel.name) + "()");
 				if (mondatory) {
 					println(1, ";");
 				} else {
@@ -104,8 +107,7 @@ public class TypedAnnotatedObjectTemplateClassGenerator {
 				final String paramValue = resourceModel2TypeMap.get(type);
 				println(1, "@Resource(resourceId = " + resourceId.intValue() + ", operation = Operation.Write"
 						+ multipleResource + ")");
-				print(1, modifire + " void write" + toJavaName(resourceModel.name)
-						+ "(" + paramValue +" writeValue)");
+				print(1, modifire + " void write" + toJavaName(resourceModel.name) + "(" + paramValue + " writeValue)");
 				if (mondatory) {
 					println(1, ";");
 				} else {
@@ -117,8 +119,7 @@ public class TypedAnnotatedObjectTemplateClassGenerator {
 			if (operations.isExecutable()) {
 				println(1, "@Resource(resourceId = " + resourceId.intValue() + ", operation = Operation.Execute"
 						+ multipleResource + ")");
-				print(1, modifire + " void execute" + toJavaName(resourceModel.name)
-						+ "(String executeParameter)");
+				print(1, modifire + " void execute" + toJavaName(resourceModel.name) + "(String executeParameter)");
 				if (mondatory) {
 					println(1, ";");
 				} else {
@@ -162,6 +163,10 @@ public class TypedAnnotatedObjectTemplateClassGenerator {
 			}
 		}
 		return className.toString();
+	}
+
+	protected String getModifier() {
+		return abstractTemplate ? " abstract" : "";
 	}
 
 	protected void printComment(int indentNum, String value) {
