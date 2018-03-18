@@ -5,6 +5,8 @@ import org.eclipse.leshan.core.response.*;
 /**
  * This object specifies resources to enable a device to connect to a WLAN bearer.
  **/
+//typed_object package is recommended.
+@Deprecated
 @LWM2MObject(objectId = 12, name = "WLAN connectivity", multiple = true)
 public abstract class WLANConnectivityObject extends AnnotatedLwM2mInstanceEnabler {
 

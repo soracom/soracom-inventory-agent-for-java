@@ -13,10 +13,28 @@
  * Contributors:
  *     SORACOM,Inc. - initial API and implementation
  *******************************************************************************/
-package io.soracom.inventory.agent.core.bootstrap;
+package io.soracom.inventory.agent.core.lwm2m;
 
-public interface BootstrapConstants {
+import org.eclipse.leshan.ResponseCode;
 
-	public static final String DEFAULT_BOOTSTRAP_SERVER_ADDRESS = "bootstrap.soracom.io:5683";
-	public static final String DEFAULT_BOOTSTRAP_COAPS_SERVER_ADDRESS = "bootstrap.soracom.io:5684";
+public class LwM2mInstanceResponseException extends RuntimeException {
+
+	protected ResponseCode responseCode;
+
+	public LwM2mInstanceResponseException(ResponseCode responseCode) {
+		this.responseCode = responseCode;
+	}
+
+	public LwM2mInstanceResponseException(ResponseCode responseCode, String errorMessage) {
+		super(errorMessage);
+		this.responseCode = responseCode;
+	}
+
+	public ResponseCode getResponseCode() {
+		return responseCode;
+	}
+
+	public static LwM2mInstanceResponseException notFound() {
+		return new LwM2mInstanceResponseException(ResponseCode.NOT_FOUND);
+	}
 }

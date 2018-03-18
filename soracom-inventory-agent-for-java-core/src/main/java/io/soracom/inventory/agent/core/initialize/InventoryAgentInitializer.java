@@ -17,12 +17,11 @@ package io.soracom.inventory.agent.core.initialize;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
+import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.leshan.LwM2mId;
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
@@ -40,7 +39,6 @@ import io.soracom.inventory.agent.core.credential.Credentials;
 import io.soracom.inventory.agent.core.credential.PreSharedKey;
 import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
 import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
-import io.soracom.inventory.agent.core.lwm2m.ObservableInventoryObjectEnabler;
 
 public class InventoryAgentInitializer {
 
@@ -54,6 +52,8 @@ public class InventoryAgentInitializer {
 	protected boolean forceBootstrap;
 	protected LwM2mModel lwM2mModel;
 	protected Map<Integer, List<AnnotatedLwM2mInstanceEnabler>> objectInstanceMap = new HashMap<>();
+	protected LwM2mInstanceEnabler serverInstance;
+	private int shortServerId = 123;
 
 	public InventoryAgentInitializer() {
 
@@ -86,9 +86,10 @@ public class InventoryAgentInitializer {
 	public void setLwM2mModel(LwM2mModel lwM2mModel) {
 		this.lwM2mModel = lwM2mModel;
 	}
-	
+
 	public void addInstancesForObject(AnnotatedLwM2mInstanceEnabler objectInstance) {
-		final LWM2MObject lwm2mObjectAnnotation = InventoryAgentHelper.findLWM2MObjectAnnotation(objectInstance.getClass());
+		final LWM2MObject lwm2mObjectAnnotation = InventoryAgentHelper
+				.findLWM2MObjectAnnotation(objectInstance.getClass());
 		final int objectId = lwm2mObjectAnnotation.objectId();
 		List<AnnotatedLwM2mInstanceEnabler> instanceList = objectInstanceMap.get(objectId);
 		if (instanceList == null) {
@@ -104,26 +105,21 @@ public class InventoryAgentInitializer {
 
 	public LeshanClient buildClient() {
 		final LwM2mModel lwM2mModel = initLwM2mModel();
-		final ObjectsInitializer initializer = new ObjectsInitializer(lwM2mModel) {
-			protected org.eclipse.leshan.client.resource.ObjectEnabler createNodeEnabler(org.eclipse.leshan.core.model.ObjectModel objectModel) {
-		        Map<Integer, LwM2mInstanceEnabler> instances = new HashMap<>();
-		        LwM2mInstanceEnabler[] newInstances = createInstances(objectModel);
-		        for (int i = 0; i < newInstances.length; i++) {
-		            instances.put(i, newInstances[i]);
-		        }
-				return new ObservableInventoryObjectEnabler(objectModel.id, objectModel, instances, getFactoryFor(objectModel));
-			};
-		};
+		final ObjectsInitializer initializer = new ObjectsInitializer(lwM2mModel);
 		initSecurity(initializer);
 		initServer(initializer);
 		initObjects(initializer);
-		final List<LwM2mObjectEnabler> enablers = initObjectEnablers(initializer);
+		final Map<Integer, LwM2mObjectEnabler> objectEnablerMap = initObjectEnablers(initializer);
 		// Create client
 		final String endpoint = initEndpoint();
 		final LeshanClientBuilder builder = new LeshanClientBuilder(endpoint);
-		builder.setObjects(enablers);
+		builder.setObjects(new ArrayList<>(objectEnablerMap.values()));
 		final LeshanClient client = builder.build();
-		client.addObserver(new BootstrapObserver(enablers, credentialStore));
+		client.addObserver(new BootstrapObserver(objectEnablerMap, credentialStore));
+		final InventoryResourceObserver resourceObserver = new InventoryResourceObserver();
+		for (Resource resource : client.getCoapServer().getRoot().getChildren()) {
+			resource.addObserver(resourceObserver);
+		}
 		InventoryAgentHelper.addShutdownHoot(client);
 		return client;
 	}
@@ -132,7 +128,7 @@ public class InventoryAgentInitializer {
 		return this.lwM2mModel == null ? InventoryAgentHelper.createDefaultLwM2mModel() : this.lwM2mModel;
 	}
 
-	protected void initSecurity(ObjectsInitializer initializer) {
+	private void initSecurity(ObjectsInitializer initializer) {
 		if (objectInstanceMap.containsKey(LwM2mId.SECURITY)) {
 			return;
 		}
@@ -144,7 +140,7 @@ public class InventoryAgentInitializer {
 			log.info("set bootstrap security object from psk.");
 			Credentials credential = new Credentials();
 			credential.setServerURI(serverUri);
-			credential.setShortServerId(123);
+			credential.setShortServerId(shortServerId);
 			credential.setPskId(preSharedKey.getPskIdentityBytes());
 			credential.setPskKey(preSharedKey.getPskKey());
 			securityInfo = InventoryAgentHelper.getSecurityInfo(credential);
@@ -154,24 +150,25 @@ public class InventoryAgentInitializer {
 				log.info("set bootstrap security object.");
 				securityInfo = InventoryAgentHelper.getSecurityInfoForBootstrap(serverUri, null, null);
 			} else {
-				log.info("set security object from credential.");
+				log.info("set security object from credential store.");
 				securityInfo = InventoryAgentHelper.getSecurityInfo(credential);
 			}
 		}
 		initializer.setInstancesForObject(LwM2mId.SECURITY, securityInfo);
 	}
 
-	protected void initServer(ObjectsInitializer initializer) {
+	private void initServer(ObjectsInitializer initializer) {
 		if (objectInstanceMap.containsKey(LwM2mId.SERVER)) {
 			return;
 		}
 		final Credentials credential = credentialStore.loadCredentials();
 		if (credential != null) {
-			initializer.setInstancesForObject(LwM2mId.SERVER, InventoryAgentHelper.getServerInfo(credential));
+			final LwM2mInstanceEnabler serverInfo = InventoryAgentHelper.getServerInfo(credential);
+			initializer.setInstancesForObject(LwM2mId.SERVER, serverInfo);
 		}
 	}
 
-	protected void initObjects(ObjectsInitializer initializer) {
+	private void initObjects(ObjectsInitializer initializer) {
 		for (Entry<Integer, List<AnnotatedLwM2mInstanceEnabler>> entry : objectInstanceMap.entrySet()) {
 			final int objectId = entry.getKey();
 			final List<AnnotatedLwM2mInstanceEnabler> instances = entry.getValue();
@@ -180,21 +177,21 @@ public class InventoryAgentInitializer {
 		}
 	}
 
-	protected List<LwM2mObjectEnabler> initObjectEnablers(ObjectsInitializer initializer) {
-		Set<Integer> keySet = new HashSet<>();
-		keySet.addAll(objectInstanceMap.keySet());
+	private Map<Integer, LwM2mObjectEnabler> initObjectEnablers(ObjectsInitializer initializer) {
+		final Map<Integer, LwM2mObjectEnabler> enablerMap = new HashMap<>();
+		final List<Integer> keySet = new ArrayList<>();
 		keySet.add(LwM2mId.SERVER);
 		keySet.add(LwM2mId.SECURITY);
-		List<LwM2mObjectEnabler> enablers = new ArrayList<>();
+		keySet.addAll(objectInstanceMap.keySet());
 		for (Integer objectId : keySet) {
-			LwM2mObjectEnabler objectEnabler = initializer.create(objectId);
+			final LwM2mObjectEnabler objectEnabler = initializer.create(objectId);
 			log.debug("create LwM2mObjectEnabler. objectId:" + objectId);
-			enablers.add(objectEnabler);
+			enablerMap.put(objectId, objectEnabler);
 		}
-		return enablers;
+		return enablerMap;
 	}
 
-	protected String initEndpoint() {
+	private String initEndpoint() {
 		String endpoint = this.endpoint;
 		if (endpoint == null) {
 			endpoint = InventoryAgentHelper.generateEndpoint();

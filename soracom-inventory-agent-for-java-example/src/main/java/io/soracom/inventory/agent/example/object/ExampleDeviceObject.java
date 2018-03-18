@@ -23,13 +23,10 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import org.eclipse.leshan.core.request.BindingMode;
-import org.eclipse.leshan.core.response.ExecuteResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.soracom.inventory.agent.core.lwm2m.ResourceContext;
-import io.soracom.inventory.agent.core.lwm2m.base_object.DeviceObject;
+import io.soracom.inventory.agent.core.lwm2m.typed_object.DeviceObject;
 import io.soracom.inventory.agent.core.util.CommandExecutor;
 
 public class ExampleDeviceObject extends DeviceObject {
@@ -37,75 +34,74 @@ public class ExampleDeviceObject extends DeviceObject {
 	private static final Logger log = LoggerFactory.getLogger(ExampleSoftwareComponentObject.class);
 
 	@Override
-	public ReadResponse readUTCOffset(ResourceContext resourceContext) {
+	public String readUTCOffset() {
 		String utcOffset = new SimpleDateFormat("X").format(Calendar.getInstance().getTime());
-		return ReadResponse.success(resourceContext.getResourceId(), utcOffset);
+		return utcOffset;
 	}
 
 	@Override
-	public ReadResponse readTimezone(ResourceContext resourceContext) {
+	public String readTimezone() {
 		String timeZone = TimeZone.getDefault().getID();
-		return ReadResponse.success(resourceContext.getResourceId(), timeZone);
+		return timeZone;
 	}
 
 	@Override
-	public ReadResponse readCurrentTime(ResourceContext resourceContext) {
-		return ReadResponse.success(resourceContext.getResourceId(), new Date());
+	public Date readCurrentTime() {
+		return new Date();
 	}
 
 	@Override
-	public ReadResponse readMemoryFree(ResourceContext resourceContext) {
+	public Integer readMemoryFree() {
 		int freeMemory = (int) Runtime.getRuntime().freeMemory() / 1024;
-		return ReadResponse.success(resourceContext.getResourceId(), freeMemory);
+		return freeMemory;
 	}
 
 	@Override
-	public ReadResponse readMemoryTotal(ResourceContext resourceContext) {
+	public Integer readMemoryTotal() {
 		int totalMemory = (int) Runtime.getRuntime().totalMemory() / 1024;
-		return ReadResponse.success(resourceContext.getResourceId(), totalMemory);
+		return totalMemory;
 	}
 
 	@Override
-	public ReadResponse readBatteryLevel(ResourceContext resourceContext) {
-		return ReadResponse.success(resourceContext.getResourceId(), 100);
+	public Integer readBatteryLevel() {
+		return 100;
 	}
 
 	@Override
-	public ReadResponse readManufacturer(ResourceContext resourceContext) {
-		return ReadResponse.success(resourceContext.getResourceId(), "SORACOM");
+	public String readManufacturer() {
+		return "SORACOM";
+	}
+
+	String serialNumber = "T-" + UUID.randomUUID().toString().substring(0, 8);
+
+	@Override
+	public String readSerialNumber() {
+		return serialNumber;
 	}
 
 	@Override
-	public ReadResponse readSerialNumber(ResourceContext resourceContext) {
-		return ReadResponse.success(resourceContext.getResourceId(),
-				"T-" + UUID.randomUUID().toString().substring(0, 8));
+	public String readFirmwareVersion() {
+		return "1.0.0";
 	}
 
 	@Override
-	public ReadResponse readFirmwareVersion(ResourceContext resourceContext) {
-		return ReadResponse.success(resourceContext.getResourceId(), "1.0.0");
+	public Integer readErrorCode() {
+		return 0;
 	}
 
 	@Override
-	public ReadResponse readErrorCode(ResourceContext resourceContext) {
-		return ReadResponse.success(resourceContext.getResourceId(), 0);
+	public String readSupportedBindingAndModes() {
+		return BindingMode.U.toString();
 	}
 
 	@Override
-	public ReadResponse readSupportedBindingAndModes(ResourceContext resourceContext) {
-		return ReadResponse.success(resourceContext.getResourceId(), BindingMode.U.toString());
-	}
-
-	@Override
-	public ExecuteResponse executeReboot(ResourceContext resourceContext) {
-
+	public void executeReboot(String executeParameter) {
 		File scriptFile = new File("script/DeviceObject-Reboot.sh");
-		String param = resourceContext.getExecuteParameter();
+		String param = executeParameter;
 		if (param == null) {
 			param = "";
 		}
 		log.info("executeReboot command=" + scriptFile.getName() + " param=" + param);
 		CommandExecutor.execute(new String[] { scriptFile.getAbsolutePath(), param });
-		return ExecuteResponse.success();
 	}
 }
