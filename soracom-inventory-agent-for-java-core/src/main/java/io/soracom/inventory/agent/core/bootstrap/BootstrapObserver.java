@@ -16,14 +16,11 @@
 package io.soracom.inventory.agent.core.bootstrap;
 
 import static org.eclipse.leshan.LwM2mId.SECURITY;
-import static org.eclipse.leshan.LwM2mId.SERVER;
 import static org.eclipse.leshan.client.request.ServerIdentity.SYSTEM;
 import static org.eclipse.leshan.core.model.ResourceModel.Type.INTEGER;
 import static org.eclipse.leshan.core.model.ResourceModel.Type.OPAQUE;
 import static org.eclipse.leshan.core.model.ResourceModel.Type.STRING;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.leshan.client.observer.LwM2mClientObserverAdapter;
@@ -57,10 +54,7 @@ public class BootstrapObserver extends LwM2mClientObserverAdapter {
 
 	private CredentialStore credentialStore;
 
-	public BootstrapObserver(List<LwM2mObjectEnabler> enablers, CredentialStore credentialStore) {
-		Map<Integer, LwM2mObjectEnabler> enablerMap = new HashMap<>();
-		enablerMap.put(SECURITY, enablers.get(0));
-		enablerMap.put(SERVER, enablers.get(1));
+	public BootstrapObserver(Map<Integer, LwM2mObjectEnabler> enablerMap, CredentialStore credentialStore) {
 		objectEnablerMap = enablerMap;
 		this.credentialStore = credentialStore;
 	}
