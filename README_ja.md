@@ -39,12 +39,15 @@ soracom-inventory-agent-for-java-exampleプロジェクトは、Inventoryエー�
 SORACOMInventoryAgentExampleが、mainクラスとなります。このクラスが実行のメインクラスとなります。
 環境に応じて、適宜変更してください。
 
-実装する必要があるクラスは、io.soracom.inventory.agent.core.lwm2m.base_object パッケージに入っているオブジェクト群です。
+実装する必要があるクラスは、io.soracom.inventory.agent.core.lwm2m.typed_object パッケージに入っているオブジェクト群です。
+(release-0.0.1で実装されたio.soracom.inventory.agent.core.lwm2m.base_objectは非推奨になっています）
 このオブジェクトは、LWM2M v1.0で規定された定義XMLから生成されたクラスとなっています。
 
 実際にサーバとやりとりをするためには、このクラスを継承したクラスを作成して、実装したいメソッドをオーバーライドして
 実装を行ってください。
-exampleのプロジェクトでは、"DeviceObject"と"LWM2MSoftwareComponent"を実装したサンプルが入っています。
+exampleのプロジェクトでは、"DeviceObject","LocationObject", "LWM2MSoftwareComponent"を実装したサンプルが入っています。
+(注:LWM2MSoftwareComponentを実装した ExampleSoftwareComponentObject は、release-0.0.1で利用していた実装方式で作られています。
+release-0.0.2以降は、ExampleDeviceObjectやExampleLocationObjectの実装方法が推奨です）
 
 実装後、InventoryAgentInitializer#addInstancesForObjectメソッドを使用して、登録を行います。
 
@@ -53,3 +56,32 @@ exampleのプロジェクトでは、"DeviceObject"と"LWM2MSoftwareComponent"�
 これらのExecuteをサーバ側から呼ぶと、scriptフォルダ内のシェルが実行されます。
 
 実行するシェルスクリプトを変えたり、種類を増やす場合はこれらを参考にしてください。
+
+##カスタムオブジェクトの利用
+規定のオブジェクト以外は、次の手順で実装を作成します。
+
+1.オブジェクト定義XMLの作成
+exampleプロジェクトには、src/main/resources以下に、カスタムオブジェクトの定義として 30000.xml が入っています。
+これを参考に、カスタムオブジェクト定義を作成します。
+
+2.実装クラスの作成
+io.soracom.inventory.agent.example.object.CustomModelObject を参考に、実装クラスを作成します。
+なお、io.soracom.inventory.agent.core.util.TypedAnnotatedObjectTemplateClassGenerator を使用すると、定義XMLから雛形となるJavaソースを
+生成できます。
+
+3.Main関数での読み込み
+定義ファイルは、InventoryAgentInitializer#setLwM2mModelで登録します。
+以下が読み込みの例となります。
+
+````
+InventoryAgentInitializer initializer = new InventoryAgentInitializer();
+initializer.setLwM2mModel(
+				new LwM2mModelBuilder().addPresetObjectModels().addObjectModelFromClassPath("/30000.xml").build());
+````
+
+また、実装したJavaクラスは、同じくInventoryAgentInitializer#addInstancesForObjectで設定します。
+
+````
+//CustomModelObjectが実装したJavaソース
+initializer.addInstancesForObject(new CustomModelObject());
+````
