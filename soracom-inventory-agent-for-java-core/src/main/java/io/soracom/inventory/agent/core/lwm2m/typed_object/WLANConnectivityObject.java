@@ -14,9 +14,9 @@ public abstract class WLANConnectivityObject extends AnnotatedLwM2mInstanceEnabl
 	 * eg. wlan0
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read)
-	public abstract String readInterfaceName()	;
+	public abstract String readInterfaceName();
 	@Resource(resourceId = 0, operation = Operation.Write)
-	public abstract void writeInterfaceName(String writeValue)	;
+	public abstract void writeInterfaceName(String writeValue);
 
 	/**
 	 * 0: Disabled
@@ -25,9 +25,9 @@ public abstract class WLANConnectivityObject extends AnnotatedLwM2mInstanceEnabl
 	 * When disabled radio must also be disabled
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read)
-	public abstract Boolean readEnable()	;
+	public abstract Boolean readEnable();
 	@Resource(resourceId = 1, operation = Operation.Write)
-	public abstract void writeEnable(Boolean writeValue)	;
+	public abstract void writeEnable(Boolean writeValue);
 
 	/**
 	 * 0: Disabled
@@ -53,21 +53,21 @@ public abstract class WLANConnectivityObject extends AnnotatedLwM2mInstanceEnabl
 	 * 2: Error
 	 **/
 	@Resource(resourceId = 3, operation = Operation.Read)
-	public abstract Integer readStatus()	;
+	public abstract Integer readStatus();
 
 	/**
 	 * The MAC address of the interface, in hexadecimal form.
 	 **/
 	@Resource(resourceId = 4, operation = Operation.Read)
-	public abstract String readBSSID()	;
+	public abstract String readBSSID();
 
 	/**
 	 * The Service Set Identifier for this interface.
 	 **/
 	@Resource(resourceId = 5, operation = Operation.Read)
-	public abstract String readSSID()	;
+	public abstract String readSSID();
 	@Resource(resourceId = 5, operation = Operation.Write)
-	public abstract void writeSSID(String writeValue)	;
+	public abstract void writeSSID(String writeValue);
 
 	/**
 	 * 0: Do not broadcast SSID
@@ -102,9 +102,9 @@ public abstract class WLANConnectivityObject extends AnnotatedLwM2mInstanceEnabl
 	 * 3: Repeater
 	 **/
 	@Resource(resourceId = 8, operation = Operation.Read)
-	public abstract Integer readMode()	;
+	public abstract Integer readMode();
 	@Resource(resourceId = 8, operation = Operation.Write)
-	public abstract void writeMode(Integer writeValue)	;
+	public abstract void writeMode(Integer writeValue);
 
 	/**
 	 * The current radio channel in use by this interface.
@@ -112,9 +112,9 @@ public abstract class WLANConnectivityObject extends AnnotatedLwM2mInstanceEnabl
 	 * 1: Enabled
 	 **/
 	@Resource(resourceId = 9, operation = Operation.Read)
-	public abstract Integer readChannel()	;
+	public abstract Integer readChannel();
 	@Resource(resourceId = 9, operation = Operation.Write)
-	public abstract void writeChannel(Integer writeValue)	;
+	public abstract void writeChannel(Integer writeValue);
 
 	/**
 	 * 0: Disabled
@@ -179,9 +179,9 @@ public abstract class WLANConnectivityObject extends AnnotatedLwM2mInstanceEnabl
 	 * 7: 802.11ah
 	 **/
 	@Resource(resourceId = 14, operation = Operation.Read)
-	public abstract Integer readStandard()	;
+	public abstract Integer readStandard();
 	@Resource(resourceId = 14, operation = Operation.Write)
-	public abstract void writeStandard(Integer writeValue)	;
+	public abstract void writeStandard(Integer writeValue);
 
 	/**
 	 * 0: None (Open)
@@ -191,9 +191,9 @@ public abstract class WLANConnectivityObject extends AnnotatedLwM2mInstanceEnabl
 	 * 4: EAPSIM
 	 **/
 	@Resource(resourceId = 15, operation = Operation.Read)
-	public abstract Integer readAuthenticationMode()	;
+	public abstract Integer readAuthenticationMode();
 	@Resource(resourceId = 15, operation = Operation.Write)
-	public abstract void writeAuthenticationMode(Integer writeValue)	;
+	public abstract void writeAuthenticationMode(Integer writeValue);
 
 	/**
 	 * 0: AES (WPA2)

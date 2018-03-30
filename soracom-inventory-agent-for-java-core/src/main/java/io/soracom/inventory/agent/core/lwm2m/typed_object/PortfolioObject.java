@@ -20,9 +20,9 @@ public abstract class PortfolioObject extends AnnotatedLwM2mInstanceEnabler {
 	 * This Resource contains data that the GetAuthData executable Resource can work with.
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read, multiple = true)
-	public abstract String readIdentity()	;
+	public abstract String readIdentity();
 	@Resource(resourceId = 0, operation = Operation.Write, multiple = true)
-	public abstract void writeIdentity(String writeValue)	;
+	public abstract void writeIdentity(String writeValue);
 
 	/**
 	 * Executable resource to trigger Services described in Section 5.2.2 

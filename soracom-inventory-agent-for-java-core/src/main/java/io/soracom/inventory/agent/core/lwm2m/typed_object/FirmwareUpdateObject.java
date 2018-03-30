@@ -17,23 +17,23 @@ public abstract class FirmwareUpdateObject extends AnnotatedLwM2mInstanceEnabler
 	 * Firmware package
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Write)
-	public abstract void writePackage(byte[] writeValue)	;
+	public abstract void writePackage(byte[] writeValue);
 
 	/**
 	 * URI from where the device can download the firmware package by an alternative mechanism. As soon the device has received the Package URI it performs the download at the next practical opportunity. 
 	 * The URI format is defined in RFC 3986. For example, coaps://example.org/firmware is a syntactically valid URI. The URI scheme determines the protocol to be used. For CoAP this endpoint MAY be a LwM2M Server but does not necessarily need to be. A CoAP server implementing block-wise transfer is sufficient as a server hosting a firmware repository and the expectation is that this server merely serves as a separate file server making firmware images available to LwM2M Clients.
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read)
-	public abstract String readPackageURI()	;
+	public abstract String readPackageURI();
 	@Resource(resourceId = 1, operation = Operation.Write)
-	public abstract void writePackageURI(String writeValue)	;
+	public abstract void writePackageURI(String writeValue);
 
 	/**
 	 * Updates firmware by using the firmware package stored in Package, or, by using the firmware downloaded from the Package URI.
 	 * This Resource is only executable when the value of the State Resource is Downloaded.
 	 **/
 	@Resource(resourceId = 2, operation = Operation.Execute)
-	public abstract void executeUpdate(String executeParameter)	;
+	public abstract void executeUpdate(String executeParameter);
 
 	/**
 	 * Indicates current state with respect to this firmware update. This value is set by the LwM2M Client.
@@ -49,7 +49,7 @@ public abstract class FirmwareUpdateObject extends AnnotatedLwM2mInstanceEnabler
 	 * Firmware Update mechanisms are illustrated below in Figure 29 of the LwM2M version 1.0 specification.
 	 **/
 	@Resource(resourceId = 3, operation = Operation.Read)
-	public abstract Integer readState()	;
+	public abstract Integer readState();
 
 	/**
 	 * Contains the result of downloading or updating the firmware
@@ -65,7 +65,7 @@ public abstract class FirmwareUpdateObject extends AnnotatedLwM2mInstanceEnabler
 	 * 9: Unsupported protocol. A LwM2M client indicates the failure to retrieve the firmware imagine using the URI provided in the Package URI resource by writing the value 9 to the /5/0/5 (Update Result resource) when the URI contained a URI scheme unsupported by the client. Consequently, the LwM2M Client is unable to retrieve the firmware image using the URI provided by the LwM2M Server in the Package URI when it refers to an unsupported protocol.
 	 **/
 	@Resource(resourceId = 5, operation = Operation.Read)
-	public abstract Integer readUpdateResult()	;
+	public abstract Integer readUpdateResult();
 
 	/**
 	 * Name of the Firmware Package
@@ -105,5 +105,5 @@ public abstract class FirmwareUpdateObject extends AnnotatedLwM2mInstanceEnabler
 	 * 2 – Both. In this case the LwM2M Server MAY choose the preferred mechanism for conveying the firmware image to the LwM2M Client.
 	 **/
 	@Resource(resourceId = 9, operation = Operation.Read)
-	public abstract Integer readFirmwareUpdateDeliveryMethod()	;
+	public abstract Integer readFirmwareUpdateDeliveryMethod();
 }

@@ -61,13 +61,13 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	 * Reset resources 0-5 to 0 and start to collect information, If resource 8 (Collection Period) value is 0, the client will keep collecting information until resource 7 (Stop) is executed, otherwise the client will stop collecting information after specified period ended.
 	 **/
 	@Resource(resourceId = 6, operation = Operation.Execute)
-	public abstract void executeStart(String executeParameter)	;
+	public abstract void executeStart(String executeParameter);
 
 	/**
 	 * Stop collecting information, but do not reset resources 0-5.
 	 **/
 	@Resource(resourceId = 7, operation = Operation.Execute)
-	public abstract void executeStop(String executeParameter)	;
+	public abstract void executeStop(String executeParameter);
 
 	/**
 	 * The default collection period in seconds. The value 0 indicates that the collection period is not set.

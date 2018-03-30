@@ -13,13 +13,13 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * Name of the software package
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read)
-	public abstract String readPkgName()	;
+	public abstract String readPkgName();
 
 	/**
 	 * Version of the software package
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read)
-	public abstract String readPkgVersion()	;
+	public abstract String readPkgVersion();
 
 	/**
 	 * Software package
@@ -44,7 +44,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * Installs software from the package either stored in Package resource, or, downloaded from the Package URI. This Resource is only executable when the value of the State Resource is DELIVERED.
 	 **/
 	@Resource(resourceId = 4, operation = Operation.Execute)
-	public abstract void executeInstall(String executeParameter)	;
+	public abstract void executeInstall(String executeParameter);
 
 	/**
 	 * Link to a Checkpoint“ object which allows to specify conditions/dependencies for a software update. E.g. power connected, sufficient memory, target system.
@@ -60,7 +60,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * If used with no argument or argument is 0, the Package is removed i from the Device. If the argument is 1 (“ForUpdate”), the Client MUST prepare itself for receiving a Package used to upgrade the Software already in place. Update State is set back to INITIAL state.
 	 **/
 	@Resource(resourceId = 6, operation = Operation.Execute)
-	public abstract void executeUninstall(String executeParameter)	;
+	public abstract void executeUninstall(String executeParameter);
 
 	/**
 	 * Indicates current state with respect to this software update. This value is set by the LwM2M Client.
@@ -84,7 +84,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * (see 5.1.2.5)
 	 **/
 	@Resource(resourceId = 7, operation = Operation.Read)
-	public abstract Integer readUpdateState()	;
+	public abstract Integer readUpdateState();
 
 	/**
 	 * If this value is true, the LwM2M Client MUST inform the registered LwM2M Servers of Objects and Object Instances parameter by sending an Update or Registration message after the software update operation at the next practical opportunity if supported Objects in the LwM2M Client have changed, in order for the LwM2M Servers to promptly manage newly installed Objects. 
@@ -120,19 +120,19 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * This Resource MAY be reported by sending Observe operation.
 	 **/
 	@Resource(resourceId = 9, operation = Operation.Read)
-	public abstract Integer readUpdateResult()	;
+	public abstract Integer readUpdateResult();
 
 	/**
 	 * This action activates the software previously successfully installed (the Package Installation State Machine is currently in the INSTALLED state)
 	 **/
 	@Resource(resourceId = 10, operation = Operation.Execute)
-	public abstract void executeActivate(String executeParameter)	;
+	public abstract void executeActivate(String executeParameter);
 
 	/**
 	 * This action deactivates softwareif the Package Installation State Machine is currently in the INSTALLED state.
 	 **/
 	@Resource(resourceId = 11, operation = Operation.Execute)
-	public abstract void executeDeactivate(String executeParameter)	;
+	public abstract void executeDeactivate(String executeParameter);
 
 	/**
 	 * Indicates the current activation state of this software:
@@ -142,7 +142,7 @@ public abstract class LWM2MSoftwareManagementObject extends AnnotatedLwM2mInstan
 	 * Activation State is ENABLED only if the Software Activation State Machine is in the ACTIVE state
 	 **/
 	@Resource(resourceId = 12, operation = Operation.Read)
-	public abstract Boolean readActivationState()	;
+	public abstract Boolean readActivationState();
 
 	/**
 	 * Link to “Package Settings” object which allows to modify at any time software configuration settings. This is an application specific object. 

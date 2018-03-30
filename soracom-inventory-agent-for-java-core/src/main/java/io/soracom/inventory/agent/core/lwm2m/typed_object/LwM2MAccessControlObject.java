@@ -13,13 +13,13 @@ public abstract class LwM2MAccessControlObject extends AnnotatedLwM2mInstanceEna
 	 * The Object ID and The Object Instance ID are applied for.
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read)
-	public abstract Integer readObjectID()	;
+	public abstract Integer readObjectID();
 
 	/**
 	 * See Table 20: LwM2M Identifiers.
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read)
-	public abstract Integer readObjectInstanceID()	;
+	public abstract Integer readObjectInstanceID();
 
 	/**
 	 * The Resource Instance ID MUST be the Short Server ID of a certain LwM2M Server for which associated access rights are contained in the Resource Instance value.
@@ -47,7 +47,7 @@ public abstract class LwM2MAccessControlObject extends AnnotatedLwM2mInstanceEna
 	 * The specific value MAX_ID=65535 means this Access Control Object Instance is created and modified during a Bootstrap phase only.
 	 **/
 	@Resource(resourceId = 3, operation = Operation.Read)
-	public abstract Integer readAccessControlOwner()	;
+	public abstract Integer readAccessControlOwner();
 	@Resource(resourceId = 3, operation = Operation.Write)
-	public abstract void writeAccessControlOwner(Integer writeValue)	;
+	public abstract void writeAccessControlOwner(Integer writeValue);
 }

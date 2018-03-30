@@ -45,7 +45,7 @@ public abstract class DeviceObject extends AnnotatedLwM2mInstanceEnabler {
 	 * Reboot the LwM2M Device to restore the Device from unexpected firmware failure.
 	 **/
 	@Resource(resourceId = 4, operation = Operation.Execute)
-	public abstract void executeReboot(String executeParameter)	;
+	public abstract void executeReboot(String executeParameter);
 
 	/**
 	 * Perform factory reset of the LwM2M Device to make the LwM2M Device to go through initial deployment sequence where provisioning and bootstrap sequence is performed. This requires client ensuring post factory reset to have minimal information to allow it to carry out one of the bootstrap methods specified in section 5.2.3. 
@@ -118,7 +118,7 @@ public abstract class DeviceObject extends AnnotatedLwM2mInstanceEnabler {
 	 * This error code Resource MAY be observed by the LwM2M Server. How to deal with LwM2M Client’s error report depends on the policy of the LwM2M Server.
 	 **/
 	@Resource(resourceId = 11, operation = Operation.Read, multiple = true)
-	public abstract Integer readErrorCode()	;
+	public abstract Integer readErrorCode();
 
 	/**
 	 * Delete all error code Resource Instances and create only one zero-value error code that implies no error.
@@ -170,7 +170,7 @@ public abstract class DeviceObject extends AnnotatedLwM2mInstanceEnabler {
 	 * Indicates which bindings and modes are supported in the LwM2M Client. The possible values of Resource are combination of "U" or "UQ" and "S" or "SQ".
 	 **/
 	@Resource(resourceId = 16, operation = Operation.Read)
-	public abstract String readSupportedBindingAndModes()	;
+	public abstract String readSupportedBindingAndModes();
 
 	/**
 	 * Type of the device (manufacturer specified string: e.g., smart meters / dev Class…)
