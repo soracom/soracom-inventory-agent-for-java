@@ -67,6 +67,14 @@ public class BootstrapObserver extends LwM2mClientObserverAdapter {
 	}
 
 	@Override
+	public void onRegistrationSuccess(DmServerInfo server, String registrationID) {
+		log.info("Registration success: serverUri:" + server.serverUri + " lifetime:" + server.lifetime
+				+ " registrationID:" + registrationID);
+		Credentials c = extractCredentialsInfo();
+		credentialStore.saveCredentials(c);
+	}
+
+	@Override
 	public void onBootstrapTimeout(ServerInfo bsserver) {
 		log.info("Bootstrap timeout: " + bsserver.getFullUri().toString());
 	}
@@ -83,30 +91,32 @@ public class BootstrapObserver extends LwM2mClientObserverAdapter {
 
 	private Credentials extractCredentialsInfo() {
 		try {
-			ServersInfo si = ServersInfoExtractor.getInfo(objectEnablerMap);
-			log.info("Bootstrap server: " + si.bootstrap.toString() + ", Device management servers: "
-					+ si.deviceMangements.toString());
+			final ServersInfo si = ServersInfoExtractor.getInfo(objectEnablerMap);
+			if (si.bootstrap != null) {
+				log.info("Bootstrap server: " + si.bootstrap.toString());
+			}
+			log.info("Device management servers: " + si.deviceMangements.toString());
 
-			LwM2mObjectEnabler oe = objectEnablerMap.get(SECURITY);
-			LwM2mObject object = (LwM2mObject) oe.read(SYSTEM, new ReadRequest(0)).getContent();
+			final LwM2mObjectEnabler oe = objectEnablerMap.get(SECURITY);
+			final LwM2mObject object = (LwM2mObject) oe.read(SYSTEM, new ReadRequest(0)).getContent();
 			if (object == null) {
 				log.warn("no security object found");
 				return null;
 			}
-			LwM2mObjectInstance i = findDeviceManagementServerInstance(object);
-			if (i == null) {
+			final LwM2mObjectInstance deviceManagementServer = findDeviceManagementServerInstance(object);
+			if (deviceManagementServer == null) {
 				log.warn("no device management server instance found");
 				return null;
 			}
+			final Long shortServerId = getResourceInteger(deviceManagementServer, 10);
+			final DmServerInfo dm = si.deviceMangements.get(shortServerId);
 
-			Long shortServerId = getResourceInteger(i, 10);
 			Credentials c = new Credentials();
-			c.setServerURI(getResourceString(i, 0));
+			c.setServerURI(getResourceString(deviceManagementServer, 0));
 			c.setShortServerId(shortServerId.intValue());
-			c.setPskId(getResourceOpaque(i, 3));
-			c.setPskKey(getResourceOpaque(i, 5));
+			c.setPskId(getResourceOpaque(deviceManagementServer, 3));
+			c.setPskKey(getResourceOpaque(deviceManagementServer, 5));
 
-			DmServerInfo dm = si.deviceMangements.get(shortServerId);
 			c.setLifetime(dm.lifetime);
 			c.setBindingMode(dm.binding);
 			c.setNotifyWhenDisable(false);

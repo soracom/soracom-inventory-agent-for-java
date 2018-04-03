@@ -112,7 +112,7 @@ public class InventoryAgentInitializer {
 		initSecurity(initializer, credentials);
 		initServer(initializer, credentials);
 		initObjects(initializer);
-		
+
 		final Map<Integer, LwM2mObjectEnabler> objectEnablerMap = initObjectEnablers(initializer);
 		// Create client
 		final String endpoint = initEndpoint();
@@ -121,6 +121,7 @@ public class InventoryAgentInitializer {
 		final LeshanClient client = builder.build();
 		client.addObserver(new BootstrapObserver(objectEnablerMap, credentialStore));
 		final InventoryResourceObserver resourceObserver = new InventoryResourceObserver();
+		client.addObserver(resourceObserver);
 		for (Resource resource : client.getCoapServer().getRoot().getChildren()) {
 			resource.addObserver(resourceObserver);
 		}
@@ -190,7 +191,7 @@ public class InventoryAgentInitializer {
 	}
 
 	private void initObjects(ObjectsInitializer initializer) {
-		
+
 		for (Entry<Integer, List<AnnotatedLwM2mInstanceEnabler>> entry : objectInstanceMap.entrySet()) {
 			final int objectId = entry.getKey();
 			final List<AnnotatedLwM2mInstanceEnabler> instances = entry.getValue();
@@ -201,7 +202,7 @@ public class InventoryAgentInitializer {
 
 	private Map<Integer, LwM2mObjectEnabler> initObjectEnablers(ObjectsInitializer initializer) {
 		final Map<Integer, LwM2mObjectEnabler> enablerMap = new HashMap<>();
-		final List<Integer> keySet = new ArrayList<>();	
+		final List<Integer> keySet = new ArrayList<>();
 		keySet.add(LwM2mId.SERVER);
 		keySet.add(LwM2mId.SECURITY);
 		keySet.addAll(objectInstanceMap.keySet());

@@ -27,12 +27,15 @@ import java.util.TimerTask;
 import org.eclipse.californium.core.observe.ObserveRelation;
 import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.core.server.resources.ResourceObserver;
+import org.eclipse.leshan.ResponseCode;
+import org.eclipse.leshan.client.observer.LwM2mClientObserverAdapter;
 import org.eclipse.leshan.client.resource.NotifySender;
+import org.eclipse.leshan.client.servers.DmServerInfo;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InventoryResourceObserver implements ResourceObserver {
+public class InventoryResourceObserver extends LwM2mClientObserverAdapter implements ResourceObserver {
 
 	private static final Logger log = LoggerFactory.getLogger(InventoryResourceObserver.class);
 
@@ -45,17 +48,16 @@ public class InventoryResourceObserver implements ResourceObserver {
 	protected Timer timer;
 
 	public InventoryResourceObserver() {
-		initObserve();
 	}
 
 	public void setObserveInternalMillis(int observeInternalMillis) {
 		this.observeInternalMillis = observeInternalMillis;
-		initObserve();
+		startObservationIfRunning();
 	}
 
 	public void setObserveStartDelayMillis(int observeStartDelayMillis) {
 		this.observeStartDelayMillis = observeStartDelayMillis;
-		initObserve();
+		startObservationIfRunning();
 	}
 
 	@Override
@@ -105,7 +107,22 @@ public class InventoryResourceObserver implements ResourceObserver {
 		}
 	}
 
-	protected void initObserve() {
+	@Override
+	public void onRegistrationSuccess(DmServerInfo server, String registrationID) {
+		startObservation();
+	}
+
+	@Override
+	public void onRegistrationFailure(DmServerInfo server, ResponseCode responseCode, String errorMessage) {
+		stopObservation();
+	}
+
+	@Override
+	public void onRegistrationTimeout(DmServerInfo server) {
+		stopObservation();
+	}
+
+	protected void startObservation() {
 		if (timer != null) {
 			timer.cancel();
 		}
@@ -117,8 +134,22 @@ public class InventoryResourceObserver implements ResourceObserver {
 				fireResourcesChange();
 			}
 		}, observeStartDelayMillis, observeInternalMillis);
-		log.info("Observe start. observeStartDelayMillis:" + observeStartDelayMillis + " observeInternalMillis:"
+		log.info("Start observation. observeStartDelayMillis:" + observeStartDelayMillis + " observeInternalMillis:"
 				+ observeInternalMillis);
+	}
+
+	protected void startObservationIfRunning() {
+		if (timer != null) {
+			startObservation();
+		}
+	}
+
+	protected void stopObservation() {
+		if (timer != null) {
+			timer.cancel();
+			timer = null;
+			log.info("Stop observation.");
+		}
 	}
 
 	protected void fireResourcesChange() {
