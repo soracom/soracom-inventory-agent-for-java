@@ -75,8 +75,10 @@ public class InventoryAgentHelper {
 			String hardwareAddress = detectHardwareAddress();
 			if (hardwareAddress == null) {
 				hardwareAddress = "";
+			} else {
+				hardwareAddress = "-" + hardwareAddress;
 			}
-			return localHost.getHostName() + "-" + hardwareAddress;
+			return localHost.getHostName() + hardwareAddress;
 		} catch (Exception e) {
 			return "SORACOMInventoryJavaAgent-" + UUID.randomUUID().toString();
 		}
