@@ -43,15 +43,15 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 			.synchronizedMap(new HashMap<LwM2mPath, NotifySender>());
 
 	private int observeStartDelayMillis = 10000;
-	private int observeInternalMillis = 60000;
+	private int observeIntervallMillis = 60000;
 
 	protected Timer timer;
 
 	public InventoryResourceObserver() {
 	}
 
-	public void setObserveInternalMillis(int observeInternalMillis) {
-		this.observeInternalMillis = observeInternalMillis;
+	public void setObserveIntervalMillis(int observeInternalMillis) {
+		this.observeIntervallMillis = observeInternalMillis;
 		startObservationIfRunning();
 	}
 
@@ -133,9 +133,9 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 				log.info("fire resource change for observation.");
 				fireResourcesChange();
 			}
-		}, observeStartDelayMillis, observeInternalMillis);
+		}, observeStartDelayMillis, observeIntervallMillis);
 		log.info("Start observation. observeStartDelayMillis:" + observeStartDelayMillis + " observeInternalMillis:"
-				+ observeInternalMillis);
+				+ observeIntervallMillis);
 	}
 
 	protected void startObservationIfRunning() {
