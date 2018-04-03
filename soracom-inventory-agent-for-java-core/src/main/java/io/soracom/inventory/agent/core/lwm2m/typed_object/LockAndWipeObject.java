@@ -18,15 +18,15 @@ public abstract class LockAndWipeObject extends AnnotatedLwM2mInstanceEnabler {
 	 * To render the device fully inoperable the device has been fully locked.
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read)
-	public abstract Integer readState()	;
+	public abstract Integer readState();
 	@Resource(resourceId = 0, operation = Operation.Write)
-	public abstract void writeState(Integer writeValue)	;
+	public abstract void writeState(Integer writeValue);
 
 	/**
 	 * To specify one or several targets for the lock operation. This allows partially locking the device by selecting specific components or interfaces to be locked.
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Write, multiple = true)
-	public abstract void writeLockTarget(String writeValue)	;
+	public abstract void writeLockTarget(String writeValue);
 
 	/**
 	 * Indicates which data can be wiped from the device. This resource could be e.g. representing a directory.
@@ -40,13 +40,13 @@ public abstract class LockAndWipeObject extends AnnotatedLwM2mInstanceEnabler {
 	 * To permanently erase data from the device.
 	 **/
 	@Resource(resourceId = 3, operation = Operation.Execute)
-	public abstract void executeWipe(String executeParameter)	;
+	public abstract void executeWipe(String executeParameter);
 
 	/**
 	 * To specify one or several targets for the wipe operation. This allows selecting specific data, or, memory areas for the wipe operation.
 	 **/
 	@Resource(resourceId = 4, operation = Operation.Write, multiple = true)
-	public abstract void writeWipeTarget(String writeValue)	;
+	public abstract void writeWipeTarget(String writeValue);
 
 	/**
 	 * Contains the result of a lock and wipe operation
@@ -61,5 +61,5 @@ public abstract class LockAndWipeObject extends AnnotatedLwM2mInstanceEnabler {
 	 * This Resource MAY be reported by sending Observe operation.
 	 **/
 	@Resource(resourceId = 5, operation = Operation.Read)
-	public abstract Integer readLockOrWipeOperationResult()	;
+	public abstract Integer readLockOrWipeOperationResult();
 }

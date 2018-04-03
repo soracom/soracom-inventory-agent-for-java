@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 SORACOM, Inc. and others.
+ * Copyright (c) 2018 SORACOM, Inc. and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -15,6 +15,8 @@
  *******************************************************************************/
 package io.soracom.inventory.agent.core.credential;
 
+import java.util.Base64;
+
 import org.eclipse.leshan.util.Hex;
 
 public class PreSharedKey {
@@ -27,9 +29,13 @@ public class PreSharedKey {
 		pskKey = psk;
 	}
 
-	public PreSharedKey(String keyId, String pskHex) {
+	public PreSharedKey(String keyId, String pskBase64OrHex) {
 		pskIdentity = keyId;
-		pskKey = Hex.decodeHex(pskHex.toCharArray());
+		try {
+			pskKey = Base64.getDecoder().decode(pskBase64OrHex);
+		} catch (Exception e) {
+			pskKey = Hex.decodeHex(pskBase64OrHex.toCharArray());
+		}
 	}
 
 	public String getPskIdentity() {

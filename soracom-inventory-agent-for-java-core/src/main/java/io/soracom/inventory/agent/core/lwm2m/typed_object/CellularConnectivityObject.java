@@ -144,5 +144,5 @@ public abstract class CellularConnectivityObject extends AnnotatedLwM2mInstanceE
 	 * Links to instances of the “APN connection profile” object representing every APN connection profile that has an activated connection to a PDN.
 	 **/
 	@Resource(resourceId = 11, operation = Operation.Read, multiple = true)
-	public abstract String readActivatedProfileNames()	;
+	public abstract String readActivatedProfileNames();
 }

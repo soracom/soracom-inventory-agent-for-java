@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 SORACOM, Inc. and others.
+ * Copyright (c) 2018 SORACOM, Inc. and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -16,8 +16,11 @@
 package io.soracom.inventory.agent.core.util;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,12 +29,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Operations;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.node.ObjectLink;
 
+/**
+ * <pre>
+ * Utility class to generate template implementation of java class from LWM2M model definition model file.
+ * 
+ * Usage:
+ * String javaPackage = "my.models"; //Java package for generated java source
+ * File sourceOutputDir = new File("source"); // root of source dir
+ * TypedAnnotatedObjectTemplateClassGenerator generator = new TypedAnnotatedObjectTemplateClassGenerator(javaPackage,outputDir);
+ * File modelFile = new File("30000.xml");
+ * generator.generateTemplateClassFromObjectModel(modelFile);
+ * </pre>
+ * 
+ * @author c9katayama
+ *
+ */
 public class TypedAnnotatedObjectTemplateClassGenerator {
 
 	protected String indentChar = "\t";
@@ -40,16 +59,32 @@ public class TypedAnnotatedObjectTemplateClassGenerator {
 
 	protected boolean abstractTemplate = false;
 
+	protected String javaPackage;
+
+	protected File sourceOutputDir;
+
 	public TypedAnnotatedObjectTemplateClassGenerator() {
-		pw = System.out;
 	}
 
-	public void setOutput(File file) throws IOException {
-		pw = new PrintStream(new FileOutputStream(file));
+	public TypedAnnotatedObjectTemplateClassGenerator(String javaPackage) {
+		this.javaPackage = javaPackage;
+	}
+
+	public TypedAnnotatedObjectTemplateClassGenerator(String javaPackage, File sourceOutputDir) {
+		this.javaPackage = javaPackage;
+		setSourceOutputDir(sourceOutputDir);
+	}
+
+	public void setSourceOutputDir(File dir) {
+		sourceOutputDir = dir;
 	}
 
 	public void setIndentChar(String indentChar) {
 		this.indentChar = indentChar;
+	}
+
+	public void setJavaPackage(String javaPackage) {
+		this.javaPackage = javaPackage;
 	}
 
 	public void setGenerateAbstractTemplate(boolean abstractTemplate) {
@@ -67,14 +102,46 @@ public class TypedAnnotatedObjectTemplateClassGenerator {
 		resourceModel2TypeMap.put(ResourceModel.Type.TIME, Date.class.getName());
 	}
 
-	public void generateTemplateClassFromObjectModel(String javaPackage, ObjectModel model) {
-		println("package " + javaPackage + ";");
+	public void generateTemplateClassFromObjectModel(File modelDefinitionFile) {
+		try {
+			generateTemplateClassFromObjectModel(new FileInputStream(modelDefinitionFile));
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+
+	protected FileOutputStream prepareSourceFileOutputStream(String className) {
+		File sourceDir = javaPackage == null ? sourceOutputDir
+				: new File(sourceOutputDir, javaPackage.replaceAll("\\.", "\\/"));
+		sourceDir.mkdirs();
+		try {
+			return new FileOutputStream(new File(sourceDir, className + ".java"));
+		} catch (IOException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+
+	public void generateTemplateClassFromObjectModel(InputStream modelDefinitionInputStream) {
+		final ObjectModel model = ObjectLoader.loadDdfFile(modelDefinitionInputStream, "");
+		final String className = toJavaName(model.name + "Object");
+
+		FileOutputStream fout = null;
+		if (sourceOutputDir != null) {
+			fout = prepareSourceFileOutputStream(className);
+			pw = new PrintStream(fout);
+		} else {
+			pw = System.out;
+		}
+
+		if (javaPackage != null) {
+			println("package " + javaPackage + ";");
+		}
 		println("import io.soracom.inventory.agent.core.lwm2m.*;");
 		println("import java.util.Date;");
 		println("import " + ObjectLink.class.getName() + ";");
 		println("");
 		printComment(0, model.description);
-		final String className = toJavaName(model.name + "Object");
+
 		final String multipleObject = model.multiple ? ", multiple = true" : "";
 		println(0, "@LWM2MObject(objectId = " + model.id + ", name = \"" + model.name + "\"" + multipleObject + ")");
 		final String defaultModifier = getModifier();
@@ -96,7 +163,7 @@ public class TypedAnnotatedObjectTemplateClassGenerator {
 						+ multipleResource + ")");
 				print(1, modifire + " " + responseValue + " read" + toJavaName(resourceModel.name) + "()");
 				if (mondatory) {
-					println(1, ";");
+					println(0, ";");
 				} else {
 					println(1, "{");
 					println(2, "throw LwM2mInstanceResponseException.notFound();");
@@ -109,7 +176,7 @@ public class TypedAnnotatedObjectTemplateClassGenerator {
 						+ multipleResource + ")");
 				print(1, modifire + " void write" + toJavaName(resourceModel.name) + "(" + paramValue + " writeValue)");
 				if (mondatory) {
-					println(1, ";");
+					println(0, ";");
 				} else {
 					println(1, "{");
 					println(2, "throw LwM2mInstanceResponseException.notFound();");
@@ -121,7 +188,7 @@ public class TypedAnnotatedObjectTemplateClassGenerator {
 						+ multipleResource + ")");
 				print(1, modifire + " void execute" + toJavaName(resourceModel.name) + "(String executeParameter)");
 				if (mondatory) {
-					println(1, ";");
+					println(0, ";");
 				} else {
 					println(1, "{");
 					println(2, "throw LwM2mInstanceResponseException.notFound();");
@@ -131,6 +198,13 @@ public class TypedAnnotatedObjectTemplateClassGenerator {
 		}
 		println(0, "}");
 		pw.close();
+		if (fout != null) {
+			try {
+				fout.close();
+			} catch (IOException e) {
+				// ignore
+			}
+		}
 	}
 
 	public String toJavaClassName(ObjectModel model) {

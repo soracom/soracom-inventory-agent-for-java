@@ -34,13 +34,13 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	 * 44~50: reserved for others type wireline networks.
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read)
-	public abstract Integer readNetworkBearer()	;
+	public abstract Integer readNetworkBearer();
 
 	/**
 	 * Indicates list of current available network bearer. Each Resource Instance has a value from the network bearer list.
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read, multiple = true)
-	public abstract Integer readAvailableNetworkBearer()	;
+	public abstract Integer readAvailableNetworkBearer();
 
 	/**
 	 * This node contains the average value of the
@@ -53,7 +53,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	 * refer to ETSI TS 36.133 specification).
 	 **/
 	@Resource(resourceId = 2, operation = Operation.Read)
-	public abstract Integer readRadioSignalStrength()	;
+	public abstract Integer readRadioSignalStrength();
 
 	/**
 	 * This contains received link quality  e.g., LQI for IEEE 802.15.4, (Range (0..255)), RxQual Downlink (for GSM range is 0…7).
@@ -68,7 +68,7 @@ public abstract class ConnectivityMonitoringObject extends AnnotatedLwM2mInstanc
 	 * The IP addresses assigned to the connectivity interface. (e.g., IPv4, IPv6, etc.)
 	 **/
 	@Resource(resourceId = 4, operation = Operation.Read, multiple = true)
-	public abstract String readIPAddresses()	;
+	public abstract String readIPAddresses();
 
 	/**
 	 * The IP address of the next-hop IP router, on each of the interfaces specified in resource 4 (IP Addresses).

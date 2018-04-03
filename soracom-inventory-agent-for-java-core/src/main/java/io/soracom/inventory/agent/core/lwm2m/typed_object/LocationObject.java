@@ -13,13 +13,13 @@ public abstract class LocationObject extends AnnotatedLwM2mInstanceEnabler {
 	 * The decimal notation of latitude, e.g., -43.5723 [World Geodetic System 1984].
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read)
-	public abstract Float readLatitude()	;
+	public abstract Float readLatitude();
 
 	/**
 	 * The decimal notation of longitude, e.g., 153.21760 [World Geodetic System 1984].
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read)
-	public abstract Float readLongitude()	;
+	public abstract Float readLongitude();
 
 	/**
 	 * The decimal notation of altitude in meters above sea level.
@@ -49,7 +49,7 @@ public abstract class LocationObject extends AnnotatedLwM2mInstanceEnabler {
 	 * The timestamp of when the location measurement was performed.
 	 **/
 	@Resource(resourceId = 5, operation = Operation.Read)
-	public abstract java.util.Date readTimestamp()	;
+	public abstract java.util.Date readTimestamp();
 
 	/**
 	 * Speed is the time rate of change in position of a LwM2M Client without regard for direction: the scalar component of velocity.

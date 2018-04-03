@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 SORACOM, Inc. and others.
+ * Copyright (c) 2018 SORACOM, Inc. and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -26,10 +26,12 @@ import org.eclipse.leshan.LwM2mId;
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
 import org.eclipse.leshan.client.object.Security;
+import org.eclipse.leshan.client.object.Server;
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;
 import org.eclipse.leshan.core.model.LwM2mModel;
+import org.eclipse.leshan.core.request.BindingMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,37 +56,49 @@ public class InventoryAgentInitializer {
 	protected Map<Integer, List<AnnotatedLwM2mInstanceEnabler>> objectInstanceMap = new HashMap<>();
 	protected LwM2mInstanceEnabler serverInstance;
 	private int shortServerId = 123;
+	protected Integer observationStartDelaySeconds;
+	protected Integer observationIntervalSeconds;
 
 	public InventoryAgentInitializer() {
 
 	}
-
+	/**
+	 * Server URI to use bootstrap and regitration
+	 * @param serverUri
+	 */
 	public void setServerUri(String serverUri) {
 		this.serverUri = serverUri;
-	}
-
-	public String getServerUri() {
-		return serverUri;
 	}
 
 	public void setPreSharedKey(PreSharedKey preSharedKey) {
 		this.preSharedKey = preSharedKey;
 	}
-
+	
+	/**
+	 * Endpoint name to identify client device
+	 * @param endpoint
+	 */
 	public void setEndpoint(String endpoint) {
 		this.endpoint = endpoint;
 	}
-
+	
 	public void setCredentialStore(CredentialStore credentialStore) {
 		this.credentialStore = credentialStore;
 	}
-
+	
 	public void setForceBootstrap(boolean forceBootstrap) {
 		this.forceBootstrap = forceBootstrap;
 	}
 
 	public void setLwM2mModel(LwM2mModel lwM2mModel) {
 		this.lwM2mModel = lwM2mModel;
+	}
+	/**
+	 * Observation interval calling read method continuously  
+	 * @param observationIntervalSeconds
+	 */
+	public void setObservationIntervalSeconds(Integer observationIntervalSeconds) {
+		this.observationIntervalSeconds = observationIntervalSeconds;
 	}
 
 	public void addInstancesForObject(AnnotatedLwM2mInstanceEnabler objectInstance) {
@@ -106,9 +120,11 @@ public class InventoryAgentInitializer {
 	public LeshanClient buildClient() {
 		final LwM2mModel lwM2mModel = initLwM2mModel();
 		final ObjectsInitializer initializer = new ObjectsInitializer(lwM2mModel);
-		initSecurity(initializer);
-		initServer(initializer);
+		final Credentials credentials = loadCredentials();
+		initSecurity(initializer, credentials);
+		initServer(initializer, credentials);
 		initObjects(initializer);
+
 		final Map<Integer, LwM2mObjectEnabler> objectEnablerMap = initObjectEnablers(initializer);
 		// Create client
 		final String endpoint = initEndpoint();
@@ -116,7 +132,8 @@ public class InventoryAgentInitializer {
 		builder.setObjects(new ArrayList<>(objectEnablerMap.values()));
 		final LeshanClient client = builder.build();
 		client.addObserver(new BootstrapObserver(objectEnablerMap, credentialStore));
-		final InventoryResourceObserver resourceObserver = new InventoryResourceObserver();
+		final InventoryResourceObserver resourceObserver = buildInventoryResourceObserver();
+		client.addObserver(resourceObserver);
 		for (Resource resource : client.getCoapServer().getRoot().getChildren()) {
 			resource.addObserver(resourceObserver);
 		}
@@ -124,51 +141,80 @@ public class InventoryAgentInitializer {
 		return client;
 	}
 
+	protected InventoryResourceObserver buildInventoryResourceObserver() {
+		final InventoryResourceObserver resourceObserver = new InventoryResourceObserver();
+		if (observationIntervalSeconds != null) {
+			resourceObserver.setObserveIntervalSeconds(observationIntervalSeconds);
+		}
+		if (observationStartDelaySeconds != null) {
+			resourceObserver.setObserveStartDelaySeconds(observationStartDelaySeconds);
+		}
+		return resourceObserver;
+	}
+
 	protected LwM2mModel initLwM2mModel() {
 		return this.lwM2mModel == null ? InventoryAgentHelper.createDefaultLwM2mModel() : this.lwM2mModel;
 	}
 
-	private void initSecurity(ObjectsInitializer initializer) {
+	private Credentials loadCredentials() {
+		if (preSharedKey != null) {
+			log.info("load credentials from psk.");
+			Credentials credentials = new Credentials();
+			credentials.setServerURI(serverUri);
+			credentials.setShortServerId(shortServerId);
+			credentials.setPskId(preSharedKey.getPskIdentityBytes());
+			credentials.setPskKey(preSharedKey.getPskKey());
+			credentials.setBindingMode(BindingMode.U);
+			credentials.setLifetime(60L);
+			return credentials;
+		} else {
+			if (forceBootstrap) {
+				credentialStore.clearCredentials();
+			}
+			final Credentials credentials = credentialStore.loadCredentials();
+			if (credentials == null) {
+				log.info("credentials does not exist.");
+			} else {
+				log.info("load credentials from credential store.");
+			}
+			return credentials;
+		}
+	}
+
+	private Security securityObject;
+	private Server serverObject;
+
+	private void initSecurity(ObjectsInitializer initializer, Credentials credentials) {
 		if (objectInstanceMap.containsKey(LwM2mId.SECURITY)) {
 			return;
 		}
-		if (forceBootstrap) {
-			credentialStore.clearCredentials();
-		}
-		Security securityInfo = null;
 		if (preSharedKey != null) {
 			log.info("set bootstrap security object from psk.");
-			Credentials credential = new Credentials();
-			credential.setServerURI(serverUri);
-			credential.setShortServerId(shortServerId);
-			credential.setPskId(preSharedKey.getPskIdentityBytes());
-			credential.setPskKey(preSharedKey.getPskKey());
-			securityInfo = InventoryAgentHelper.getSecurityInfo(credential);
+			securityObject = InventoryAgentHelper.getSecurityInfo(credentials);
 		} else {
-			final Credentials credential = credentialStore.loadCredentials();
-			if (credential == null) {
+			if (credentials == null) {
 				log.info("set bootstrap security object.");
-				securityInfo = InventoryAgentHelper.getSecurityInfoForBootstrap(serverUri, null, null);
+				securityObject = InventoryAgentHelper.getSecurityInfoForBootstrap(serverUri, null, null);
 			} else {
 				log.info("set security object from credential store.");
-				securityInfo = InventoryAgentHelper.getSecurityInfo(credential);
+				securityObject = InventoryAgentHelper.getSecurityInfo(credentials);
 			}
 		}
-		initializer.setInstancesForObject(LwM2mId.SECURITY, securityInfo);
+		initializer.setInstancesForObject(LwM2mId.SECURITY, securityObject);
 	}
 
-	private void initServer(ObjectsInitializer initializer) {
+	private void initServer(ObjectsInitializer initializer, Credentials credentials) {
 		if (objectInstanceMap.containsKey(LwM2mId.SERVER)) {
 			return;
 		}
-		final Credentials credential = credentialStore.loadCredentials();
-		if (credential != null) {
-			final LwM2mInstanceEnabler serverInfo = InventoryAgentHelper.getServerInfo(credential);
-			initializer.setInstancesForObject(LwM2mId.SERVER, serverInfo);
+		if (credentials != null) {
+			serverObject = InventoryAgentHelper.getServerInfo(credentials);
+			initializer.setInstancesForObject(LwM2mId.SERVER, serverObject);
 		}
 	}
 
 	private void initObjects(ObjectsInitializer initializer) {
+
 		for (Entry<Integer, List<AnnotatedLwM2mInstanceEnabler>> entry : objectInstanceMap.entrySet()) {
 			final int objectId = entry.getKey();
 			final List<AnnotatedLwM2mInstanceEnabler> instances = entry.getValue();

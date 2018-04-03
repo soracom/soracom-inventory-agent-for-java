@@ -16,7 +16,7 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * executable Resource can work with.
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read)
-	public abstract String readProperty()	;
+	public abstract String readProperty();
 
 	/**
 	 * Group name of Device Capabilities
@@ -32,7 +32,7 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * 9-15: reserved
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read)
-	public abstract Integer readGroup()	;
+	public abstract Integer readGroup();
 
 	/**
 	 * Device Capability Description
@@ -59,21 +59,21 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * The ‘Attached’ and ‘Enabled’ resources are independent. A Device Capability MAY have ‘True’ as value for ‘Enabled’ Resource while having ‘False’ as value for the ‘Attached’ Resource. That means the Device Capability is still not available and can’t be used until it is attached to the Device, but will be useable once the Device Capability is attached.
 	 **/
 	@Resource(resourceId = 4, operation = Operation.Read)
-	public abstract Boolean readEnabled()	;
+	public abstract Boolean readEnabled();
 
 	/**
 	 * This command is used to enable the Device Capability to transfer the Device Capability from Disabled State to Enabled state.
 	 * In Enabled State, the Device Capability is allowed to work when it is attached to the Device.
 	 **/
 	@Resource(resourceId = 5, operation = Operation.Execute)
-	public abstract void executeOpEnable(String executeParameter)	;
+	public abstract void executeOpEnable(String executeParameter);
 
 	/**
 	 * This command is used to disable the Device Capability to transfer the Device Capability from Enabled State to Disabled State.
 	 * In Disabled state the Device Capability is not allowed to work.
 	 **/
 	@Resource(resourceId = 6, operation = Operation.Execute, multiple = true)
-	public abstract void executeOpDisable(String executeParameter)	;
+	public abstract void executeOpDisable(String executeParameter);
 
 	/**
 	 * When the Resources “Enabled” or “Attached” are under “Observation”, this resource specifies whether the LWM2M Server MUST be notified when the value of the Resource on “Observation” changed. If the Resource “NotifyEn” is not present or the value is ‘False’, the LWM2M Server will be not notified about this change. If the “NotifyEn” Resource is present and the value is ‘True’, the LWM2M Server will be notified.

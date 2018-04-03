@@ -13,9 +13,9 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	 * Human-readable identifier. Multiple connection profiles can share the same APN value but e.g. have different credentials.
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read)
-	public abstract String readProfileName()	;
+	public abstract String readProfileName();
 	@Resource(resourceId = 0, operation = Operation.Write)
-	public abstract void writeProfileName(String writeValue)	;
+	public abstract void writeProfileName(String writeValue);
 
 	/**
 	 * Presented to network during connection to PDN e.g. ‘internet.15.234’.
@@ -65,9 +65,9 @@ public abstract class APNConnectionProfileObject extends AnnotatedLwM2mInstanceE
 	 * 3: None
 	 **/
 	@Resource(resourceId = 4, operation = Operation.Read)
-	public abstract Integer readAuthenticationType()	;
+	public abstract Integer readAuthenticationType();
 	@Resource(resourceId = 4, operation = Operation.Write)
-	public abstract void writeAuthenticationType(Integer writeValue)	;
+	public abstract void writeAuthenticationType(Integer writeValue);
 
 	/**
 	 * Used with e.g. PAP.
