@@ -29,6 +29,7 @@ public class SORACOMInventoryAgentExample {
 		initializer.setServerUri(parser.serverURI);
 		initializer.setForceBootstrap(parser.forceBootstrap);
 		initializer.setPreSharedKey(parser.psk);
+		initializer.setObservationIntervalSeconds(60);
 		initializer.setCredentialStore(new FileCredentialStore());
 
 		final LwM2mModelBuilder lwM2mModelBuilder = new LwM2mModelBuilder();

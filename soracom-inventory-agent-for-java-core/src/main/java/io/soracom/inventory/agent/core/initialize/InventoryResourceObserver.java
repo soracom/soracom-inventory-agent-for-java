@@ -42,21 +42,24 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 	private Map<LwM2mPath, NotifySender> observedResourceMap = Collections
 			.synchronizedMap(new HashMap<LwM2mPath, NotifySender>());
 
-	private int observeStartDelayMillis = 10000;
-	private int observeIntervallMillis = 60000;
+	private int observationStartDelaySeconds = 10;
+	private int observationIntervalSeconds = 60;
 
 	protected Timer timer;
 
 	public InventoryResourceObserver() {
 	}
 
-	public void setObserveIntervalMillis(int observeInternalMillis) {
-		this.observeIntervallMillis = observeInternalMillis;
+	public void setObserveStartDelaySeconds(int observationStartDelaySeconds) {
+		this.observationStartDelaySeconds = observationStartDelaySeconds;
 		startObservationIfRunning();
 	}
 
-	public void setObserveStartDelayMillis(int observeStartDelayMillis) {
-		this.observeStartDelayMillis = observeStartDelayMillis;
+	public void setObserveIntervalSeconds(int observationIntervalSeconds) {
+		if (observationIntervalSeconds < 1) {
+			throw new IllegalArgumentException("ObservationIntervalSeconds must be at least 1.");
+		}
+		this.observationIntervalSeconds = observationIntervalSeconds;
 		startObservationIfRunning();
 	}
 
@@ -133,9 +136,9 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 				log.info("fire resource change for observation.");
 				fireResourcesChange();
 			}
-		}, observeStartDelayMillis, observeIntervallMillis);
-		log.info("Start observation. observeStartDelayMillis:" + observeStartDelayMillis + " observeInternalMillis:"
-				+ observeIntervallMillis);
+		}, observationStartDelaySeconds * 1000, observationIntervalSeconds * 1000);
+		log.info("Start observation. observationStartDelaySeconds:" + observationStartDelaySeconds
+				+ " observationIntervalSeconds:" + observationIntervalSeconds);
 	}
 
 	protected void startObservationIfRunning() {

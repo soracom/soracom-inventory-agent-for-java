@@ -56,37 +56,49 @@ public class InventoryAgentInitializer {
 	protected Map<Integer, List<AnnotatedLwM2mInstanceEnabler>> objectInstanceMap = new HashMap<>();
 	protected LwM2mInstanceEnabler serverInstance;
 	private int shortServerId = 123;
+	protected Integer observationStartDelaySeconds;
+	protected Integer observationIntervalSeconds;
 
 	public InventoryAgentInitializer() {
 
 	}
-
+	/**
+	 * Server URI to use bootstrap and regitration
+	 * @param serverUri
+	 */
 	public void setServerUri(String serverUri) {
 		this.serverUri = serverUri;
-	}
-
-	public String getServerUri() {
-		return serverUri;
 	}
 
 	public void setPreSharedKey(PreSharedKey preSharedKey) {
 		this.preSharedKey = preSharedKey;
 	}
-
+	
+	/**
+	 * Endpoint name to identify client device
+	 * @param endpoint
+	 */
 	public void setEndpoint(String endpoint) {
 		this.endpoint = endpoint;
 	}
-
+	
 	public void setCredentialStore(CredentialStore credentialStore) {
 		this.credentialStore = credentialStore;
 	}
-
+	
 	public void setForceBootstrap(boolean forceBootstrap) {
 		this.forceBootstrap = forceBootstrap;
 	}
 
 	public void setLwM2mModel(LwM2mModel lwM2mModel) {
 		this.lwM2mModel = lwM2mModel;
+	}
+	/**
+	 * Observation interval calling read method continuously  
+	 * @param observationIntervalSeconds
+	 */
+	public void setObservationIntervalSeconds(Integer observationIntervalSeconds) {
+		this.observationIntervalSeconds = observationIntervalSeconds;
 	}
 
 	public void addInstancesForObject(AnnotatedLwM2mInstanceEnabler objectInstance) {
@@ -120,13 +132,24 @@ public class InventoryAgentInitializer {
 		builder.setObjects(new ArrayList<>(objectEnablerMap.values()));
 		final LeshanClient client = builder.build();
 		client.addObserver(new BootstrapObserver(objectEnablerMap, credentialStore));
-		final InventoryResourceObserver resourceObserver = new InventoryResourceObserver();
+		final InventoryResourceObserver resourceObserver = buildInventoryResourceObserver();
 		client.addObserver(resourceObserver);
 		for (Resource resource : client.getCoapServer().getRoot().getChildren()) {
 			resource.addObserver(resourceObserver);
 		}
 		InventoryAgentHelper.addShutdownHoot(client);
 		return client;
+	}
+
+	protected InventoryResourceObserver buildInventoryResourceObserver() {
+		final InventoryResourceObserver resourceObserver = new InventoryResourceObserver();
+		if (observationIntervalSeconds != null) {
+			resourceObserver.setObserveIntervalSeconds(observationIntervalSeconds);
+		}
+		if (observationStartDelaySeconds != null) {
+			resourceObserver.setObserveStartDelaySeconds(observationStartDelaySeconds);
+		}
+		return resourceObserver;
 	}
 
 	protected LwM2mModel initLwM2mModel() {
