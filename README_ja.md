@@ -5,7 +5,7 @@ SORACOM Inventory agent for Java は、SORACOM Inventory用のエージェント
 ##セットアップ
 Eclipseの場合、以下のコマンドでEclipse用のプロジェクトファイルを生成できます。
 ```
-./gradrew eclipse
+./gradlew eclipse
 ```
 なお、IntelliJの場合は、"./gradrew idea"で同様にファイルを生成できます。
 
@@ -18,14 +18,14 @@ soracom-inventory-agent-for-java-exampleプロジェクトは、Inventoryエー�
 ##ビルド
 ビルドは以下のコマンドで実行できます。 
 ```
-./gradrew build
+./gradlew build
 ```
 
 ##配布
 アプリケーション配布用のZipファイルは、以下のコマンドで生成できます。
 生成されたアーカイブは、build/distributionsに出力されます。
 ```
-./gradrew distZip
+./gradlew distZip
 ```
 生成されたzip/tarを解凍したあとにできるbinディレクトリに、実行用のシェルが同梱されています。
 デバイス上で動作させる場合は、このシェルを利用してください。
