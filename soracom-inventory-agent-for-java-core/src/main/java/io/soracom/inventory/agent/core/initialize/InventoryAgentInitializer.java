@@ -42,6 +42,11 @@ import io.soracom.inventory.agent.core.credential.PreSharedKey;
 import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
 import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
 
+/**
+ * Helper class to initialize LeshanClient instance
+ * @author c9katayama
+ *
+ */
 public class InventoryAgentInitializer {
 
 	private static final Logger log = LoggerFactory.getLogger(InventoryAgentInitializer.class);
@@ -63,7 +68,7 @@ public class InventoryAgentInitializer {
 
 	}
 	/**
-	 * Server URI to use bootstrap and regitration
+	 * Server URI to use bootstrap and registration
 	 * @param serverUri
 	 */
 	public void setServerUri(String serverUri) {

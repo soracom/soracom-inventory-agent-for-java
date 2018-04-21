@@ -21,13 +21,29 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This annotation indicates definition of LWM2M object.
+ * 
+ * @author c9katayama
+ *
+ */
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface LWM2MObject {
+	/**
+	 * Object id of LWM2M object.
+	 * 
+	 * @return
+	 */
 	int objectId();
 
 	String name();
 
+	/**
+	 * Whether multiple instance registration is permitted or not.
+	 * 
+	 * @return
+	 */
 	boolean multiple() default false;
 }

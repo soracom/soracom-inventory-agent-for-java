@@ -17,6 +17,14 @@ package io.soracom.inventory.agent.core.lwm2m;
 
 import org.eclipse.leshan.core.node.LwM2mResource;
 
+/**
+ * This class includes runtime values such as write value. An instance of
+ * LWM2MObject can receive this instance as an argument of a method that is
+ * annotated with {@link io.soracom.inventory.agent.core.lwm2m.Resource}
+ * 
+ * @author c9katayama
+ *
+ */
 public class ResourceContext {
 
 	private int resourceId;
@@ -32,14 +40,34 @@ public class ResourceContext {
 		this.executeParameter = executeParameter;
 	}
 
+	/**
+	 * Obtains an instance of {@code ResourceContext} for read operation.
+	 * 
+	 * @param resourceId
+	 * @return
+	 */
 	public static ResourceContext ofReadContext(int resourceId) {
 		return new ResourceContext(resourceId, Operation.Read, null, null);
 	}
 
+	/**
+	 * Obtains an instance of {@code ResourceContext} for write operation.
+	 * 
+	 * @param resourceId
+	 * @param writeValue
+	 * @return
+	 */
 	public static ResourceContext ofWriteContext(int resourceId, LwM2mResource writeValue) {
 		return new ResourceContext(resourceId, Operation.Write, writeValue, null);
 	}
 
+	/**
+	 * Obtains an instance of {@code ResourceContext} for execute operation.
+	 * 
+	 * @param resourceId
+	 * @param executeParameter
+	 * @return
+	 */
 	public static ResourceContext ofExecuteContext(int resourceId, String executeParameter) {
 		return new ResourceContext(resourceId, Operation.Execute, null, executeParameter);
 	}
