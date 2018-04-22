@@ -28,7 +28,6 @@ import org.eclipse.californium.core.observe.ObserveRelation;
 import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.core.server.resources.ResourceObserver;
 import org.eclipse.leshan.ResponseCode;
-import org.eclipse.leshan.client.californium.impl.ObjectResource;
 import org.eclipse.leshan.client.observer.LwM2mClientObserverAdapter;
 import org.eclipse.leshan.client.resource.NotifySender;
 import org.eclipse.leshan.client.servers.DmServerInfo;
@@ -39,6 +38,13 @@ import org.slf4j.LoggerFactory;
 /**
  * Handle resource observe and remove observe request.
  * 
+ * <pre>
+ * This class provides continuous invocation for observed resources.
+ * Once an observation request from server, this class add the observed resource to observed map,
+ * then invoke the resource at the interval of observationIntervalSeconds property.
+ * Also this class listens registration status through {@link org.eclipse.leshan.client.observer.LwM2mClientObserver}.
+ * Observation is started when registration is succeeded, and it is stopped registration is failed. 
+ * <pre>
  * @author c9katayama
  *
  */
@@ -49,8 +55,8 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 	private Map<LwM2mPath, NotifySender> observedResourceMap = Collections
 			.synchronizedMap(new HashMap<LwM2mPath, NotifySender>());
 
-	private int observationStartDelaySeconds = 10;
-	private int observationIntervalSeconds = 60;
+	protected int observationStartDelaySeconds = 10;
+	protected int observationIntervalSeconds = 60;
 
 	protected Timer timer;
 
