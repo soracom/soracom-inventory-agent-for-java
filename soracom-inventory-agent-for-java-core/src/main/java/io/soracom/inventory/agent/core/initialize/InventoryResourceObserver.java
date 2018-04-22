@@ -35,6 +35,12 @@ import org.eclipse.leshan.core.node.LwM2mPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Handle resource observe and remove observe request.
+ * 
+ * @author c9katayama
+ *
+ */
 public class InventoryResourceObserver extends LwM2mClientObserverAdapter implements ResourceObserver {
 
 	private static final Logger log = LoggerFactory.getLogger(InventoryResourceObserver.class);
@@ -50,11 +56,21 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 	public InventoryResourceObserver() {
 	}
 
+	/**
+	 * The time to delay start observation
+	 * 
+	 * @param observationStartDelaySeconds
+	 */
 	public void setObserveStartDelaySeconds(int observationStartDelaySeconds) {
 		this.observationStartDelaySeconds = observationStartDelaySeconds;
 		startObservationIfRunning();
 	}
 
+	/**
+	 * The period between observations
+	 * 
+	 * @param observationIntervalSeconds
+	 */
 	public void setObserveIntervalSeconds(int observationIntervalSeconds) {
 		if (observationIntervalSeconds < 1) {
 			throw new IllegalArgumentException("ObservationIntervalSeconds must be at least 1.");
@@ -68,7 +84,7 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 		LwM2mPath path = new LwM2mPath(relation.getExchange().getCurrentRequest().getOptions().getUriPathString());
 		NotifySender removed = observedResourceMap.remove(path);
 		if (removed != null) {
-			log.info("removedObserveRelation path=" + path.toString());
+			log.info("removed Observe Relation path=" + path.toString());
 		}
 	}
 
@@ -83,7 +99,7 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 		}
 		for (LwM2mPath path : removeKeyList) {
 			observedResourceMap.remove(path);
-			log.info("removedChild path=" + path.toString());
+			log.info("removed child path=" + path.toString());
 		}
 	}
 
@@ -106,7 +122,7 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 		if (resource instanceof NotifySender) {
 			NotifySender notifySender = (NotifySender) resource;
 			observedResourceMap.put(path, notifySender);
-			log.info("addedObserveRelation path=" + path.toString());
+			log.info("added ObserveRelation path=" + path.toString());
 		}
 	}
 
@@ -137,7 +153,7 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 				fireResourcesChange();
 			}
 		}, observationStartDelaySeconds * 1000, observationIntervalSeconds * 1000);
-		log.info("Start observation. observationStartDelaySeconds:" + observationStartDelaySeconds
+		log.info("start observation. observationStartDelaySeconds:" + observationStartDelaySeconds
 				+ " observationIntervalSeconds:" + observationIntervalSeconds);
 	}
 
@@ -151,7 +167,7 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 		if (timer != null) {
 			timer.cancel();
 			timer = null;
-			log.info("Stop observation.");
+			log.info("stop observation.");
 		}
 	}
 
@@ -159,7 +175,7 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 		for (LwM2mPath lwm2mPath : observedResourceMap.keySet()) {
 			final NotifySender sender = observedResourceMap.get(lwm2mPath);
 			final String relationURI = toRelationURI(lwm2mPath);
-			log.debug("sendNotify " + relationURI);
+			log.debug("send notify to " + relationURI);
 			sender.sendNotify(relationURI);
 		}
 	}
