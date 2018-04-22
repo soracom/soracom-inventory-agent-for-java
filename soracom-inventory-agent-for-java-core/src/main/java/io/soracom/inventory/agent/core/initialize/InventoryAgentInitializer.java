@@ -44,6 +44,7 @@ import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
 
 /**
  * Helper class to initialize LeshanClient instance
+ * 
  * @author c9katayama
  *
  */
@@ -61,14 +62,17 @@ public class InventoryAgentInitializer {
 	protected Map<Integer, List<AnnotatedLwM2mInstanceEnabler>> objectInstanceMap = new HashMap<>();
 	protected LwM2mInstanceEnabler serverInstance;
 	private int shortServerId = 123;
-	protected Integer observationStartDelaySeconds;
-	protected Integer observationIntervalSeconds;
+	protected Integer observationTimerTaskStartDelaySeconds;
+	protected Integer observationTimerTaskIntervalSeconds;
+	protected boolean enableObservationTimerTask = true;
 
 	public InventoryAgentInitializer() {
 
 	}
+
 	/**
 	 * Server URI to use bootstrap and registration
+	 * 
 	 * @param serverUri
 	 */
 	public void setServerUri(String serverUri) {
@@ -78,19 +82,20 @@ public class InventoryAgentInitializer {
 	public void setPreSharedKey(PreSharedKey preSharedKey) {
 		this.preSharedKey = preSharedKey;
 	}
-	
+
 	/**
 	 * Endpoint name to identify client device
+	 * 
 	 * @param endpoint
 	 */
 	public void setEndpoint(String endpoint) {
 		this.endpoint = endpoint;
 	}
-	
+
 	public void setCredentialStore(CredentialStore credentialStore) {
 		this.credentialStore = credentialStore;
 	}
-	
+
 	public void setForceBootstrap(boolean forceBootstrap) {
 		this.forceBootstrap = forceBootstrap;
 	}
@@ -98,12 +103,24 @@ public class InventoryAgentInitializer {
 	public void setLwM2mModel(LwM2mModel lwM2mModel) {
 		this.lwM2mModel = lwM2mModel;
 	}
+
 	/**
-	 * Observation interval calling read method continuously  
+	 * Observation interval calling read method continuously
+	 * 
 	 * @param observationIntervalSeconds
 	 */
-	public void setObservationIntervalSeconds(Integer observationIntervalSeconds) {
-		this.observationIntervalSeconds = observationIntervalSeconds;
+	public void setObservationTimerTaskIntervalSeconds(Integer observationTimerTaskIntervalSeconds) {
+		this.observationTimerTaskIntervalSeconds = observationTimerTaskIntervalSeconds;
+	}
+
+	/**
+	 * Enable timer task to invoke observed resources continuously.
+	 * 
+	 * @param enableObservationTimerTasks
+	 *            defaul value is true
+	 */
+	public void setEnableObservationTimerTasks(boolean enableObservationTimerTasks) {
+		this.enableObservationTimerTask = enableObservationTimerTasks;
 	}
 
 	public void addInstancesForObject(AnnotatedLwM2mInstanceEnabler objectInstance) {
@@ -137,7 +154,7 @@ public class InventoryAgentInitializer {
 		builder.setObjects(new ArrayList<>(objectEnablerMap.values()));
 		final LeshanClient client = builder.build();
 		client.addObserver(new BootstrapObserver(objectEnablerMap, credentialStore));
-		final InventoryResourceObserver resourceObserver = buildInventoryResourceObserver();
+		final InventoryResourceObservationTimerTask resourceObserver = buildInventoryResourceObserverTimerTask();
 		client.addObserver(resourceObserver);
 		for (Resource resource : client.getCoapServer().getRoot().getChildren()) {
 			resource.addObserver(resourceObserver);
@@ -146,14 +163,15 @@ public class InventoryAgentInitializer {
 		return client;
 	}
 
-	protected InventoryResourceObserver buildInventoryResourceObserver() {
-		final InventoryResourceObserver resourceObserver = new InventoryResourceObserver();
-		if (observationIntervalSeconds != null) {
-			resourceObserver.setObserveIntervalSeconds(observationIntervalSeconds);
+	InventoryResourceObservationTimerTask buildInventoryResourceObserverTimerTask() {
+		final InventoryResourceObservationTimerTask resourceObserver = new InventoryResourceObservationTimerTask();
+		if (observationTimerTaskIntervalSeconds != null) {
+			resourceObserver.setTimerTaskIntervalSeconds(observationTimerTaskIntervalSeconds);
 		}
-		if (observationStartDelaySeconds != null) {
-			resourceObserver.setObserveStartDelaySeconds(observationStartDelaySeconds);
+		if (observationTimerTaskStartDelaySeconds != null) {
+			resourceObserver.setTimerTaskStartDelaySeconds(observationTimerTaskStartDelaySeconds);
 		}
+		resourceObserver.setEnable(this.enableObservationTimerTask);
 		return resourceObserver;
 	}
 

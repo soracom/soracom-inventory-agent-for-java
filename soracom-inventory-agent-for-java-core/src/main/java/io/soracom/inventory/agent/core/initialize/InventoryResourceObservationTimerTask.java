@@ -36,31 +36,38 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Handle resource observe and remove observe request.
+ * Handle resource observe and remove observe request, and invoke observed
+ * resource continuously.
  * 
  * <pre>
  * This class provides continuous read method invocation for observed resources.
- * Once an observation request comes from server, this class add the observed resource to observed map,
- * then the resource's read method is invoked at the interval of observationIntervalSeconds property.
- * Also this class listens registration status through {@link org.eclipse.leshan.client.observer.LwM2mClientObserver}.
- * Observation is started when registration is succeeded, and it is stopped registration is failed. 
+ * Once an observation request comes from server, this class add the observed
+ * resource to observed map, then the resource's read method is invoked at the
+ * interval of observationIntervalSeconds property. Also this class listens
+ * registration status through
+ * {@link org.eclipse.leshan.client.observer.LwM2mClientObserver}. Observation
+ * is started when registration is succeeded, and it is stopped registration is
+ * failed.
+ * 
  * <pre>
+ * 
  * @author c9katayama
  *
  */
-public class InventoryResourceObserver extends LwM2mClientObserverAdapter implements ResourceObserver {
+public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAdapter implements ResourceObserver {
 
-	private static final Logger log = LoggerFactory.getLogger(InventoryResourceObserver.class);
+	private static final Logger log = LoggerFactory.getLogger(InventoryResourceObservationTimerTask.class);
 
 	private Map<LwM2mPath, NotifySender> observedResourceMap = Collections
 			.synchronizedMap(new HashMap<LwM2mPath, NotifySender>());
 
-	protected int observationStartDelaySeconds = 10;
-	protected int observationIntervalSeconds = 60;
+	protected int timerTaskStartDelaySeconds = 10;
+	protected int timerTaskIntervalSeconds = 60;
+	protected boolean enable = true;
 
 	protected Timer timer;
 
-	public InventoryResourceObserver() {
+	public InventoryResourceObservationTimerTask() {
 	}
 
 	/**
@@ -68,8 +75,8 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 	 * 
 	 * @param observationStartDelaySeconds
 	 */
-	public void setObserveStartDelaySeconds(int observationStartDelaySeconds) {
-		this.observationStartDelaySeconds = observationStartDelaySeconds;
+	public void setTimerTaskStartDelaySeconds(int value) {
+		this.timerTaskStartDelaySeconds = value;
 		startObservationIfRunning();
 	}
 
@@ -78,13 +85,21 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 	 * 
 	 * @param observationIntervalSeconds
 	 */
-	public void setObserveIntervalSeconds(int observationIntervalSeconds) {
-		if (observationIntervalSeconds < 1) {
-			throw new IllegalArgumentException("ObservationIntervalSeconds must be at least 1.");
+	public void setTimerTaskIntervalSeconds(int value) {
+		if (value < 1) {
+			throw new IllegalArgumentException("TimerTaskIntervalSeconds must be at least 1.");
 		}
-		this.observationIntervalSeconds = observationIntervalSeconds;
+		this.timerTaskIntervalSeconds = value;
 		startObservationIfRunning();
 	}
+
+	public void setEnable(boolean enable) {
+		this.enable = enable;
+		if (enable == false) {
+			stopObservation();
+		}
+	}
+
 	/**
 	 * Remove observation.
 	 */
@@ -154,6 +169,10 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 		if (timer != null) {
 			timer.cancel();
 		}
+		if (enable == false) {
+			log.debug("InventoryResourceObservationTimerTask is disabled.");
+			return;
+		}
 		timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
@@ -161,9 +180,9 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 				log.info("fire resource change for observation.");
 				fireResourcesChange();
 			}
-		}, observationStartDelaySeconds * 1000, observationIntervalSeconds * 1000);
-		log.info("start observation. observationStartDelaySeconds:" + observationStartDelaySeconds
-				+ " observationIntervalSeconds:" + observationIntervalSeconds);
+		}, timerTaskStartDelaySeconds * 1000, timerTaskIntervalSeconds * 1000);
+		log.info("start observation. observationStartDelaySeconds:" + timerTaskStartDelaySeconds
+				+ " observationIntervalSeconds:" + timerTaskIntervalSeconds);
 	}
 
 	protected void startObservationIfRunning() {
