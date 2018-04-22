@@ -51,10 +51,10 @@ public class AnnotatedLwM2mInstanceEnabler extends BaseInstanceEnabler {
 
 	private static final Logger log = LoggerFactory.getLogger(AnnotatedLwM2mInstanceEnabler.class);
 
-	private List<ResourceChangedListener> listeners = Collections
+	List<ResourceChangedListener> listeners = Collections
 			.synchronizedList(new ArrayList<ResourceChangedListener>());
 
-	private MetaDataHolder metaDataHolder;
+	MetaDataHolder metaDataHolder;
 
 	static class MetaDataHolder {
 		Map<Integer, Method> readMethodMap = new HashMap<>();
