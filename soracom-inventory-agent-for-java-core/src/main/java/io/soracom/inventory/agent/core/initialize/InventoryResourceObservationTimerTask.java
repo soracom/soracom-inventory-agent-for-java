@@ -115,15 +115,17 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public void removedChild(Resource child) {
-		List<LwM2mPath> removeKeyList = new ArrayList<>();
-		for (Entry<LwM2mPath, NotifySender> entry : observedResourceMap.entrySet()) {
-			if (entry.getValue() == child || entry.getValue().equals(child)) {
-				removeKeyList.add(entry.getKey());
+		synchronized (observedResourceMap) {
+			List<LwM2mPath> removeKeyList = new ArrayList<>();
+			for (Entry<LwM2mPath, NotifySender> entry : observedResourceMap.entrySet()) {
+				if (entry.getValue() == child || entry.getValue().equals(child)) {
+					removeKeyList.add(entry.getKey());
+				}
 			}
-		}
-		for (LwM2mPath path : removeKeyList) {
-			observedResourceMap.remove(path);
-			log.info("removed child path=" + path.toString());
+			for (LwM2mPath path : removeKeyList) {
+				observedResourceMap.remove(path);
+				log.info("removed child path=" + path.toString());
+			}
 		}
 	}
 
@@ -141,12 +143,14 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 
 	@Override
 	public void addedObserveRelation(ObserveRelation relation) {
-		LwM2mPath path = new LwM2mPath(relation.getExchange().getCurrentRequest().getOptions().getUriPathString());
-		Resource resource = relation.getResource();
-		if (resource instanceof NotifySender) {
-			NotifySender notifySender = (NotifySender) resource;
-			observedResourceMap.put(path, notifySender);
-			log.info("added ObserveRelation path=" + path.toString());
+		synchronized (observedResourceMap) {
+			LwM2mPath path = new LwM2mPath(relation.getExchange().getCurrentRequest().getOptions().getUriPathString());
+			Resource resource = relation.getResource();
+			if (resource instanceof NotifySender) {
+				NotifySender notifySender = (NotifySender) resource;
+				observedResourceMap.put(path, notifySender);
+				log.info("added ObserveRelation path=" + path.toString());
+			}
 		}
 	}
 
@@ -203,7 +207,7 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 		for (LwM2mPath lwm2mPath : observedResourceMap.keySet()) {
 			final NotifySender sender = observedResourceMap.get(lwm2mPath);
 			final String relationURI = toRelationURI(lwm2mPath);
-			log.debug("send notify to " + relationURI);
+			log.info("send notify to " + relationURI);
 			sender.sendNotify(relationURI);
 		}
 	}
