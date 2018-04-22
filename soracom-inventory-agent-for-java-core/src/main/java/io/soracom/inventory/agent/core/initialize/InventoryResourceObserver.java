@@ -39,9 +39,9 @@ import org.slf4j.LoggerFactory;
  * Handle resource observe and remove observe request.
  * 
  * <pre>
- * This class provides continuous invocation for observed resources.
- * Once an observation request from server, this class add the observed resource to observed map,
- * then invoke the resource at the interval of observationIntervalSeconds property.
+ * This class provides continuous read method invocation for observed resources.
+ * Once an observation request comes from server, this class add the observed resource to observed map,
+ * then the resource's read method is invoked at the interval of observationIntervalSeconds property.
  * Also this class listens registration status through {@link org.eclipse.leshan.client.observer.LwM2mClientObserver}.
  * Observation is started when registration is succeeded, and it is stopped registration is failed. 
  * <pre>
@@ -85,7 +85,9 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 		this.observationIntervalSeconds = observationIntervalSeconds;
 		startObservationIfRunning();
 	}
-
+	/**
+	 * Remove observation.
+	 */
 	@Override
 	public void removedObserveRelation(ObserveRelation relation) {
 		LwM2mPath path = new LwM2mPath(relation.getExchange().getCurrentRequest().getOptions().getUriPathString());
