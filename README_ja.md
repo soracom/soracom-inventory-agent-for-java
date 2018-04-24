@@ -47,8 +47,6 @@ SORACOMInventoryAgentExampleが、mainクラスとなります。このクラス
 実装を行ってください。
 
 exampleのプロジェクトでは、"DeviceObject","LocationObject", "LWM2MSoftwareComponent"を実装したサンプルが入っています。
-(注:LWM2MSoftwareComponentを実装した ExampleSoftwareComponentObject は、release-0.0.1で利用していた実装方式で作られています。
-release-0.0.2以降は、ExampleDeviceObjectやExampleLocationObjectの実装方法が推奨です）
 
 実装後、InventoryAgentInitializer#addInstancesForObjectメソッドを使用して、登録を行います。
 
@@ -61,20 +59,58 @@ release-0.0.2以降は、ExampleDeviceObjectやExampleLocationObjectの実装方
 ##カスタムオブジェクトの利用
 規定のオブジェクト以外は、次の手順で実装を作成します。
 
-1.モデル定義XMLの作成
+### 1.モデル定義XMLの作成
 
 exampleプロジェクトには、src/main/resources以下に、カスタムオブジェクトの定義として 30000.xml が入っています。
-これを参考に、カスタムオブジェクト定義を作成します。
+このサンプルには基本的な定義が入っていますので、このファイルと下記URLの定義を、カスタムオブジェクト定義を作成します。
 
-2.実装クラスの作成
+参考URL:
+LwM2Mオブジェクト作成ガイドライン：http://www.openmobilealliance.org/documents/whitepapers/OMA-ORG-Guidelines_Creation_Registration_LwM2M_Objects_Resources-V1_0-20180209-A.pdf
+XMLスキーマ : http://www.openmobilealliance.org/tech/profiles/LWM2M.xsd
 
-io.soracom.inventory.agent.example.object.CustomModelObject を参考に、実装クラスを作成します。
-なお、io.soracom.inventory.agent.core.util.TypedAnnotatedObjectTemplateClassGenerator を使用すると、モデル定義XMLから
-雛形となるJavaソースを生成できます。
+
+### 2.実装クラスの作成
+
+sooracom-inventory-for-java-coreのio.soracom.inventory.agent.core.lwm2m.typed_objectパッケージ内のクラス、もしくはexampleプロジェクトのio.soracom.inventory.agent.example.object.CustomModelObject を参考に、実装クラスを作成します。
+
+モデル定義XMLと対になるクラスは、AnnotatedLwM2mInstanceEnablerクラスを継承したクラスとして定義し、クラスには@LWM2MObject アノテーションを付与します。objectId属性は、モデル定義XMLのObjectIDと合わせます。
+
+````
+//クラス定義
+@LWM2MObject(objectId = 30000, name = "Custom Model")
+public class CustomModelObject extends AnnotatedLwM2mInstanceEnabler {
+
+````
+
+モデル定義XMLのResourcesに対応する部分は、メソッドとして定義を行います。
+````
+//メソッド定義例
+@Resource(resourceId = 0, operation = Operation.Read)
+public Float readCurrentX()	{
+	return 0;
+}
+
+@Resource(resourceId = 1, operation = Operation.Write)
+public void writeTargetX(Float writeValue)	{
+	this.value = writeValue;
+}
+
+@Resource(resourceId = 2, operation = Operation.Execute)
+public void executeExecuteCommand(String executeParameter)	{
+	//execute shell or batch 
+}
+````
+リソースを示すメソッドには、@Resourceアノテーションを付与します。resourceIdはモデル定義xml内のresourceIdに該当する値を、operationにはRead/Write/Executeの各操作を定義します。
+Readオペレーションの場合は、メソッドの戻り値としてモデル定義xmlに定義されたデータ型を宣言します。同様にWriteオペレーションの場合は、引数でデータ型を宣言します。
+Executeオペレーションの場合は、実行パラメータを受け取る場合はStringで変数を宣言します。
+なお、デバイスが対応していないリソースの場合は、LwM2mInstanceResponseException.notFound() で生成される例外をスローして下さい。
+
+なお、このモデル定義と対になるクラスは、その雛形をio.soracom.inventory.agent.core.util.TypedAnnotatedObjectTemplateClassGenerator を使用して、モデル定義XMLから
+Javaソースを生成できます。以下が生成サンプルです。
 
 ````
 //雛形のソースコード生成のサンプル
-String javaPackage = "my.models"; //生成するJavaソースのパッケージ
+String javaPackage = "my.models"; //生成するJavaソースのパッケージ名
 File sourceOutputDir = new File("source"); //ソース出力するルートディレクトリ 
 TypedAnnotatedObjectTemplateClassGenerator generator 
    = new TypedAnnotatedObjectTemplateClassGenerator(javaPackage,outputDir);
@@ -82,9 +118,11 @@ File modelFile = new File("src/main/resources/30000.xml"); //モデル定義
 generator.generateTemplateClassFromObjectModel(modelFile); //ソース生成
 ````
 
-3.Main関数でモデル定義XMLと実装クラスの読み込み
+Javaソースを生成後、適宜修正を加えることで効率よく実装を行ええます。
 
-モデル定義XMLを、InventoryAgentInitializer#setLwM2mModel()で登録します。
+### 3.Main関数でモデル定義XMLと実装クラスの読み込み
+
+実行時にカスタムモデルを利用する場合は、まずモデル定義XMLを、InventoryAgentInitializer#setLwM2mModel()で登録します。
 以下が読み込みの例となります。
 
 ````

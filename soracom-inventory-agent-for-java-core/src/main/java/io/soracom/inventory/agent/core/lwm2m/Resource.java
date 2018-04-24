@@ -20,6 +20,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * This annotation indicates LWM2M resource.
+ * 
+ * @author c9katayama
+ *
+ */
 @Target({ ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Resource {
@@ -30,5 +36,10 @@ public @interface Resource {
 
 	boolean multiple() default false;
 	
+	/**
+	 * To indicate type of resource such as STRING.
+	 * @return
+	 */
+	@Deprecated
 	String type() default "";
 }

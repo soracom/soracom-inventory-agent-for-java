@@ -15,6 +15,12 @@
  *******************************************************************************/
 package io.soracom.inventory.agent.core.lwm2m;
 
+/**
+ * This annotation indicates LWM2M operation.
+ * 
+ * @author c9katayama
+ *
+ */
 public enum Operation {
 	Read, Write, Execute;
 }

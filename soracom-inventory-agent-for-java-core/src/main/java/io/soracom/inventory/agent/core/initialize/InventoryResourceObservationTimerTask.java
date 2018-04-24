@@ -35,40 +35,80 @@ import org.eclipse.leshan.core.node.LwM2mPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InventoryResourceObserver extends LwM2mClientObserverAdapter implements ResourceObserver {
+/**
+ * Handle resource observe and remove observe request, and invoke observed
+ * resource continuously.
+ * 
+ * <pre>
+ * This class provides continuous read method invocation for observed resources.
+ * Once an observation request comes from server, this class add the observed
+ * resource to observed map, then the resource's read method is invoked at the
+ * interval of observationIntervalSeconds property. Also this class listens
+ * registration status through
+ * {@link org.eclipse.leshan.client.observer.LwM2mClientObserver}. Observation
+ * is started when registration is succeeded, and it is stopped registration is
+ * failed.
+ * 
+ * <pre>
+ * 
+ * @author c9katayama
+ *
+ */
+public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAdapter implements ResourceObserver {
 
-	private static final Logger log = LoggerFactory.getLogger(InventoryResourceObserver.class);
+	private static final Logger log = LoggerFactory.getLogger(InventoryResourceObservationTimerTask.class);
 
 	private Map<LwM2mPath, NotifySender> observedResourceMap = Collections
 			.synchronizedMap(new HashMap<LwM2mPath, NotifySender>());
 
-	private int observationStartDelaySeconds = 10;
-	private int observationIntervalSeconds = 60;
+	protected int timerTaskStartDelaySeconds = 10;
+	protected int timerTaskIntervalSeconds = 60;
+	protected boolean enable = true;
 
 	protected Timer timer;
 
-	public InventoryResourceObserver() {
+	public InventoryResourceObservationTimerTask() {
 	}
 
-	public void setObserveStartDelaySeconds(int observationStartDelaySeconds) {
-		this.observationStartDelaySeconds = observationStartDelaySeconds;
+	/**
+	 * The time to delay start observation
+	 * 
+	 * @param observationStartDelaySeconds
+	 */
+	public void setTimerTaskStartDelaySeconds(int value) {
+		this.timerTaskStartDelaySeconds = value;
 		startObservationIfRunning();
 	}
 
-	public void setObserveIntervalSeconds(int observationIntervalSeconds) {
-		if (observationIntervalSeconds < 1) {
-			throw new IllegalArgumentException("ObservationIntervalSeconds must be at least 1.");
+	/**
+	 * The period between observations
+	 * 
+	 * @param observationIntervalSeconds
+	 */
+	public void setTimerTaskIntervalSeconds(int value) {
+		if (value < 1) {
+			throw new IllegalArgumentException("TimerTaskIntervalSeconds must be at least 1.");
 		}
-		this.observationIntervalSeconds = observationIntervalSeconds;
+		this.timerTaskIntervalSeconds = value;
 		startObservationIfRunning();
 	}
 
+	public void setEnable(boolean enable) {
+		this.enable = enable;
+		if (enable == false) {
+			stopObservation();
+		}
+	}
+
+	/**
+	 * Remove observation.
+	 */
 	@Override
 	public void removedObserveRelation(ObserveRelation relation) {
 		LwM2mPath path = new LwM2mPath(relation.getExchange().getCurrentRequest().getOptions().getUriPathString());
 		NotifySender removed = observedResourceMap.remove(path);
 		if (removed != null) {
-			log.info("removedObserveRelation path=" + path.toString());
+			log.info("removed Observe Relation path=" + path.toString());
 		}
 	}
 
@@ -83,7 +123,7 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 		}
 		for (LwM2mPath path : removeKeyList) {
 			observedResourceMap.remove(path);
-			log.info("removedChild path=" + path.toString());
+			log.info("removed child path=" + path.toString());
 		}
 	}
 
@@ -106,7 +146,7 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 		if (resource instanceof NotifySender) {
 			NotifySender notifySender = (NotifySender) resource;
 			observedResourceMap.put(path, notifySender);
-			log.info("addedObserveRelation path=" + path.toString());
+			log.info("added ObserveRelation path=" + path.toString());
 		}
 	}
 
@@ -129,6 +169,10 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 		if (timer != null) {
 			timer.cancel();
 		}
+		if (enable == false) {
+			log.debug("InventoryResourceObservationTimerTask is disabled.");
+			return;
+		}
 		timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
@@ -136,9 +180,9 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 				log.info("fire resource change for observation.");
 				fireResourcesChange();
 			}
-		}, observationStartDelaySeconds * 1000, observationIntervalSeconds * 1000);
-		log.info("Start observation. observationStartDelaySeconds:" + observationStartDelaySeconds
-				+ " observationIntervalSeconds:" + observationIntervalSeconds);
+		}, timerTaskStartDelaySeconds * 1000, timerTaskIntervalSeconds * 1000);
+		log.info("start observation. observationStartDelaySeconds:" + timerTaskStartDelaySeconds
+				+ " observationIntervalSeconds:" + timerTaskIntervalSeconds);
 	}
 
 	protected void startObservationIfRunning() {
@@ -151,7 +195,7 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 		if (timer != null) {
 			timer.cancel();
 			timer = null;
-			log.info("Stop observation.");
+			log.info("stop observation.");
 		}
 	}
 
@@ -159,7 +203,7 @@ public class InventoryResourceObserver extends LwM2mClientObserverAdapter implem
 		for (LwM2mPath lwm2mPath : observedResourceMap.keySet()) {
 			final NotifySender sender = observedResourceMap.get(lwm2mPath);
 			final String relationURI = toRelationURI(lwm2mPath);
-			log.debug("sendNotify " + relationURI);
+			log.debug("send notify to " + relationURI);
 			sender.sendNotify(relationURI);
 		}
 	}
