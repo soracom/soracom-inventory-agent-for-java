@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import io.soracom.inventory.agent.core.bootstrap.BootstrapObserver;
 import io.soracom.inventory.agent.core.credential.CredentialStore;
 import io.soracom.inventory.agent.core.credential.Credentials;
+import io.soracom.inventory.agent.core.credential.FileCredentialStore;
 import io.soracom.inventory.agent.core.credential.PreSharedKey;
 import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
 import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
@@ -140,7 +141,8 @@ public class InventoryAgentInitializer {
 	}
 
 	public LeshanClient buildClient() {
-		final LwM2mModel lwM2mModel = initLwM2mModel();
+		initLwM2mModel();
+		initCredentialStore();
 		final ObjectsInitializer initializer = new ObjectsInitializer(lwM2mModel);
 		final Credentials credentials = loadCredentials();
 		initSecurity(initializer, credentials);
@@ -175,8 +177,16 @@ public class InventoryAgentInitializer {
 		return resourceObserver;
 	}
 
-	protected LwM2mModel initLwM2mModel() {
-		return this.lwM2mModel == null ? InventoryAgentHelper.createDefaultLwM2mModel() : this.lwM2mModel;
+	protected void initLwM2mModel() {
+		if(this.lwM2mModel == null) {
+			this.lwM2mModel = InventoryAgentHelper.createDefaultLwM2mModel();
+		}
+	}
+	
+	protected void initCredentialStore() {
+		if(this.credentialStore == null) {
+			this.credentialStore = new FileCredentialStore();
+		}
 	}
 
 	private Credentials loadCredentials() {
