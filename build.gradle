@@ -1,7 +1,18 @@
+plugins {
+    id 'org.ajoberstar.git-publish' version '0.4.0'
+}
+
+allprojects{
+    apply plugin: 'java'
+    apply plugin: 'maven'
+	apply plugin: 'maven-publish'
+	group = 'io.soracom'
+	version = '0.0.5-SNAPSHOT'
+}
+
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
-    apply plugin: 'java'
 
     def defaultEncoding = 'UTF-8'
     tasks.withType(JavaCompile) {
@@ -10,9 +21,12 @@ subprojects {
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
-
-    version = '0.0.5-SNAPSHOT'
-
+    
+    jar {
+		baseName = project.name
+		version =  project.version
+	}
+		
     repositories {
         mavenCentral()
         jcenter()
@@ -21,6 +35,26 @@ subprojects {
     dependencies {
         testCompile 'junit:junit:4.12'
     }
+
+	task sourceJar(type: Jar) {
+    	from sourceSets.main.allJava
+	}
+
+	publishing {
+	    publications {
+	        mavenJava(MavenPublication) {
+	            from components.java
+	            artifact sourceJar {
+	                classifier "sources"
+	            }
+	        }
+	    }
+	    repositories {
+	    	maven {
+		        url file("$buildDir/dist-mvn")
+	   		}
+	   	}
+	}    
 }
 
 project(':soracom-inventory-agent-for-java-core') {
@@ -68,3 +102,20 @@ def createScript(project, mainClass, name) {
     } 
 }
 
+
+//use gradle gitPublishPush to push artifacts
+gitPublish {
+    repoUri = 'https://github.com/soracom/maven-repository.git'
+    branch = 'gh-pages'
+    repoDir = file("maven-repository")
+    contents {
+        from file("soracom-inventory-agent-for-java-core/build/dist-mvn")
+        from file("soracom-inventory-agent-for-java-example/build/dist-mvn")
+    }
+    preserve {
+        include '**'
+    }
+    commitMessage = 'Publishing a new archive'
+}
+
+gitPublishCopy.dependsOn clean,build,publish
