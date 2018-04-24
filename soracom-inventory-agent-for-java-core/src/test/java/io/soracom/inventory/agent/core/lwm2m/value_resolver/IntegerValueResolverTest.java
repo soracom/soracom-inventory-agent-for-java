@@ -27,7 +27,7 @@ public class IntegerValueResolverTest {
 		ResourceContext rc = ResourceContext.ofReadContext(0);
 		ReadResponse readResponse = resolver.toReadResponse(rc, (Integer) value);
 		LwM2mResource resource = (LwM2mResource) readResponse.getContent();
-		assertEquals(value, ((Integer) resource.getValue()).longValue());
+		assertEquals(value, ((Long) resource.getValue()).intValue());
 		assertEquals(type, resource.getType());
 	}
 }
