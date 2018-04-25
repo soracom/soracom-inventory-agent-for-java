@@ -24,8 +24,8 @@ public class PreSharedKey {
 	protected String pskIdentity;
 	protected byte[] pskKey;
 
-	public PreSharedKey(String keyId, byte[] psk) {
-		pskIdentity = keyId;
+	public PreSharedKey(String pskIdentity, byte[] psk) {
+		this.pskIdentity = pskIdentity;
 		pskKey = psk;
 	}
 
