@@ -1,65 +1,151 @@
-## SORACOM Inventory agent for Java
+# SORACOM Inventory agent for Java
 SORACOM Inventory agent for Java は、SORACOM Inventory用のエージェント実装を提供します。
 このエージェントには、SIM経由のブートストラップ、取得したキーの保存、基本的なLWM2Mのオブジェクト定義が入っています
 
-##セットアップ
-Eclipseの場合、以下のコマンドでEclipse用のプロジェクトファイルを生成できます。
-```
-./gradlew eclipse
-```
-なお、IntelliJの場合は、"./gradrew idea"で同様にファイルを生成できます。
+## リポジトリの構成
+このエージェントには、2つのプロジェクトがあります
+- soracom-inventory-agent-core -- エージェントを実装するためのコアライブラリ
+- soracom-inventory-agent-example -- コアライブラリを使用したエージェントの実装サンプル
 
-実行後、Eclipseにプロジェクトをインポートします。
-soracom-inventory-agent-for-java-coreプロジェクトは、Inventoryエージェントを作成するのに便利なクラス群を提供する
-ためのライブラリプロジェクトです。
-soracom-inventory-agent-for-java-exampleプロジェクトは、Inventoryエージェントを作成するためのサンプルが入った
-プロジェクトです。基本的にこちらに変更をおこなって頂き、デバイスに合ったエージェントを作成します。
+soracom-inventory-agent-coreを利用して、自分の目的にあったInventoryエージェントを構築します。
 
-##ビルド
-ビルドは以下のコマンドで実行できます。 
+エージェント実装の際には、soracom-inventory-agent-exampleが実装サンプルとして利用できます。
+
+この実装サンプルには、コマンドラインからの起動、LWM2Mモデルのハンドリングおよびカスタムモデルの構築についての実装サンプルが入っています。
+
+## プロジェクトのソースからのBuild
+プロジェクトのビルドには、Gradleを使用します。プロジェクトをソースからビルドしたい場合は、チェックアウト後、コマンドを実行します。
+ 
 ```
 ./gradlew build
 ```
 
-##配布
-アプリケーション配布用のZipファイルは、以下のコマンドで生成できます。
-生成されたアーカイブは、build/distributionsに出力されます。
+IDE用の設定ファイルは、以下のコマンドで生成できます。
+
+```
+//Eclipseの場合
+./gradlew eclipse
+
+//IntelliJの場合
+./gradrew idea
+```
+
+また実装サンプルをアプリケーション配布するためのZipファイルは、以下のコマンドで生成できます。
+
 ```
 ./gradlew distZip
 ```
+
+生成されたアーカイブは、build/distributionsに出力されます。
+
 生成されたzip/tarを解凍したあとにできるbinディレクトリに、実行用のシェルが同梱されています。
-デバイス上で動作させる場合は、このシェルを利用してください。
+実装サンプルをデバイス上で動作させる場合は、このシェルを利用してください。
 
-##動作
-初回通信時は、SIM経由のブートストラップを実施します。一度bootstrapに成功すると、.soracom-inventory-credentials.datというファイルが作成されます。
-次回以降はこのファイルを使ってbootstrapなしでSORACOM Inventoryと通信できるため、wifiなどSIM以外経由でも通信を行うことが出来ます。
-再度ブートストラップしたい場合は、ファイルを消して再度実行するか、実行時に -b オプションをつけてください。
+### Inventoryエージェントの基本的な動作と設定
+Inventoryエージェントは、初回通信時にSIM経由のブートストラップを実施します。一度bootstrapに成功すると、.soracom-inventory-credentials.datというファイルを生成し、キーをデバイス上に保管します。ブートストラップ成功後は、このファイルを使うことで、bootstrapなしでSORACOM Inventoryと通信できるため、wifiなどSIM以外経由でも通信を行うことが出来ます。
 
-##実装方法
-SORACOMInventoryAgentExampleが、mainクラスとなります。このクラスが実行のメインクラスとなります。
-環境に応じて、適宜変更してください。
+この保存先については、デフォルトではFileCredentialStoreが利用されますが、任意の方法で保存したい場合は、CredentialStoreインターフェースを実装して下さい。また再度ブートストラップしたい場合は、ファイルを消して再度実行するか、forceBootstrapオプションを有効にしてください。
 
-実装する必要があるクラスは、io.soracom.inventory.agent.core.lwm2m.typed_object パッケージに入っているオブジェクト群です。
-(release-0.0.1で実装されたio.soracom.inventory.agent.core.lwm2m.base_objectは非推奨になっています）
-このオブジェクトは、LWM2M v1.0で規定された定義XMLから生成されたクラスとなっています。
+Observeされたリソースについては、デフォルトで60秒に一度、対象リソースのreadメソッドの呼び出しが行われるようになっています。呼び出し間隔を変更したい場合は、InventoryAgentInitializer#setObservationTimerTaskIntervalSeconds で秒数を指定して下さい。
 
-実際にサーバとやりとりをするためには、このクラスを継承したクラスを作成して、実装したいメソッドをオーバーライドして
-実装を行ってください。
+### ライブラリを使用したエージェントの実装方法
+#### 環境構築
+soracom-inventory-agent-coreエージェントをクラスパスに通した形で、javaのプロジェクトを作成します。以下Gradleがインストールされている前提のセットアップ手順となります。
 
-exampleのプロジェクトでは、"DeviceObject","LocationObject", "LWM2MSoftwareComponent"を実装したサンプルが入っています。
+1. プロジェクトの初期化
+適当なフォルダを作成し、フォルダ内で以下のコマンドを実行します
 
-実装後、InventoryAgentInitializer#addInstancesForObjectメソッドを使用して、登録を行います。
+```
+gradle init --type java-application
+```
 
-また外部シェルを実行する場合のサンプル実装が、DeviceObjectのRebootとSoftwareComponentObjectのActivate/Deactivateに
-実装されています。
-これらのExecuteをサーバ側から呼ぶと、scriptフォルダ内のシェルが実行されます。
+2. build.gradleファイルの編集
+初期化後に生成される build.gradleファイルを、以下の内容に置き換えます。
 
-実行するシェルスクリプトを変えたり、種類を増やす場合はこれらを参考にしてください。
+INVENTORY_AGENT_VERSIONの部分は、利用するInventoryエージェントのバージョンを指定して下さい。
 
-##カスタムオブジェクトの利用
-規定のオブジェクト以外は、次の手順で実装を作成します。
+```
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'application'
 
-### 1.モデル定義XMLの作成
+repositories {
+  jcenter()
+  maven { url 'https://soracom.github.io/maven-repository/' }
+}
+
+def INVENTORY_AGENT_VERSION="0.0.5"
+
+dependencies {
+    compile "io.soracom:soracom-inventory-agent-for-java-core:$INVENTORY_AGENT_VERSION"
+    testCompile 'junit:junit:4.12'
+}
+
+mainClassName = 'App'
+```
+
+3. IDE用ファイルの生成
+IDEを使用する場合は、下記コマンドでIDE用ファイルを作成し、各IDEにインポートして下さい。
+
+```
+//Eclipseの場合
+./gradlew eclipse
+
+//IntelliJの場合
+./gradrew idea
+```
+
+#### Inventoryエージェントの実装
+Inventoryエージェント実行時のエントリポイントとなるmainメソッドを持ったクラスを作成します。上記手順で環境構築を行った場合、mainメソッドを持ったAppというjavaクラスが生成されています。もしなければ、適切な名前をつけたクラスを作成して下さい。
+
+最もシンプルな実装は、以下のような形になります。
+
+```
+import org.eclipse.leshan.client.californium.LeshanClient;
+
+import io.soracom.inventory.agent.core.initialize.InventoryAgentInitializer;
+import io.soracom.inventory.agent.core.lwm2m.typed_object.impl.MockDeviceObjectImpl;
+
+public class App {
+
+	public static void main(String[] args) {
+		InventoryAgentInitializer initializer = new InventoryAgentInitializer();
+		initializer.addInstancesForObject(new MockDeviceObjectImpl());
+		LeshanClient client = initializer.buildClient();
+		client.start();
+	}
+}
+```
+
+この実装では、SIMを使ったブートストラップ（デバイスの新規作成）と、デバイスの日付/メモリ量を通知するだけのエージェント実装になります。
+
+#### Inventoryエージェントの動作確認
+Inventoryエージェントの動作確認には、SORACOMのSIMと通信機器(USBドングル/Wifiルーターなど)が必要になります。
+
+SORACOMのユーザーコンソールから、SIMのグループ設定でInventoryの利用をonにした後、SORACOM SIMで通信できるように設定した後、Inventoryエージェントを実行します。
+正常にブートストラップが動作すると、下記のようなログが出力されます
+
+```
+[RegistrationEngine#0] INFO io.soracom.inventory.agent.core.bootstrap.BootstrapObserver - Bootstrap success: deviceId:d-xxxxxxxxxxxxxxxxxxx
+```
+
+またユーザーコンソール上に、ログ出力されたdeviceIdでデバイスが登録されます。
+
+#### Inventoryエージェントの拡張(基本的なモデル定義）
+基本的なInventoryエージェントの拡張は、次のように行います。
+
+io.soracom.inventory.agent.core.lwm2m.typed_object パッケージには、このパッケージには、デフォルトで定義されたLWM2Mのモデルのテンプレート実装が入っています。
+上記のエージェント実装で利用した MockDeviceObjectImpl クラスも、このテンプレート実装からの拡張となります。
+
+Inventroyエージェントが扱いたいリソースに対応したクラス/メソッドをオーバーライドし、その実装クラスをInventoryAgentInitializer#addInstancesForObjectで追加することで、Inventoryエージェントが扱うリソースを拡張することが出来ます。
+
+実装サンプルとしては、 soracom-inventory-agent-exampleのプロジェクトでは、"DeviceObject","LocationObject", "LWM2MSoftwareComponent"を実装したサンプルが入っていますのでこれも参考にして下さい。
+
+#### Inventoryエージェントの拡張(カスタムモデル定義）
+規定のモデル定義ではなく、カスタムモデルを使用したい場合は、次の手順で実装を作成します。
+
+#### 1.モデル定義XMLの作成
 
 exampleプロジェクトには、src/main/resources以下に、カスタムオブジェクトの定義として 30000.xml が入っています。
 このサンプルには基本的な定義が入っていますので、このファイルと下記URLの定義を、カスタムオブジェクト定義を作成します。
@@ -69,21 +155,22 @@ LwM2Mオブジェクト作成ガイドライン：http://www.openmobilealliance.
 XMLスキーマ : http://www.openmobilealliance.org/tech/profiles/LWM2M.xsd
 
 
-### 2.実装クラスの作成
+#### 2.実装クラスの作成
 
 sooracom-inventory-for-java-coreのio.soracom.inventory.agent.core.lwm2m.typed_objectパッケージ内のクラス、もしくはexampleプロジェクトのio.soracom.inventory.agent.example.object.CustomModelObject を参考に、実装クラスを作成します。
 
 モデル定義XMLと対になるクラスは、AnnotatedLwM2mInstanceEnablerクラスを継承したクラスとして定義し、クラスには@LWM2MObject アノテーションを付与します。objectId属性は、モデル定義XMLのObjectIDと合わせます。
 
-````
+```
 //クラス定義
 @LWM2MObject(objectId = 30000, name = "Custom Model")
 public class CustomModelObject extends AnnotatedLwM2mInstanceEnabler {
 
-````
+```
 
 モデル定義XMLのResourcesに対応する部分は、メソッドとして定義を行います。
-````
+
+```
 //メソッド定義例
 @Resource(resourceId = 0, operation = Operation.Read)
 public Float readCurrentX()	{
@@ -99,7 +186,8 @@ public void writeTargetX(Float writeValue)	{
 public void executeExecuteCommand(String executeParameter)	{
 	//execute shell or batch 
 }
-````
+```
+
 リソースを示すメソッドには、@Resourceアノテーションを付与します。resourceIdはモデル定義xml内のresourceIdに該当する値を、operationにはRead/Write/Executeの各操作を定義します。
 Readオペレーションの場合は、メソッドの戻り値としてモデル定義xmlに定義されたデータ型を宣言します。同様にWriteオペレーションの場合は、引数でデータ型を宣言します。
 Executeオペレーションの場合は、実行パラメータを受け取る場合はStringで変数を宣言します。
@@ -108,34 +196,66 @@ Executeオペレーションの場合は、実行パラメータを受け取る�
 なお、このモデル定義と対になるクラスは、その雛形をio.soracom.inventory.agent.core.util.TypedAnnotatedObjectTemplateClassGenerator を使用して、モデル定義XMLから
 Javaソースを生成できます。以下が生成サンプルです。
 
-````
-//雛形のソースコード生成のサンプル
-String javaPackage = "my.models"; //生成するJavaソースのパッケージ名
-File sourceOutputDir = new File("source"); //ソース出力するルートディレクトリ 
-TypedAnnotatedObjectTemplateClassGenerator generator 
-   = new TypedAnnotatedObjectTemplateClassGenerator(javaPackage,outputDir);
-File modelFile = new File("src/main/resources/30000.xml"); //モデル定義
-generator.generateTemplateClassFromObjectModel(modelFile); //ソース生成
-````
+```
+import java.io.File;
+import java.io.IOException;
+
+import io.soracom.inventory.agent.core.util.TypedAnnotatedObjectTemplateClassGenerator;
+
+public class GenerateCustomModelJavaSource {
+
+	public static void main(String[] args) throws IOException {
+		String javaPackage = "my.object";//生成するJavaソースのパッケージ名
+		File sourceFileDir = new File("src/main/java");//ソース出力するルートディレクトリ 
+		TypedAnnotatedObjectTemplateClassGenerator generator = new TypedAnnotatedObjectTemplateClassGenerator(
+				javaPackage, sourceFileDir);
+		File modelFile = new File("src/main/resources/custom-model.xml");//モデル定義XML
+		generator.generateTemplateClassFromObjectModel(modelFile);//ソース生成実行
+		System.out.println("generate Java source.");
+		System.exit(0);
+	}
+
+}
+```
 
 Javaソースを生成後、適宜修正を加えることで効率よく実装を行ええます。
 
-### 3.Main関数でモデル定義XMLと実装クラスの読み込み
+#### 3.Inventoryエージェントでの、モデル定義XMLと実装クラスの読み込み
 
 実行時にカスタムモデルを利用する場合は、まずモデル定義XMLを、InventoryAgentInitializer#setLwM2mModel()で登録します。
-以下が読み込みの例となります。
-
-````
-InventoryAgentInitializer initializer = new InventoryAgentInitializer();
-initializer.setLwM2mModel(
-	new LwM2mModelBuilder().addPresetObjectModels()
-	.addObjectModelFromClassPath("/30000.xml") //モデル定義xmlファイルの指定
-	.build());
-````
 
 また、実装したJavaクラスは、同じくInventoryAgentInitializer#addInstancesForObject()で設定します。
 
-````
-//CustomModelObjectは、モデル定義XMLを元に実装したJavaソース
-initializer.addInstancesForObject(new CustomModelObject());
-````
+カスタムモデル定義およびカスタムモデル実装クラスを読みこんだInventoryエージェントの実装は以下のようになります。
+
+```
+import org.eclipse.leshan.client.californium.LeshanClient;
+
+import io.soracom.inventory.agent.core.initialize.InventoryAgentInitializer;
+import io.soracom.inventory.agent.core.lwm2m.typed_object.impl.MockDeviceObjectImpl;
+
+public class App {
+
+	public static void main(String[] args) {
+		InventoryAgentInitializer initializer = new InventoryAgentInitializer();
+		
+		LwM2mModelBuilder lwM2mModelBuilder = new LwM2mModelBuilder();
+		lwM2mModelBuilder.addPresetObjectModels(); // デフォルトのモデル定義の読み込み
+		lwM2mModelBuilder.addObjectModelFromClassPath("/custom-model.xml");// カスタムモデル定義の読み込み
+		initializer.setLwM2mModel(lwM2mModelBuilder.build());
+
+		initializer.addInstancesForObject(new MockDeviceObjectImpl());
+		initializer.addInstancesForObject(new CustomModelObject());
+
+		final LeshanClient client = initializer.buildClient();
+		client.start();
+	}
+}
+```
+
+#### 4.ユーザーコンソールでのモデル定義XMLの登録
+上記Inventoryエージェント実行前に、モデル定義XMLをユーザーコンソールから登録して下さい。登録後エージェントを実行すると、カスタムモデル定義部分もユーザーコンソールに反映されます。
+
+
+
+
