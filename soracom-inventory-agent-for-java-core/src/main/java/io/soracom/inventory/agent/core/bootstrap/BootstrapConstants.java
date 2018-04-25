@@ -17,6 +17,7 @@ package io.soracom.inventory.agent.core.bootstrap;
 
 public interface BootstrapConstants {
 
-	public static final String DEFAULT_BOOTSTRAP_SERVER_ADDRESS = "bootstrap.soracom.io:5683";
-	public static final String DEFAULT_BOOTSTRAP_COAPS_SERVER_ADDRESS = "bootstrap.soracom.io:5684";
+	public static final String DEFAULT_BOOTSTRAP_SERVER_ADDRESS = "bootstrap.soracom.io";
+	public static final String DEFAULT_JP_DM_SERVER_ADDRESS = "jp.inventory.soracom.io";
+	public static final String DEFAULT_GLOBAL_DM_SERVER_ADDRESS = "g.inventory.soracom.io";
 }
