@@ -15,13 +15,13 @@ soracom-inventory-agent-exampleは、soracom-inventory-agent-coreを使用した
 ## SORACOM Inventory agent for Java自体のビルド
 プロジェクトのビルドには、Gradleを使用します。プロジェクトをソースからビルドしたい場合は、チェックアウト後、コマンドを実行します。
  
-```
+```sh
 ./gradlew build
 ```
 
 IDE用の設定ファイルは、以下のコマンドで生成できます。
 
-```
+```sh
 //Eclipseの場合
 ./gradlew eclipse
 
@@ -31,7 +31,7 @@ IDE用の設定ファイルは、以下のコマンドで生成できます。
 
 また実装サンプルをアプリケーション配布するためのZipファイルは、以下のコマンドで生成できます。
 
-```
+```sh
 ./gradlew distZip
 ```
 
@@ -42,7 +42,7 @@ soracom-inventory-agent-coreエージェントをクラスパスに通した形�
 1. プロジェクトの初期化
 適当なフォルダを作成し、フォルダ内で以下のコマンドを実行します
 
-```
+```sh
 gradle init --type java-application
 ```
 
@@ -51,7 +51,7 @@ gradle init --type java-application
 
 INVENTORY_AGENT_VERSIONの部分は、利用するInventoryエージェントのバージョンを指定して下さい。
 
-```
+```java
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
@@ -75,7 +75,7 @@ mainClassName = 'App'
 3. IDE用ファイルの生成
 IDEを使用する場合は、下記コマンドでIDE用ファイルを作成し、各IDEにインポートして下さい。
 
-```
+```sh
 //Eclipseの場合
 ./gradlew eclipse
 
@@ -88,7 +88,7 @@ Inventoryエージェント実行時のエントリポイントとなるmainメ�
 
 最もシンプルな実装は、以下のような形になります。
 
-```
+```java
 import org.eclipse.leshan.client.californium.LeshanClient;
 
 import io.soracom.inventory.agent.core.initialize.InventoryAgentInitializer;
@@ -142,7 +142,7 @@ Inventroyエージェントが扱いたいリソースに対応したクラス/�
 
 カスタムモデルの定義には、XMLを使った定義ファイルを作成します。定義ファイルは以下のような形になります。
 
-```
+```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <LWM2M xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://openmobilealliance.org/tech/profiles/LWM2M.xsd">
@@ -208,7 +208,7 @@ Inventroyエージェントが扱いたいリソースに対応したクラス/�
 
 以下が生成を実行するmain関数を持ったクラスのサンプルです。
 
-```
+```java
 import java.io.File;
 
 import io.soracom.inventory.agent.core.util.TypedAnnotatedObjectTemplateClassGenerator;
@@ -231,7 +231,7 @@ public class JavaSourceGenerateMain {
 
 生成が行われると、次のようなクラスが生成されます。
 
-```
+```java
 /**
  * MyCustomModel
  **/
@@ -276,7 +276,7 @@ public class MyCustomModelObject extends AnnotatedLwM2mInstanceEnabler {
 
 まずクラスは、AnnotatedLwM2mInstanceEnablerクラスを継承したクラスとして定義し、@LWM2MObject アノテーションを付与します。objectId属性は、モデル定義XMLのObjectIDと合わせます。
 
-```
+```java
 //クラス定義
 @LWM2MObject(objectId = 30000, name = "MyCustomModel")
 public class MyCustomModelObject extends AnnotatedLwM2mInstanceEnabler {
@@ -289,7 +289,7 @@ Readオペレーションの場合は、メソッドの戻り値としてモデ�
 Executeオペレーションの場合は、実行パラメータを受け取る場合はStringで変数を宣言します。
 なお、デバイスが対応していないリソースの場合は、LwM2mInstanceResponseException.notFound() で生成される例外をスローして下さい。
 
-```
+```java
 @Resource(resourceId = 0, operation = Operation.Read)
 public Float readValue1()	{
 	return 1.0f;
@@ -319,7 +319,7 @@ public void executeCommand(String executeParameter)	{
 
 カスタムモデル定義およびカスタムモデル実装クラスを読みこんだInventoryエージェントの実装は以下のようになります。
 
-```
+```java
 import org.eclipse.leshan.client.californium.LeshanClient;
 
 import io.soracom.inventory.agent.core.initialize.InventoryAgentInitializer;
@@ -350,7 +350,7 @@ public class App {
 #### 5.Inventoryエージェントの実行
 Inventoryエージェントの実装が完了したあとは、実行用のアーカイブを作成し、配布/実行します。アーカイブは以下のコマンドで作成できます。
 
-```
+```sh
 ./gradlew distZip
 ```
 
