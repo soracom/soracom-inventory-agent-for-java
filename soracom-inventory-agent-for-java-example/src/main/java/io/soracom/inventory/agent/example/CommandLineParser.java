@@ -29,13 +29,13 @@ public class CommandLineParser {
 		options.addOption("h", "help", false, "Display help information.");
 		options.addOption("e", "endpoint", true,
 				String.format("Set the endpoint name of the Client.\nDefault: generate from network interface."));
-		options.addOption("b", "bootstrap", false, "Use bootstrap even credential exists if present this option.");
+		options.addOption("b", "bootstrap", false, "If this option is enabled, bootstrap is executed even if there is a cedential in local.");
 		options.addOption("u", true, "Set the LWM2M or Bootstrap server URL.\nDefault: "
 				+ BootstrapConstants.DEFAULT_BOOTSTRAP_SERVER_ADDRESS);
 		options.addOption("i", true,
-				"Set the LWM2M or Bootstrap server PSK identity in ascii.\nSIM bootstrap is executed if this value is not set.");
+				"Set the PSK identity (deviceId) in ascii.\nBootstrap sequence is not executed if the value is set.");
 		options.addOption("p", true,
-				"Set the LWM2M or Bootstrap server Pre-Shared-Key in hexa.\nSIM bootstrap is executed if this value is not set.");
+				"Set the Pre-Shared-Key (secret key) in hexa.\nBootstrap sequence is not executed if the value is set.");
 
 		CommandLine cl = null;
 		try {
@@ -72,7 +72,9 @@ public class CommandLineParser {
 			serverURI += cl.getOptionValue("u");
 		} else {
 			if (cl.hasOption("i")) {
-				serverURI += BootstrapConstants.DEFAULT_BOOTSTRAP_COAPS_SERVER_ADDRESS;
+				throw new IllegalStateException("Server uri is necessary when using PSK. ["
+						+ BootstrapConstants.DEFAULT_JP_DM_SERVER_ADDRESS + "] is for Japan coverage, and ["
+						+ BootstrapConstants.DEFAULT_GLOBAL_DM_SERVER_ADDRESS + "] is for Global coverage.");
 			} else {
 				serverURI += BootstrapConstants.DEFAULT_BOOTSTRAP_SERVER_ADDRESS;
 			}
@@ -91,6 +93,7 @@ public class CommandLineParser {
 		formatter.setOptionComparator(null);
 		final String USAGE = "java -jar soracom-inventory-agent-example.jar [OPTION]";
 		formatter.printHelp(USAGE, options);
+		System.exit(0);
 	}
 
 }
