@@ -35,6 +35,7 @@ import org.eclipse.leshan.core.request.BindingMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.soracom.inventory.agent.core.bootstrap.BootstrapConstants;
 import io.soracom.inventory.agent.core.bootstrap.BootstrapObserver;
 import io.soracom.inventory.agent.core.credential.CredentialStore;
 import io.soracom.inventory.agent.core.credential.Credentials;
@@ -141,6 +142,7 @@ public class InventoryAgentInitializer {
 	}
 
 	public LeshanClient buildClient() {
+		initServerUri();
 		initLwM2mModel();
 		initCredentialStore();
 		final ObjectsInitializer initializer = new ObjectsInitializer(lwM2mModel);
@@ -177,14 +179,28 @@ public class InventoryAgentInitializer {
 		return resourceObserver;
 	}
 
+	protected void initServerUri() {
+		if (serverUri == null) {
+			if (preSharedKey != null) {
+				// need to set serverUri when using PSK
+				throw new IllegalStateException("Server uri is necessary when using PSK. ["
+						+ BootstrapConstants.DEFAULT_JP_DM_SERVER_ADDRESS + "] is for Japan coverage, and ["
+						+ BootstrapConstants.DEFAULT_GLOBAL_DM_SERVER_ADDRESS + "] is for Global coverage.");
+			} else {
+				serverUri = "coap://" + BootstrapConstants.DEFAULT_BOOTSTRAP_SERVER_ADDRESS;
+			}
+		}
+		log.info("serverUri:" + serverUri);
+	}
+
 	protected void initLwM2mModel() {
-		if(this.lwM2mModel == null) {
+		if (this.lwM2mModel == null) {
 			this.lwM2mModel = InventoryAgentHelper.createDefaultLwM2mModel();
 		}
 	}
-	
+
 	protected void initCredentialStore() {
-		if(this.credentialStore == null) {
+		if (this.credentialStore == null) {
 			this.credentialStore = new FileCredentialStore();
 		}
 	}
