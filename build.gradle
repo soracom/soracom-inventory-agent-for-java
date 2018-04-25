@@ -117,5 +117,9 @@ gitPublish {
     }
     commitMessage = 'Publishing a new archive'
 }
-
-gitPublishCopy.dependsOn clean,build,publish
+task preparePush {
+    subprojects.each { dependsOn("${it.name}:clean") }
+    subprojects.each { dependsOn("${it.name}:build") }
+    subprojects.each { dependsOn("${it.name}:publish") }
+}
+gitPublishPush.dependsOn preparePush
