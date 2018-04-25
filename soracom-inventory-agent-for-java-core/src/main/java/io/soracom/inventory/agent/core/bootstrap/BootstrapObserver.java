@@ -61,16 +61,16 @@ public class BootstrapObserver extends LwM2mClientObserverAdapter {
 
 	@Override
 	public void onBootstrapSuccess(ServerInfo bsserver) {
-		log.info("Bootstrap success: " + bsserver.getFullUri().toString());
 		Credentials c = extractCredentialsInfo();
+		log.info("Bootstrap success: deviceId:" + new String(c.getPskId()));
 		credentialStore.saveCredentials(c);
 	}
 
 	@Override
 	public void onRegistrationSuccess(DmServerInfo server, String registrationID) {
-		log.info("Registration success: serverUri:" + server.serverUri + " lifetime:" + server.lifetime
-				+ " registrationID:" + registrationID);
 		Credentials c = extractCredentialsInfo();
+		log.info("Registration success: deviceId:" + new String(c.getPskId()) + " serverUri:" + server.serverUri
+				+ " lifetime:" + server.lifetime + " registrationID:" + registrationID);
 		credentialStore.saveCredentials(c);
 	}
 
