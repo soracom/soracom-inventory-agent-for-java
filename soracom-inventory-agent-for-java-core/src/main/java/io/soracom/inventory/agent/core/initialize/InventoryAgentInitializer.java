@@ -45,7 +45,7 @@ import io.soracom.inventory.agent.core.bootstrap.krypton.KryptonClientConfigForI
 import io.soracom.inventory.agent.core.bootstrap.krypton.KryptonLogListener;
 import io.soracom.inventory.agent.core.credential.CredentialStore;
 import io.soracom.inventory.agent.core.credential.Credentials;
-import io.soracom.inventory.agent.core.credential.FileCredentialStore;
+import io.soracom.inventory.agent.core.credential.JCEFileCredentialStore;
 import io.soracom.inventory.agent.core.credential.PreSharedKey;
 import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
 import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
@@ -182,10 +182,10 @@ public class InventoryAgentInitializer {
 		initLwM2mModel();
 		// psk > credential store > krypton > bootstrap
 		Credentials credentials = loadCredentials();
-		if(credentials == null) {
+		if (credentials == null) {
 			executeKryptonBootstrap();
 			credentials = loadCredentials();
-		}		
+		}
 		final ObjectsInitializer initializer = new ObjectsInitializer(lwM2mModel);
 		initSecurity(initializer, credentials);
 		initServer(initializer, credentials);
@@ -259,13 +259,13 @@ public class InventoryAgentInitializer {
 
 	protected void initCredentialStore() {
 		if (this.credentialStore == null) {
-			this.credentialStore = new FileCredentialStore();
+			this.credentialStore = new JCEFileCredentialStore();
 		}
 		if (forceBootstrap) {
 			credentialStore.clearCredentials();
 		}
 	}
-	
+
 	private Credentials loadCredentials() {
 		if (preSharedKey != null) {
 			log.info("load credentials from psk.");
