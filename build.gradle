@@ -11,11 +11,6 @@ subprojects {
 
 	group = 'io.soracom'
 	version = '0.0.6-SNAPSHOT'
-	
-    def defaultEncoding = 'UTF-8'
-    tasks.withType(JavaCompile) {
-        options.encoding = defaultEncoding
-    }
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7

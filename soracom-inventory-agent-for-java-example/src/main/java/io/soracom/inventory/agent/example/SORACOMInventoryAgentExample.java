@@ -2,6 +2,8 @@ package io.soracom.inventory.agent.example;
 
 import org.eclipse.leshan.client.californium.LeshanClient;
 
+import io.soracom.inventory.agent.core.bootstrap.krypton.KryptonApiEndpointUrl;
+import io.soracom.inventory.agent.core.bootstrap.krypton.KryptonClientConfigForInventory;
 import io.soracom.inventory.agent.core.credential.FileCredentialStore;
 import io.soracom.inventory.agent.core.initialize.InventoryAgentInitializer;
 import io.soracom.inventory.agent.core.initialize.LwM2mModelBuilder;
@@ -19,7 +21,6 @@ import io.soracom.inventory.agent.example.object.ExampleSoftwareComponentObject;
 public class SORACOMInventoryAgentExample {
 
 	public static void main(String[] args) {
-
 		final CommandLineParser parser = new CommandLineParser();
 		parser.parseArguments(args);
 
@@ -31,6 +32,13 @@ public class SORACOMInventoryAgentExample {
 		initializer.setPreSharedKey(parser.psk);
 		initializer.setObservationTimerTaskIntervalSeconds(60);
 		initializer.setCredentialStore(new FileCredentialStore());
+		
+		//enable bootstrap by SORACOM Krypton
+		if(parser.enableKryptonBootstrap) {
+			KryptonClientConfigForInventory kryptonClientConfig = new KryptonClientConfigForInventory();
+			kryptonClientConfig.setKryptonApiEndpointUrl(KryptonApiEndpointUrl.GLOBAL_COVERAGE);
+			initializer.enableKryptonBootstrap(kryptonClientConfig);
+		}
 
 		final LwM2mModelBuilder lwM2mModelBuilder = new LwM2mModelBuilder();
 		lwM2mModelBuilder.addPresetObjectModels();// set default lwm2m object models

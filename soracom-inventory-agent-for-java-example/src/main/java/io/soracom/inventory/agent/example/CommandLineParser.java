@@ -20,6 +20,7 @@ public class CommandLineParser {
 	String endpoint;
 	String serverURI;
 	PreSharedKey psk;
+	boolean enableKryptonBootstrap;
 	boolean forceBootstrap;
 
 	public void parseArguments(String[] args) {
@@ -36,6 +37,8 @@ public class CommandLineParser {
 				"Set the PSK identity (deviceId) in ascii.\nBootstrap sequence is not executed if the value is set.");
 		options.addOption("p", true,
 				"Set the Pre-Shared-Key (secret key) in hexa.\nBootstrap sequence is not executed if the value is set.");
+		options.addOption("k","krypton", false,
+				"Enable bootstrap by SORACOM Krypton");
 
 		CommandLine cl = null;
 		try {
@@ -86,6 +89,7 @@ public class CommandLineParser {
 		}
 
 		forceBootstrap = cl.hasOption("b");
+		enableKryptonBootstrap = cl.hasOption("krypton");
 	}
 
 	protected void printHelp() {
