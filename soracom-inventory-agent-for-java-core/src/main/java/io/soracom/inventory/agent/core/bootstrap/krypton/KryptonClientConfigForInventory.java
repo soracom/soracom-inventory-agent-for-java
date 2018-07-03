@@ -13,9 +13,10 @@
  *******************************************************************************/
 package io.soracom.inventory.agent.core.bootstrap.krypton;
 
-import io.soracom.krypton.KryptonClientConfig;
+import io.soracom.endorse.SORACOMEndorseClientConfig;
+import io.soracom.krypton.SORACOMKryptonClientConfig;
 
-public class KryptonClientConfigForInventory extends KryptonClientConfig {
+public class KryptonClientConfigForInventory extends SORACOMKryptonClientConfig {
 	private static final int KEY_LENGTH = 16;
 
 	public KryptonClientConfigForInventory() {
@@ -23,23 +24,8 @@ public class KryptonClientConfigForInventory extends KryptonClientConfig {
 	}
 
 	private void setDefaultValue() {
-		setApplicationKey(true);
-		setKeyLength(KEY_LENGTH);
-		setKryptonApiEndpointUrl(KryptonApiEndpointUrl.GLOBAL_COVERAGE);
-	}
-
-	public void setKryptonApiEndpointUrl(KryptonApiEndpointUrl url) {
-		setKeyAgreementUrl(url.getKeyAgreementUrl());
-		setKeyDistributionUrl(url.getKeyDistributionUrl());
-	}
-
-	@Override
-	public void setApplicationKey(boolean applicationKey) {
-		super.setApplicationKey(true);// always true
-	}
-
-	@Override
-	public void setKeyLength(int keyLength) {
-		super.setKeyLength(KEY_LENGTH);
+		SORACOMEndorseClientConfig endorseClientConfig = new SORACOMEndorseClientConfig();
+		endorseClientConfig.setKeyLength(KEY_LENGTH);
+		setEndorseClientConfig(endorseClientConfig);
 	}
 }

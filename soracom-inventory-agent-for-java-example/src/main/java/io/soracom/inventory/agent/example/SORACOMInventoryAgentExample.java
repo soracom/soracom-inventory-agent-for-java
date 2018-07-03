@@ -2,7 +2,6 @@ package io.soracom.inventory.agent.example;
 
 import org.eclipse.leshan.client.californium.LeshanClient;
 
-import io.soracom.inventory.agent.core.bootstrap.krypton.KryptonApiEndpointUrl;
 import io.soracom.inventory.agent.core.bootstrap.krypton.KryptonClientConfigForInventory;
 import io.soracom.inventory.agent.core.initialize.InventoryAgentInitializer;
 import io.soracom.inventory.agent.core.initialize.LwM2mModelBuilder;
@@ -34,7 +33,6 @@ public class SORACOMInventoryAgentExample {
 		// enable bootstrap by SORACOM Krypton
 		if (parser.enableKryptonBootstrap) {
 			KryptonClientConfigForInventory kryptonClientConfig = new KryptonClientConfigForInventory();
-			kryptonClientConfig.setKryptonApiEndpointUrl(KryptonApiEndpointUrl.GLOBAL_COVERAGE);
 			initializer.enableKryptonBootstrap(kryptonClientConfig);
 		}
 

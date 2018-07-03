@@ -16,8 +16,8 @@ package io.soracom.inventory.agent.core.bootstrap.krypton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.soracom.krypton.common.ITextLogListener;
-import io.soracom.krypton.common.TextLogItem;
+import io.soracom.endorse.common.ITextLogListener;
+import io.soracom.endorse.common.TextLogItem;
 
 public class KryptonLogListener implements ITextLogListener {
 

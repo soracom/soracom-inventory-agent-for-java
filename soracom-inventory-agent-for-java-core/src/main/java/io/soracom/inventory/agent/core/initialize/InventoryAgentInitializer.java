@@ -35,12 +35,8 @@ import org.eclipse.leshan.core.request.BindingMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
 import io.soracom.inventory.agent.core.bootstrap.BootstrapConstants;
 import io.soracom.inventory.agent.core.bootstrap.BootstrapObserver;
-import io.soracom.inventory.agent.core.bootstrap.krypton.KryptonBootstrapParameter;
 import io.soracom.inventory.agent.core.bootstrap.krypton.KryptonClientConfigForInventory;
 import io.soracom.inventory.agent.core.bootstrap.krypton.KryptonLogListener;
 import io.soracom.inventory.agent.core.credential.CredentialStore;
@@ -49,9 +45,10 @@ import io.soracom.inventory.agent.core.credential.JCEFileCredentialStore;
 import io.soracom.inventory.agent.core.credential.PreSharedKey;
 import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
 import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
-import io.soracom.krypton.KryptonClient;
-import io.soracom.krypton.KryptonClientConfig;
-import io.soracom.krypton.beans.KeyDistributionBean;
+import io.soracom.krypton.SORACOMKryptonClient;
+import io.soracom.krypton.SORACOMKryptonClientConfig;
+import io.soracom.krypton.beans.BootstrapInventoryDeviceParams;
+import io.soracom.krypton.beans.BootstrapInventoryDeviceResult;
 
 /**
  * Helper class to initialize LeshanClient instance
@@ -77,7 +74,7 @@ public class InventoryAgentInitializer {
 	protected Integer observationTimerTaskIntervalSeconds;
 	protected boolean enableObservationTimerTask = true;
 
-	private KryptonClientConfig kryptonClientConfig;
+	private SORACOMKryptonClientConfig kryptonClientConfig;
 
 	public InventoryAgentInitializer() {
 
@@ -223,16 +220,15 @@ public class InventoryAgentInitializer {
 			return;
 		}
 		log.info("trying to retrieve bootstrap parameters from Krypton.");
-		kryptonClientConfig.setApplicationKey(true);
-		KryptonBootstrapParameter param = new KryptonBootstrapParameter();
-		param.setEndpoint(endpoint);
-		kryptonClientConfig.setRequestParameters(new Gson().toJson(param));
-		KryptonClient kryptonClient = new KryptonClient(kryptonClientConfig, new KryptonLogListener());
-		KeyDistributionBean result = kryptonClient.invokeKeyDistributionService();
-		final JsonObject bootstrapParams = result.getServiceProviderResponse();
-		this.serverUri = bootstrapParams.get("serverUri").getAsString();
-		final String pskId = bootstrapParams.get("pskId").getAsString();
-		final String appKey = result.getApplicationKey();
+		final SORACOMKryptonClient kryptonClient = new SORACOMKryptonClient(kryptonClientConfig,
+				new KryptonLogListener());
+		final BootstrapInventoryDeviceParams bootstrapParam = new BootstrapInventoryDeviceParams();
+		bootstrapParam.setEndpoint(endpoint);
+		BootstrapInventoryDeviceResult bootstrapResult = kryptonClient.bootstrapInventoryDevice(bootstrapParam);
+
+		this.serverUri = bootstrapResult.getServerUri();
+		final String pskId = bootstrapResult.getPskId();
+		final String appKey = bootstrapResult.getApplicationKey();
 		PreSharedKey psk = new PreSharedKey(pskId, appKey);
 		this.preSharedKey = psk;
 		log.info("succeded to retrieve bootstrap parameters from Krypton.pskId:" + pskId + " serverUri:" + serverUri);
