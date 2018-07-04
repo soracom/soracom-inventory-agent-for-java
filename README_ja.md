@@ -123,7 +123,9 @@ SORACOMのユーザーコンソールから、SIMのグループ設定でInvento
 - Inventoryエージェントは、初回通信時にSIM経由のブートストラップを実施します。一度bootstrapに成功すると、${user.home}/.soracom-inventory-jceというファイルを生成し、キーをデバイス上に保管します。この保存先については、デフォルトではJCEFileCredentialStoreが利用されますが、任意の方法で保存したい場合は、CredentialStoreインターフェースを実装して下さい。
 またJCEFileCredentialStoreは、デフォルトではクラス内に定義されたキーを使ってAESで暗号化を行いますが、任意のキーを使いたい場合は、環境変数にINVENTORY_CREDENTIAL_STORE_KEYを設定してください。
 - ブートストラップ成功後は、このファイルを使うことで、bootstrapなしでSORACOM Inventoryと通信できるため、wifiなどSIM以外経由でも通信を行うことが出来ます。また再度ブートストラップしたい場合は、ファイルを消して再度実行するか、forceBootstrapオプションを有効にしてください。
-- SORACOM InventoryはデフォルトではSIM認証を使用してブートストラップ処理を行いますが、ユーザーコンソールで生成したデバイスキー(デバイスIDとシークレットキーのペア）を、InventoryAgentInitializer#setPreSharedKey()で設定すると、SIMが無い場合でもブートストラップ可能です。
+- SORACOM Inventoryはデフォルトではセルラー回線を使ったSIM認証を使用してブートストラップ処理を行いますが、ユーザーコンソールで生成したデバイスキー(デバイスIDとシークレットキーのペア）を、InventoryAgentInitializer#setPreSharedKey()で設定すると、SIMが無い場合でもブートストラップ可能です。
+- version 0.0.6より、SORACOM Kryptonを使った、セルラー回線以外でのSIM認証（AKA)を使ったブートストラップもサポートされました。
+Kryptonを使用してブートストラップを行う場合は、InventoryAgentInitializer#enableKryptonBootstrap()を利用してください。
 - Observeされたリソースについては、デフォルトで60秒に一度、対象リソースのreadメソッドの呼び出しが行われるようになっています。呼び出し間隔を変更したい場合は、InventoryAgentInitializer#setObservationTimerTaskIntervalSeconds で秒数を指定して下さい。
 
 #### Inventoryエージェントの拡張(基本的なモデル定義）
@@ -357,7 +359,7 @@ Inventoryエージェントの実装が完了したあとは、実行用のア�
 
 コマンド実行後、build/distributionsディレクトリ以下にzipファイルが生成されます。
 
-配布先のデバイスでzipを回答し、binディレクトリ内の実行ファルを実行すると、Inventoryエージェントの実行が開始されます。
+配布先のデバイスでzipを解凍し、binディレクトリ内の実行ファルを実行すると、Inventoryエージェントの実行が開始されます。
 
 
 
