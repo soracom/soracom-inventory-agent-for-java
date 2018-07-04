@@ -23,17 +23,25 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.soracom.inventory.agent.core.exception.SORACOMInventoryAgentRuntimeException;
 
+/**
+ * File stored credntial store
+ * @author c9katayama
+ * @deprecated Recommended to use {@code JCEFileCredentialStore} instead of this class
+ *
+ */
+@Deprecated
 public class FileCredentialStore implements CredentialStore {
 
 	private static final Logger log = LoggerFactory.getLogger(FileCredentialStore.class);
 
-	private static final String DEFAULT_CREDENTIALS_PATH = ".soracom-inventory-credentials.dat";
+	protected static final String DEFAULT_CREDENTIALS_PATH = ".soracom-inventory-credentials.dat";
 
 	private String credentialsPath = DEFAULT_CREDENTIALS_PATH;
 
@@ -43,9 +51,15 @@ public class FileCredentialStore implements CredentialStore {
 
 	@Override
 	public void clearCredentials() {
-		File datFile = new File(credentialsPath);
-		if (datFile.exists()) {
-			datFile.delete();
+		clearCredentials(credentialsPath);
+	}
+
+	protected void clearCredentials(String path) {
+		File datFile = new File(path);
+		try {
+			Files.deleteIfExists(datFile.toPath());
+		} catch (IOException e) {
+			log.error(e.getMessage());
 		}
 	}
 
@@ -65,7 +79,11 @@ public class FileCredentialStore implements CredentialStore {
 
 	@Override
 	public Credentials loadCredentials() {
-		File datFile = new File(credentialsPath);
+		return loadCredentials(credentialsPath);
+	}
+
+	protected Credentials loadCredentials(String path) {
+		File datFile = new File(path);
 		if (datFile.exists() == false) {
 			return null;
 		}

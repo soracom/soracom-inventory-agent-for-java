@@ -2,22 +2,15 @@ plugins {
     id 'org.ajoberstar.git-publish' version '0.4.0'
 }
 
-allprojects{
-    apply plugin: 'java'
-    apply plugin: 'maven'
-	apply plugin: 'maven-publish'
-	group = 'io.soracom'
-	version = '0.0.5'
-}
-
 subprojects {
     apply plugin: 'eclipse'
     apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'maven'
+	apply plugin: 'maven-publish'
 
-    def defaultEncoding = 'UTF-8'
-    tasks.withType(JavaCompile) {
-        options.encoding = defaultEncoding
-    }
+	group = 'io.soracom'
+	version = '0.0.6'
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
@@ -28,6 +21,7 @@ subprojects {
 	}
 		
     repositories {
+    	mavenLocal()
         mavenCentral()
         jcenter()
     }
@@ -63,6 +57,7 @@ project(':soracom-inventory-agent-for-java-core') {
         compile "org.eclipse.leshan:leshan-client-cf:1.0.0-M6"
         compile 'org.slf4j:slf4j-api:1.7.22'
         compile 'org.slf4j:slf4j-simple:1.7.22'
+        compile 'io.soracom:soracom-krypton-client-for-java:0.1.0'
     }
 }
 

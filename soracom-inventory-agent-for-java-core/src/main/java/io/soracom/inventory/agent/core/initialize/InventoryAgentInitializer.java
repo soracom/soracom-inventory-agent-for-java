@@ -37,12 +37,18 @@ import org.slf4j.LoggerFactory;
 
 import io.soracom.inventory.agent.core.bootstrap.BootstrapConstants;
 import io.soracom.inventory.agent.core.bootstrap.BootstrapObserver;
+import io.soracom.inventory.agent.core.bootstrap.krypton.KryptonClientConfigForInventory;
+import io.soracom.inventory.agent.core.bootstrap.krypton.KryptonLogListener;
 import io.soracom.inventory.agent.core.credential.CredentialStore;
 import io.soracom.inventory.agent.core.credential.Credentials;
-import io.soracom.inventory.agent.core.credential.FileCredentialStore;
+import io.soracom.inventory.agent.core.credential.JCEFileCredentialStore;
 import io.soracom.inventory.agent.core.credential.PreSharedKey;
 import io.soracom.inventory.agent.core.lwm2m.AnnotatedLwM2mInstanceEnabler;
 import io.soracom.inventory.agent.core.lwm2m.LWM2MObject;
+import io.soracom.krypton.SORACOMKryptonClient;
+import io.soracom.krypton.SORACOMKryptonClientConfig;
+import io.soracom.krypton.beans.BootstrapInventoryDeviceParams;
+import io.soracom.krypton.beans.BootstrapInventoryDeviceResult;
 
 /**
  * Helper class to initialize LeshanClient instance
@@ -67,6 +73,8 @@ public class InventoryAgentInitializer {
 	protected Integer observationTimerTaskStartDelaySeconds;
 	protected Integer observationTimerTaskIntervalSeconds;
 	protected boolean enableObservationTimerTask = true;
+
+	private SORACOMKryptonClientConfig kryptonClientConfig;
 
 	public InventoryAgentInitializer() {
 
@@ -107,6 +115,29 @@ public class InventoryAgentInitializer {
 	}
 
 	/**
+	 * Enable bootstrap by SORACOM Krypton with default parameters.
+	 * 
+	 * <pre>
+	 * - Using GLOVAL_COVERAGE for api endpoint url
+	 * - Automatic detection of UICC interface
+	 * </pre>
+	 * 
+	 * @param kryptonClientConfig
+	 */
+	public void enableKryptonBootstrap() {
+		this.kryptonClientConfig = new KryptonClientConfigForInventory();
+	}
+
+	/**
+	 * Enable bootstrap by SORACOM Krypton
+	 * 
+	 * @param kryptonClientConfig
+	 */
+	public void enableKryptonBootstrap(KryptonClientConfigForInventory kryptonClientConfig) {
+		this.kryptonClientConfig = kryptonClientConfig;
+	}
+
+	/**
 	 * Observation interval calling read method continuously
 	 * 
 	 * @param observationIntervalSeconds
@@ -142,18 +173,23 @@ public class InventoryAgentInitializer {
 	}
 
 	public LeshanClient buildClient() {
+		initCredentialStore();
+		initEndpoint();
 		initServerUri();
 		initLwM2mModel();
-		initCredentialStore();
+		// psk > credential store > krypton > bootstrap
+		Credentials credentials = loadCredentials();
+		if (credentials == null) {
+			executeKryptonBootstrap();
+			credentials = loadCredentials();
+		}
 		final ObjectsInitializer initializer = new ObjectsInitializer(lwM2mModel);
-		final Credentials credentials = loadCredentials();
 		initSecurity(initializer, credentials);
 		initServer(initializer, credentials);
 		initObjects(initializer);
 
 		final Map<Integer, LwM2mObjectEnabler> objectEnablerMap = initObjectEnablers(initializer);
 		// Create client
-		final String endpoint = initEndpoint();
 		final LeshanClientBuilder builder = new LeshanClientBuilder(endpoint);
 		builder.setObjects(new ArrayList<>(objectEnablerMap.values()));
 		final LeshanClient client = builder.build();
@@ -179,6 +215,25 @@ public class InventoryAgentInitializer {
 		return resourceObserver;
 	}
 
+	protected void executeKryptonBootstrap() {
+		if (kryptonClientConfig == null) {
+			return;
+		}
+		log.info("trying to retrieve bootstrap parameters from Krypton.");
+		final SORACOMKryptonClient kryptonClient = new SORACOMKryptonClient(kryptonClientConfig,
+				new KryptonLogListener());
+		final BootstrapInventoryDeviceParams bootstrapParam = new BootstrapInventoryDeviceParams();
+		bootstrapParam.setEndpoint(endpoint);
+		BootstrapInventoryDeviceResult bootstrapResult = kryptonClient.bootstrapInventoryDevice(bootstrapParam);
+
+		this.serverUri = bootstrapResult.getServerUri();
+		final String pskId = bootstrapResult.getPskId();
+		final String appKey = bootstrapResult.getApplicationKey();
+		PreSharedKey psk = new PreSharedKey(pskId, appKey);
+		this.preSharedKey = psk;
+		log.info("succeded to retrieve bootstrap parameters from Krypton.pskId:" + pskId + " serverUri:" + serverUri);
+	}
+
 	protected void initServerUri() {
 		if (serverUri == null) {
 			if (preSharedKey != null) {
@@ -190,7 +245,6 @@ public class InventoryAgentInitializer {
 				serverUri = "coap://" + BootstrapConstants.DEFAULT_BOOTSTRAP_SERVER_ADDRESS;
 			}
 		}
-		log.info("serverUri:" + serverUri);
 	}
 
 	protected void initLwM2mModel() {
@@ -201,7 +255,10 @@ public class InventoryAgentInitializer {
 
 	protected void initCredentialStore() {
 		if (this.credentialStore == null) {
-			this.credentialStore = new FileCredentialStore();
+			this.credentialStore = new JCEFileCredentialStore();
+		}
+		if (forceBootstrap) {
+			credentialStore.clearCredentials();
 		}
 	}
 
@@ -217,13 +274,8 @@ public class InventoryAgentInitializer {
 			credentials.setLifetime(60L);
 			return credentials;
 		} else {
-			if (forceBootstrap) {
-				credentialStore.clearCredentials();
-			}
 			final Credentials credentials = credentialStore.loadCredentials();
-			if (credentials == null) {
-				log.info("credentials does not exist.");
-			} else {
+			if (credentials != null) {
 				log.info("load credentials from credential store.");
 			}
 			return credentials;
@@ -286,12 +338,10 @@ public class InventoryAgentInitializer {
 		return enablerMap;
 	}
 
-	private String initEndpoint() {
-		String endpoint = this.endpoint;
+	private void initEndpoint() {
 		if (endpoint == null) {
 			endpoint = InventoryAgentHelper.generateEndpoint();
 		}
-		return endpoint;
 	}
 
 }
