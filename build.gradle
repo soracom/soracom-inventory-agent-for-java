@@ -23,6 +23,7 @@ subprojects {
     repositories {
     	mavenLocal()
         mavenCentral()
+        maven { url 'https://soracom.github.io/maven-repository/' }
         jcenter()
     }
 
