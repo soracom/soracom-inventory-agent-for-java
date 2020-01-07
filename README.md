@@ -1,6 +1,6 @@
 [Japanese README is here](README_ja.md)
 
-This library contains bootstrap via SIM, store credential, basic LWM 2M object definition. SORACOM Inventory user can implements  an Inventory agent to match own device.
+This library contains bootstrap via SIM, store credential, basic LWM2M object definition. SORACOM Inventory user can implements  an Inventory agent to match own device.
 
 ## Repository structure
 This repository includes 2 projects.
