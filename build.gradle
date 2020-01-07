@@ -1,6 +1,8 @@
 plugins {
-    id 'org.ajoberstar.git-publish' version '0.4.0'
+	id 'org.ajoberstar.git-publish' version '2.1.3'
 }
+
+apply plugin: 'org.ajoberstar.git-publish'
 
 subprojects {
     apply plugin: 'eclipse'
@@ -10,7 +12,7 @@ subprojects {
 	apply plugin: 'maven-publish'
 
 	group = 'io.soracom'
-	version = '0.0.7-SNAPSHOT'
+	version = '0.0.7'
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
@@ -34,7 +36,6 @@ subprojects {
 	task sourceJar(type: Jar) {
     	from sourceSets.main.allJava
 	}
-
 	publishing {
 	    publications {
 	        mavenJava(MavenPublication) {
@@ -49,7 +50,7 @@ subprojects {
 		        url file("$buildDir/dist-mvn")
 	   		}
 	   	}
-	}    
+	}   
 }
 
 project(':soracom-inventory-agent-for-java-core') {
@@ -100,22 +101,38 @@ def createScript(project, mainClass, name) {
 
 
 //use gradle gitPublishPush to push artifacts
+task publishAll(type:GradleBuild) {
+	List selectedProjects = new ArrayList();
+	subprojects.each { 
+		selectedProjects.add("${it.name}:clean".toString())
+		selectedProjects.add("${it.name}:build".toString())
+		selectedProjects.add("${it.name}:gitPublishPush".toString())
+	}
+	tasks = selectedProjects
+}
+
+task preparePush(type:GradleBuild) {
+	List selectedProjects = new ArrayList();
+	subprojects.each { 
+		selectedProjects.add("${it.name}:clean".toString())
+		selectedProjects.add("${it.name}:build".toString())
+		selectedProjects.add("${it.name}:publish".toString())
+		//selectedProjects.add("${it.name}:gitPublishPush".toString())
+	}
+	tasks = selectedProjects
+}
+
 gitPublish {
     repoUri = 'https://github.com/soracom/maven-repository.git'
     branch = 'gh-pages'
-    repoDir = file("maven-repository")
     contents {
-        from file("soracom-inventory-agent-for-java-core/build/dist-mvn")
+    	from file("soracom-inventory-agent-for-java-core/build/dist-mvn")
         from file("soracom-inventory-agent-for-java-example/build/dist-mvn")
     }
     preserve {
         include '**'
     }
     commitMessage = 'Publishing a new archive'
-}
-task preparePush {
-    subprojects.each { dependsOn("${it.name}:clean") }
-    subprojects.each { dependsOn("${it.name}:build") }
-    subprojects.each { dependsOn("${it.name}:publish") }
-}
+}  	
+
 gitPublishPush.dependsOn preparePush
