@@ -90,6 +90,7 @@ def createScript(project, mainClass, name) {
     project.tasks[name].dependsOn(project.jar)
     project.applicationDistribution.with {
         into("bin") {
+            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
             from(project.tasks[name])
             fileMode = 0755
         }
