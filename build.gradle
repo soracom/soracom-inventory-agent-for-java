@@ -99,25 +99,12 @@ def createScript(project, mainClass, name) {
     } 
 }
 
-
-//use gradle gitPublishPush to push artifacts
-task publishAll(type:GradleBuild) {
-	List selectedProjects = new ArrayList();
-	subprojects.each { 
-		selectedProjects.add("${it.name}:clean".toString())
-		selectedProjects.add("${it.name}:build".toString())
-		selectedProjects.add("${it.name}:gitPublishPush".toString())
-	}
-	tasks = selectedProjects
-}
-
 task preparePush(type:GradleBuild) {
 	List selectedProjects = new ArrayList();
 	subprojects.each { 
 		selectedProjects.add("${it.name}:clean".toString())
 		selectedProjects.add("${it.name}:build".toString())
 		selectedProjects.add("${it.name}:publish".toString())
-		//selectedProjects.add("${it.name}:gitPublishPush".toString())
 	}
 	tasks = selectedProjects
 }
@@ -134,5 +121,4 @@ gitPublish {
     }
     commitMessage = 'Publishing a new archive'
 }  	
-
 gitPublishPush.dependsOn preparePush

@@ -362,5 +362,23 @@ Inventoryエージェントの実装が完了したあとは、実行用のア�
 配布先のデバイスでzipを解凍し、binディレクトリ内の実行ファルを実行すると、Inventoryエージェントの実行が開始されます。
 
 
+# コミッター向け
+## How to publish new artifact to Maven repository
+To publish a new artifact to SORACOM Maven repository, please follow the steps below.
+
+1. Set your Github token to environment variable
+
+```sh
+export GRGIT_USER=${YOUR_GITHUB_API_TOKEN}
+```
+
+2. Run Gradle command 
+
+```sh
+ ./gradlew gitPublishPush
+ ```
+
+Note: Current tool chain does not support PGP code signing for git commit, so please disable it if you are using it. 
+
 
 

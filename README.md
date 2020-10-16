@@ -123,3 +123,21 @@ MockDeviceObjectImpl class used in the above agent implementation is also as ext
 Inherit the template class for the resource you want to handle, and implement methods. You can extend the resources handled by the Inventory agent by adding that class's instance with InventoryAgentInitializer#addInstancesForObject().
 
 
+#For committer
+## How to publish new artifact to Maven repository
+To publish a new artifact to SORACOM Maven repository, please follow the steps below.
+
+1. Set your Github token to environment variable
+
+```sh
+export GRGIT_USER=${YOUR_GITHUB_API_TOKEN}
+```
+
+2. Run Gradle command 
+
+```sh
+ ./gradlew gitPublishPush
+ ```
+
+Note: Current tool chain does not support PGP code signing for git commit, so please disable it if you are using it. 
+
