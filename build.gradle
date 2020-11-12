@@ -1,5 +1,5 @@
 plugins {
-	id 'org.ajoberstar.git-publish' version '3.0.0'
+    id 'org.ajoberstar.git-publish' version '3.0.0'
 }
 
 apply plugin: 'org.ajoberstar.git-publish'
@@ -9,21 +9,21 @@ subprojects {
     apply plugin: 'idea'
     apply plugin: 'java'
     apply plugin: 'maven'
-	apply plugin: 'maven-publish'
+    apply plugin: 'maven-publish'
 
-	group = 'io.soracom'
-	version = '0.0.8-SNAPSHOT'
+    group = 'io.soracom'
+    version = '0.0.8-SNAPSHOT'
 
     sourceCompatibility = 1.7
     targetCompatibility = 1.7
-    
+
     jar {
-		baseName = project.name
-		version =  project.version
-	}
-		
+        baseName = project.name
+        version = project.version
+    }
+
     repositories {
-    	mavenLocal()
+        mavenLocal()
         mavenCentral()
         maven { url 'https://soracom.github.io/maven-repository/' }
         jcenter()
@@ -33,24 +33,24 @@ subprojects {
         testCompile 'junit:junit:4.12'
     }
 
-	task sourceJar(type: Jar) {
-    	from sourceSets.main.allJava
-	}
-	publishing {
-	    publications {
-	        mavenJava(MavenPublication) {
-	            from components.java
-	            artifact sourceJar {
-	                classifier "sources"
-	            }
-	        }
-	    }
-	    repositories {
-	    	maven {
-		        url file("$buildDir/dist-mvn")
-	   		}
-	   	}
-	}   
+    task sourceJar(type: Jar) {
+        from sourceSets.main.allJava
+    }
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                from components.java
+                artifact sourceJar {
+                    classifier "sources"
+                }
+            }
+        }
+        repositories {
+            maven {
+                url file("$buildDir/dist-mvn")
+            }
+        }
+    }
 }
 
 project(':soracom-inventory-agent-for-java-core') {
@@ -72,20 +72,22 @@ project(':soracom-inventory-agent-for-java-example') {
         baseName = "soracom-inventory-agent-example"
     }
     dependencies {
-       	compile "commons-cli:commons-cli:1.3.1"
+        compile "commons-cli:commons-cli:1.3.1"
         compile project(':soracom-inventory-agent-for-java-core')
     }
     startScripts.enabled = false
     run.enabled = false
-    createScript(project, 'io.soracom.inventory.agent.example.SORACOMInventoryAgentExample', 'soracom-inventory-agent-example-start')
+    createScript(project, 'io.soracom.inventory.agent.example.SORACOMInventoryAgentExample',
+                 'soracom-inventory-agent-example-start')
 }
 
 def createScript(project, mainClass, name) {
     project.tasks.create(name: name, type: CreateStartScripts) {
         outputDir = new File(project.buildDir, 'scripts')
-        mainClassName   = mainClass
+        mainClassName = mainClass
         applicationName = name
-        classpath = project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files + project.configurations.runtime
+        classpath =
+            project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files + project.configurations.runtime
     }
     project.tasks[name].dependsOn(project.jar)
     project.applicationDistribution.with {
@@ -97,29 +99,29 @@ def createScript(project, mainClass, name) {
         into("bin/script") {
             from("script")
         }
-    } 
+    }
 }
 
-task preparePush(type:GradleBuild) {
-	List selectedProjects = new ArrayList();
-	subprojects.each { 
-		selectedProjects.add("${it.name}:clean".toString())
-		selectedProjects.add("${it.name}:build".toString())
-		selectedProjects.add("${it.name}:publish".toString())
-	}
-	tasks = selectedProjects
+task preparePush(type: GradleBuild) {
+    List selectedProjects = new ArrayList();
+    subprojects.each {
+        selectedProjects.add("${it.name}:clean".toString())
+        selectedProjects.add("${it.name}:build".toString())
+        selectedProjects.add("${it.name}:publish".toString())
+    }
+    tasks = selectedProjects
 }
 
 gitPublish {
     repoUri = 'https://github.com/soracom/maven-repository.git'
     branch = 'gh-pages'
     contents {
-    	from file("soracom-inventory-agent-for-java-core/build/dist-mvn")
+        from file("soracom-inventory-agent-for-java-core/build/dist-mvn")
         from file("soracom-inventory-agent-for-java-example/build/dist-mvn")
     }
     preserve {
         include '**'
     }
     commitMessage = 'Publishing a new archive'
-}  	
+}
 gitPublishPush.dependsOn preparePush
