@@ -55,10 +55,10 @@ subprojects {
 
 project(':soracom-inventory-agent-for-java-core') {
     dependencies {
-        compile "org.eclipse.leshan:leshan-client-core:1.0.0-M6"
-        compile "org.eclipse.leshan:leshan-client-cf:1.0.0-M6"
-        compile 'org.slf4j:slf4j-api:1.7.22'
-        compile 'org.slf4j:slf4j-simple:1.7.22'
+        compile "org.eclipse.leshan:leshan-client-core:1.2.0"
+        compile "org.eclipse.leshan:leshan-client-cf:1.2.0"
+        compile 'org.slf4j:slf4j-api:1.7.30'
+        compile 'org.slf4j:slf4j-simple:1.7.30'
         compile 'io.soracom:soracom-krypton-client-for-java:0.1.0'
     }
 }
