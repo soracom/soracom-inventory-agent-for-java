@@ -17,7 +17,7 @@ package io.soracom.inventory.agent.core.credential;
 
 import java.util.Base64;
 
-import org.eclipse.leshan.util.Hex;
+import org.eclipse.leshan.core.util.Hex;
 
 public class PreSharedKey {
 

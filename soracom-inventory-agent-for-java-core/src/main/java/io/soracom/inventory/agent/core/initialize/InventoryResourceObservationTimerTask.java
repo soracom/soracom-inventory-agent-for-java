@@ -27,11 +27,11 @@ import java.util.TimerTask;
 import org.eclipse.californium.core.observe.ObserveRelation;
 import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.core.server.resources.ResourceObserver;
-import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.client.observer.LwM2mClientObserverAdapter;
 import org.eclipse.leshan.client.resource.NotifySender;
-import org.eclipse.leshan.client.servers.DmServerInfo;
+import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.node.LwM2mPath;
+import org.eclipse.leshan.core.request.RegisterRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,17 +151,18 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 	}
 
 	@Override
-	public void onRegistrationSuccess(DmServerInfo server, String registrationID) {
+	public void onRegistrationSuccess(ServerIdentity server, RegisterRequest request, String registrationID) {
 		startObservation();
 	}
 
 	@Override
-	public void onRegistrationFailure(DmServerInfo server, ResponseCode responseCode, String errorMessage) {
+	public void onRegistrationFailure(ServerIdentity server, RegisterRequest request,
+			org.eclipse.leshan.core.ResponseCode responseCode, String errorMessage, Exception cause) {
 		stopObservation();
 	}
 
 	@Override
-	public void onRegistrationTimeout(DmServerInfo server) {
+	public void onRegistrationTimeout(ServerIdentity server, RegisterRequest request) {
 		stopObservation();
 	}
 

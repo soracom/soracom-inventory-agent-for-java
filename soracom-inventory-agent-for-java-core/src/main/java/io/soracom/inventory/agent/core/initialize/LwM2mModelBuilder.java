@@ -24,6 +24,7 @@ import java.util.List;
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
+import org.eclipse.leshan.core.model.StaticModel;
 
 public class LwM2mModelBuilder {
 
@@ -50,6 +51,11 @@ public class LwM2mModelBuilder {
 		return this;
 	}
 
+	public LwM2mModelBuilder addObjectModels(List<ObjectModel> objectModels) {
+		objectModelList.addAll(objectModels);
+		return this;
+	}
+
 	public LwM2mModelBuilder addObjectModelsFromDir(File dir) {
 		final List<ObjectModel> loadObjectsFromDir = ObjectLoader.loadObjectsFromDir(dir);
 		if (loadObjectsFromDir.size() > 0) {
@@ -71,9 +77,9 @@ public class LwM2mModelBuilder {
 
 	public LwM2mModelBuilder addObjectModelFromFile(File file) {
 		try (FileInputStream input = new FileInputStream(file)) {
-			ObjectModel objectModel = ObjectLoader.loadDdfFile(input, file.getName());
-			if (objectModel != null) {
-				objectModelList.add(objectModel);
+			List<ObjectModel> objectModels = ObjectLoader.loadDdfFile(input, file.getName());
+			if (objectModels != null) {
+				addObjectModels(objectModels);
 			} else {
 				throw new IllegalArgumentException("Invalid model definition.file=" + file.getAbsolutePath());
 			}
@@ -84,11 +90,11 @@ public class LwM2mModelBuilder {
 	}
 
 	public LwM2mModelBuilder addObjectModel(InputStream is) {
-		addObjectModel(ObjectLoader.loadDdfFile(is, ""));
+		addObjectModels(ObjectLoader.loadDdfFile(is, ""));
 		return this;
 	}
 
 	public LwM2mModel build() {
-		return new LwM2mModel(objectModelList);
+		return new StaticModel(objectModelList);
 	}
 }

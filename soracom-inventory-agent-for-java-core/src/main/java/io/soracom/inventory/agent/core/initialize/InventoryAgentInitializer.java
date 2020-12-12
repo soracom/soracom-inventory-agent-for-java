@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.californium.core.server.resources.Resource;
-import org.eclipse.leshan.LwM2mId;
+import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
 import org.eclipse.leshan.client.object.Security;
@@ -196,7 +196,7 @@ public class InventoryAgentInitializer {
 		client.addObserver(new BootstrapObserver(objectEnablerMap, credentialStore));
 		final InventoryResourceObservationTimerTask resourceObserver = buildInventoryResourceObserverTimerTask();
 		client.addObserver(resourceObserver);
-		for (Resource resource : client.getCoapServer().getRoot().getChildren()) {
+		for (Resource resource : client.coap().getServer().getRoot().getChildren()) {
 			resource.addObserver(resourceObserver);
 		}
 		InventoryAgentHelper.addShutdownHoot(client);

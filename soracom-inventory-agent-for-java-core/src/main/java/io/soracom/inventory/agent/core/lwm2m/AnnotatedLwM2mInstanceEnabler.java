@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.resource.ResourceChangedListener;
+import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.node.ObjectLink;
 import org.eclipse.leshan.core.response.ExecuteResponse;
@@ -51,8 +52,7 @@ public class AnnotatedLwM2mInstanceEnabler extends BaseInstanceEnabler {
 
 	private static final Logger log = LoggerFactory.getLogger(AnnotatedLwM2mInstanceEnabler.class);
 
-	List<ResourceChangedListener> listeners = Collections
-			.synchronizedList(new ArrayList<ResourceChangedListener>());
+	List<ResourceChangedListener> listeners = Collections.synchronizedList(new ArrayList<ResourceChangedListener>());
 
 	MetaDataHolder metaDataHolder;
 
@@ -300,7 +300,7 @@ public class AnnotatedLwM2mInstanceEnabler extends BaseInstanceEnabler {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public final ReadResponse read(int resourceId) {
+	public final ReadResponse read(ServerIdentity identity, int resourceId) {
 		final Method m = metaDataHolder.findReadMethod(resourceId);
 		if (m == null) {
 			return ReadResponse.notFound();
@@ -332,7 +332,7 @@ public class AnnotatedLwM2mInstanceEnabler extends BaseInstanceEnabler {
 	}
 
 	@Override
-	public final WriteResponse write(int resourceId, LwM2mResource value) {
+	public final WriteResponse write(ServerIdentity identity, int resourceId, LwM2mResource value) {
 		final Method m = metaDataHolder.findWriteMethod(resourceId);
 		if (m == null) {
 			return WriteResponse.notFound();
@@ -363,7 +363,7 @@ public class AnnotatedLwM2mInstanceEnabler extends BaseInstanceEnabler {
 	}
 
 	@Override
-	public final ExecuteResponse execute(int resourceId, String executeParams) {
+	public final ExecuteResponse execute(ServerIdentity identity, int resourceId, String executeParams) {
 		final Method m = metaDataHolder.findExecuteMethod(resourceId);
 		if (m == null) {
 			return ExecuteResponse.notFound();

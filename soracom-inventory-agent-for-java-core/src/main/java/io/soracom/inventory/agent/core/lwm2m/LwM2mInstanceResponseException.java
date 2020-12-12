@@ -15,7 +15,7 @@
  *******************************************************************************/
 package io.soracom.inventory.agent.core.lwm2m;
 
-import org.eclipse.leshan.ResponseCode;
+import org.eclipse.leshan.core.ResponseCode;
 
 public class LwM2mInstanceResponseException extends RuntimeException {
 
