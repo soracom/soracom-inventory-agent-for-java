@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
+import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
 import org.eclipse.leshan.client.object.Security;
 import org.eclipse.leshan.client.object.Server;
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
@@ -190,6 +191,13 @@ public class InventoryAgentInitializer {
 		final Map<Integer, LwM2mObjectEnabler> objectEnablerMap = initObjectEnablers(initializer);
 		// Create client
 		final LeshanClientBuilder builder = new LeshanClientBuilder(endpoint);
+
+		final DefaultRegistrationEngineFactory f = new DefaultRegistrationEngineFactory();
+		// f.setRequestTimeoutInMs(5000);
+		// retry interval milllis to try registration again when network is disconnected
+		// f.setRetryWaitingTimeInMs(20000);
+		builder.setRegistrationEngineFactory(f);
+
 		builder.setObjects(new ArrayList<>(objectEnablerMap.values()));
 		final LeshanClient client = builder.build();
 		client.addObserver(new BootstrapObserver(objectEnablerMap, credentialStore));
