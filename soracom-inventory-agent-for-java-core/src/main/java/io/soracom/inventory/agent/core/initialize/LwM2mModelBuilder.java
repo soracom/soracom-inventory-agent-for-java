@@ -30,12 +30,17 @@ public class LwM2mModelBuilder {
 
 	private List<ObjectModel> objectModelList;
 
-	static String[] PRESET_LWM2M_MODELS = new String[] { "LWM2M_Access_Control-v1_0.xml",
-			"LWM2M_Connectivity_Monitoring-v1_0.xml", "LWM2M_Connectivity_Statistics-v1_0.xml", "LWM2M_Device-v1_0.xml",
-			"LWM2M_Firmware_Update-v1_0.xml", "LWM2M_Location-v1_0.xml", "LWM2M_APN_connection_profile-v1_0.xml",
-			"LWM2M_Bearer_selection-v1_0.xml", "LWM2M_Cellular_connectivity-v1_0.xml", "LWM2M_DevCapMgmt-v1_0.xml",
-			"LWM2M_Lock_and_Wipe-V1_0.xml", "LWM2M_Portfolio-v1_0.xml", "LWM2M_Software_Component-v1_0.xml",
-			"LWM2M_Software_Management-v1_0.xml", "LWM2M_WLAN_connectivity4-v1_0.xml" };
+	static String[] PRESET_LWM2M_MODELS = new String[] {
+			// leshan lib internal resources
+			"LWM2M_Access_Control-v1_0_3.xml", "LWM2M_Connectivity_Monitoring-v1_0_2.xml",
+			"LWM2M_Connectivity_Statistics-v1_0_4.xml", "LWM2M_Device-v1_0_3.xml", "LWM2M_Firmware_Update-v1_0_3.xml",
+			"LWM2M_Location-v1_0_2.xml",
+			// client resources
+			"LWM2M_APN_Connection_Profile-v1_0_1.xml", "LWM2M_Bearer_Selection-v1_0_1.xml",
+			"LwM2M_BinaryAppDataContainer-v1_0_1.xml", "LWM2M_Cellular_Connectivity-v1_0_1.xml",
+			"LWM2M_DevCapMgmt-v1_0_1.xml", "LwM2M_EventLog-v1_0_1.xml", "LWM2M_LOCKWIPE-v1_0_2.xml",
+			"LWM2M_Portfolio-v1_0_1.xml", "LWM2M_Software_Component-v1_0_1.xml", "LWM2M_Software_Management-v1_0_1.xml",
+			"LWM2M_VirtualObserveNotify-v1_0.xml", "LWM2M_WLAN_connectivity4-v1_0_1.xml" };
 
 	public LwM2mModelBuilder() {
 		objectModelList = ObjectLoader.loadDefault();

@@ -29,7 +29,7 @@ public abstract class DevCapMgmtObject extends AnnotatedLwM2mInstanceEnabler {
 	 * 6: SOUND: speaker, buzzer
 	 * 7: ANALOG_INPUT: generic input
 	 * 8: ANALOG_OUTPUT: generic output
-	 * 9-15: reserved
+	 * 9..15: reserved
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read)
 	public abstract Integer readGroup();

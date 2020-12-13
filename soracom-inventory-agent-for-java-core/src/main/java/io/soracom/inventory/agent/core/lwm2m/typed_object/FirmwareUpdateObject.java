@@ -4,9 +4,9 @@ import java.util.Date;
 import org.eclipse.leshan.core.node.ObjectLink;
 
 /**
- * This LwM2M Object enables management of firmware which is to be updated. This Object includes installing firmware package, updating firmware, and performing actions after updating firmware. The firmware update MAY require to reboot the device; it will depend on a number of factors, such as the operating system architecture and the extent of the updated software.
- * The envisioned functionality with LwM2M version 1.0 is to allow a LwM2M Client to connect to any LwM2M version 1.0 compliant Server to obtain a firmware imagine using the object and resource structure defined in this section experiencing communication security protection using DTLS. There are, however, other design decisions that need to be taken into account to allow a manufacturer of a device to securely install firmware on a device. Examples for such design decisions are how to manage the firmware update repository at the server side (which may include user interface considerations), the techniques to provide additional application layer security protection of the firmware image, how many versions of firmware imagines to store on the device, and how to execute the firmware update process considering the hardware specific details of a given IoT hardware product. These aspects are considered to be outside the scope of the LwM2M version 1.0 specification.
- * A LwM2M Server may also instruct a LwM2M Client to fetch a firmware image from a dedicated server (instead of pushing firmware imagines to the LwM2M Client). The Package URI resource is contained in the Firmware object and can be used for this purpose.
+ * This LwM2M Object enables management of firmware which is to be updated. This Object includes installing a firmware package, updating firmware, and performing actions after updating firmware. The firmware update MAY require to reboot the device; it will depend on a number of factors, such as the operating system architecture and the extent of the updated software.
+ * The envisioned functionality is to allow a LwM2M Client to connect to any LwM2M Server to obtain a firmware image using the object and resource structure defined in this section experiencing communication security protection using TLS/DTLS. There are, however, other design decisions that need to be taken into account to allow a manufacturer of a device to securely install firmware on a device. Examples for such design decisions are how to manage the firmware update repository at the server side (which may include user interface considerations), the techniques to provide additional application layer security protection of the firmware image, how many versions of firmware images to store on the device, and how to execute the firmware update process considering the hardware specific details of a given IoT hardware product. These aspects are considered to be outside the scope of this version of the specification.
+ * A LwM2M Server may also instruct a LwM2M Client to fetch a firmware image from a dedicated server (instead of pushing firmware images to the LwM2M Client). The Package URI resource is contained in the Firmware object and can be used for this purpose.
  * A LwM2M Client MUST support block-wise transfer [CoAP_Blockwise] if it implements the Firmware Update object.
  * A LwM2M Server MUST support block-wise transfer. Other protocols, such as HTTP/HTTPs, MAY also be used for downloading firmware updates (via the Package URI resource). For constrained devices it is, however, RECOMMENDED to use CoAP for firmware downloads to avoid the need for additional protocol implementations.
  **/
@@ -41,12 +41,12 @@ public abstract class FirmwareUpdateObject extends AnnotatedLwM2mInstanceEnabler
 	 * 1: Downloading (The data sequence is on the way)
 	 * 2: Downloaded
 	 * 3: Updating
-	 * If writing the firmware package to Package Resource is done, or, if the device has downloaded the firmware package from the Package URI the state changes to Downloaded.
-	 * Writing an empty string to Package Resource or to Package URI Resource, resets the Firmware Update State Machine: the State Resource value is set to Idle and the Update Result Resource value is set to 0.
+	 * If writing the firmware package to Package Resource has completed, or, if the device has downloaded the firmware package from the Package URI the state changes to Downloaded.
+	 * Writing an empty string to Package URI Resource or setting the Package Resource to NULL (‘\0’), resets the Firmware Update State Machine: the State Resource value is set to Idle and the Update Result Resource value is set to 0.
 	 * When in Downloaded state, and the executable Resource Update is triggered, the state changes to Updating.
 	 * If the Update Resource failed, the state returns at Downloaded.
 	 * If performing the Update Resource was successful, the state changes from Updating to Idle. 
-	 * Firmware Update mechanisms are illustrated below in Figure 29 of the LwM2M version 1.0 specification.
+	 * The firmware update state machine is illustrated in Figure 29 of the LwM2M version 1.0 specification (and also in Figure E.6.1-1 of this specification).
 	 **/
 	@Resource(resourceId = 3, operation = Operation.Read)
 	public abstract Integer readState();
@@ -54,15 +54,15 @@ public abstract class FirmwareUpdateObject extends AnnotatedLwM2mInstanceEnabler
 	/**
 	 * Contains the result of downloading or updating the firmware
 	 * 0: Initial value. Once the updating process is initiated (Download /Update), this Resource MUST be reset to Initial value.
-	 * 1: Firmware updated successfully,
+	 * 1: Firmware updated successfully.
 	 * 2: Not enough flash memory for the new firmware package.
-	 * 3. Out of RAM during downloading process.
+	 * 3: Out of RAM during downloading process.
 	 * 4: Connection lost during downloading process.
 	 * 5: Integrity check failure for new downloaded package.
 	 * 6: Unsupported package type.
-	 * 7: Invalid URI
-	 * 8: Firmware update failed
-	 * 9: Unsupported protocol. A LwM2M client indicates the failure to retrieve the firmware imagine using the URI provided in the Package URI resource by writing the value 9 to the /5/0/5 (Update Result resource) when the URI contained a URI scheme unsupported by the client. Consequently, the LwM2M Client is unable to retrieve the firmware image using the URI provided by the LwM2M Server in the Package URI when it refers to an unsupported protocol.
+	 * 7: Invalid URI.
+	 * 8: Firmware update failed.
+	 * 9: Unsupported protocol. A LwM2M client indicates the failure to retrieve the firmware image using the URI provided in the Package URI resource by writing the value 9 to the /5/0/5 (Update Result resource) when the URI contained a URI scheme unsupported by the client. Consequently, the LwM2M Client is unable to retrieve the firmware image using the URI provided by the LwM2M Server in the Package URI when it refers to an unsupported protocol.
 	 **/
 	@Resource(resourceId = 5, operation = Operation.Read)
 	public abstract Integer readUpdateResult();
@@ -87,10 +87,12 @@ public abstract class FirmwareUpdateObject extends AnnotatedLwM2mInstanceEnabler
 	 * This resource indicates what protocols the LwM2M Client implements to retrieve firmware images. The LwM2M server uses this information to decide what URI to include in the Package URI. A LwM2M Server MUST NOT include a URI in the Package URI object that uses a protocol that is unsupported by the LwM2M client.
 	 * For example, if a LwM2M client indicates that it supports CoAP and CoAPS then a LwM2M Server must not provide an HTTP URI in the Packet URI.
 	 * The following values are defined by this version of the specification:
-	 * 0 – CoAP (as defined in RFC 7252) with the additional support for block-wise transfer. CoAP is the default setting.
-	 * 1 – CoAPS (as defined in RFC 7252) with the additional support for block-wise transfer
-	 * 2 – HTTP 1.1 (as defined in RFC 7230)
-	 * 3 – HTTPS 1.1 (as defined in RFC 7230)
+	 * 0: CoAP (as defined in RFC 7252) with the additional support for block-wise transfer. CoAP is the default setting.
+	 * 1: CoAPS (as defined in RFC 7252) with the additional support for block-wise transfer
+	 * 2: HTTP 1.1 (as defined in RFC 7230)
+	 * 3: HTTPS 1.1 (as defined in RFC 7230)
+	 * 4: CoAP over TCP (as defined in RFC 8323)
+	 * 5: CoAP over TLS (as defined in RFC 8323)
 	 * Additional values MAY be defined in the future. Any value not understood by the LwM2M Server MUST be ignored.
 	 **/
 	@Resource(resourceId = 8, operation = Operation.Read, multiple = true)
@@ -100,9 +102,9 @@ public abstract class FirmwareUpdateObject extends AnnotatedLwM2mInstanceEnabler
 
 	/**
 	 * The LwM2M Client uses this resource to indicate its support for transferring firmware images to the client either via the Package Resource (=push) or via the Package URI Resource (=pull) mechanism.
-	 * 0 – Pull only
-	 * 1 – Push only
-	 * 2 – Both. In this case the LwM2M Server MAY choose the preferred mechanism for conveying the firmware image to the LwM2M Client.
+	 * 0: Pull only
+	 * 1: Push only
+	 * 2: Both. In this case the LwM2M Server MAY choose the preferred mechanism for conveying the firmware image to the LwM2M Client.
 	 **/
 	@Resource(resourceId = 9, operation = Operation.Read)
 	public abstract Integer readFirmwareUpdateDeliveryMethod();
