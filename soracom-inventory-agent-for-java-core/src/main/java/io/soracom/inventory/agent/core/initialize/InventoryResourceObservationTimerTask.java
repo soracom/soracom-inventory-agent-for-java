@@ -24,11 +24,11 @@ import java.util.Map.Entry;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.observe.ObserveRelation;
 import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.core.server.resources.ResourceObserver;
 import org.eclipse.leshan.client.observer.LwM2mClientObserverAdapter;
-import org.eclipse.leshan.client.resource.NotifySender;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.request.RegisterRequest;
@@ -58,8 +58,8 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 
 	private static final Logger log = LoggerFactory.getLogger(InventoryResourceObservationTimerTask.class);
 
-	private Map<LwM2mPath, NotifySender> observedResourceMap = Collections
-			.synchronizedMap(new HashMap<LwM2mPath, NotifySender>());
+	private Map<LwM2mPath, Resource> observedResourceMap = Collections
+			.synchronizedMap(new HashMap<LwM2mPath, Resource>());
 
 	protected int timerTaskStartDelaySeconds = 10;
 	protected int timerTaskIntervalSeconds = 60;
@@ -106,17 +106,16 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 	@Override
 	public void removedObserveRelation(ObserveRelation relation) {
 		LwM2mPath path = new LwM2mPath(relation.getExchange().getCurrentRequest().getOptions().getUriPathString());
-		NotifySender removed = observedResourceMap.remove(path);
+		Resource removed = observedResourceMap.remove(path);
 		if (removed != null) {
 			log.info("removed Observe Relation path=" + path.toString());
 		}
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public void removedChild(Resource child) {
 		List<LwM2mPath> removeKeyList = new ArrayList<>();
-		for (Entry<LwM2mPath, NotifySender> entry : observedResourceMap.entrySet()) {
+		for (Entry<LwM2mPath, Resource> entry : observedResourceMap.entrySet()) {
 			if (entry.getValue() == child || entry.getValue().equals(child)) {
 				removeKeyList.add(entry.getKey());
 			}
@@ -143,11 +142,8 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 	public void addedObserveRelation(ObserveRelation relation) {
 		LwM2mPath path = new LwM2mPath(relation.getExchange().getCurrentRequest().getOptions().getUriPathString());
 		Resource resource = relation.getResource();
-		if (resource instanceof NotifySender) {
-			NotifySender notifySender = (NotifySender) resource;
-			observedResourceMap.put(path, notifySender);
-			log.info("added ObserveRelation path=" + path.toString());
-		}
+		observedResourceMap.put(path, resource);
+		log.info("added ObserveRelation path=" + path.toString());
 	}
 
 	@Override
@@ -166,7 +162,7 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 		stopObservation();
 	}
 
-	protected void startObservation() {
+	protected synchronized void startObservation() {
 		if (timer != null) {
 			timer.cancel();
 		}
@@ -186,13 +182,13 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 				+ " observationIntervalSeconds:" + timerTaskIntervalSeconds);
 	}
 
-	protected void startObservationIfRunning() {
+	protected synchronized void startObservationIfRunning() {
 		if (timer != null) {
 			startObservation();
 		}
 	}
 
-	protected void stopObservation() {
+	protected synchronized void stopObservation() {
 		if (timer != null) {
 			timer.cancel();
 			timer = null;
@@ -202,10 +198,12 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 
 	protected void fireResourcesChange() {
 		for (LwM2mPath lwm2mPath : observedResourceMap.keySet()) {
-			final NotifySender sender = observedResourceMap.get(lwm2mPath);
+			final Resource resource = observedResourceMap.get(lwm2mPath);
 			final String relationURI = toRelationURI(lwm2mPath);
-			log.debug("send notify to " + relationURI);
-			sender.sendNotify(relationURI);
+			log.info("send notify to " + relationURI);
+			if (resource instanceof CoapResource) {
+				((CoapResource) resource).changed();
+			}
 		}
 	}
 
