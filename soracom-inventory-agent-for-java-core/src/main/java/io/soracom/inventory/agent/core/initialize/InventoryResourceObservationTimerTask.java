@@ -15,16 +15,12 @@
  *******************************************************************************/
 package io.soracom.inventory.agent.core.initialize;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.observe.ObserveRelation;
 import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.core.server.resources.ResourceObserver;
@@ -58,8 +54,7 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 
 	private static final Logger log = LoggerFactory.getLogger(InventoryResourceObservationTimerTask.class);
 
-	private Map<LwM2mPath, Resource> observedResourceMap = Collections
-			.synchronizedMap(new HashMap<LwM2mPath, Resource>());
+	private Set<ObserveRelation> observeRelationSet = Collections.synchronizedSet(new HashSet<ObserveRelation>());
 
 	protected int timerTaskStartDelaySeconds = 10;
 	protected int timerTaskIntervalSeconds = 60;
@@ -105,25 +100,11 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 	 */
 	@Override
 	public void removedObserveRelation(ObserveRelation relation) {
-		LwM2mPath path = new LwM2mPath(relation.getExchange().getCurrentRequest().getOptions().getUriPathString());
-		Resource removed = observedResourceMap.remove(path);
-		if (removed != null) {
-			log.info("removed Observe Relation path=" + path.toString());
-		}
+		observeRelationSet.remove(relation);
 	}
 
 	@Override
 	public void removedChild(Resource child) {
-		List<LwM2mPath> removeKeyList = new ArrayList<>();
-		for (Entry<LwM2mPath, Resource> entry : observedResourceMap.entrySet()) {
-			if (entry.getValue() == child || entry.getValue().equals(child)) {
-				removeKeyList.add(entry.getKey());
-			}
-		}
-		for (LwM2mPath path : removeKeyList) {
-			observedResourceMap.remove(path);
-			log.info("removed child path=" + path.toString());
-		}
 	}
 
 	@Override
@@ -141,8 +122,7 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 	@Override
 	public void addedObserveRelation(ObserveRelation relation) {
 		LwM2mPath path = new LwM2mPath(relation.getExchange().getCurrentRequest().getOptions().getUriPathString());
-		Resource resource = relation.getResource();
-		observedResourceMap.put(path, resource);
+		observeRelationSet.add(relation);
 		log.info("added ObserveRelation path=" + path.toString());
 	}
 
@@ -170,7 +150,7 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 			log.debug("InventoryResourceObservationTimerTask is disabled.");
 			return;
 		}
-		timer = new Timer();
+		timer = new Timer("ObservationTimer-" + System.currentTimeMillis());
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -196,14 +176,9 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 		}
 	}
 
-	protected void fireResourcesChange() {
-		for (LwM2mPath lwm2mPath : observedResourceMap.keySet()) {
-			final Resource resource = observedResourceMap.get(lwm2mPath);
-			final String relationURI = toRelationURI(lwm2mPath);
-			log.info("send notify to " + relationURI);
-			if (resource instanceof CoapResource) {
-				((CoapResource) resource).changed();
-			}
+	protected synchronized void fireResourcesChange() {
+		for (ObserveRelation relation : observeRelationSet) {
+			relation.notifyObservers();
 		}
 	}
 
