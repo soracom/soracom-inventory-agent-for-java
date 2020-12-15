@@ -26,7 +26,7 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	}
 
 	/**
-	 * Indicate the total amount of data transmitted during the collection period.
+	 * Indicate the total amount of data (IP / non-IP) transmitted during the collection period expressed in kilobytes.
 	 **/
 	@Resource(resourceId = 2, operation = Operation.Read)
 	public Integer readTxData()	{
@@ -34,7 +34,7 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	}
 
 	/**
-	 * Indicate the total amount of data received during the collection period.
+	 * Indicate the total amount of data (IP / non-IP) received during the collection period expressed in kilobytes.
 	 **/
 	@Resource(resourceId = 3, operation = Operation.Read)
 	public Integer readRxData()	{
@@ -42,7 +42,7 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	}
 
 	/**
-	 * The maximum message size that is used during the collection period.
+	 * The maximum IP message size that is used during the collection period.
 	 **/
 	@Resource(resourceId = 4, operation = Operation.Read)
 	public Integer readMaxMessageSize()	{
@@ -50,7 +50,7 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 	}
 
 	/**
-	 * The average message size that is used during the collection period.
+	 * The average IP message size that is used during the collection period.
 	 **/
 	@Resource(resourceId = 5, operation = Operation.Read)
 	public Integer readAverageMessageSize()	{
@@ -59,6 +59,7 @@ public abstract class ConnectivityStatisticsObject extends AnnotatedLwM2mInstanc
 
 	/**
 	 * Reset resources 0-5 to 0 and start to collect information, If resource 8 (Collection Period) value is 0, the client will keep collecting information until resource 7 (Stop) is executed, otherwise the client will stop collecting information after specified period ended.
+	 *         Note:When reporting the Tx Data or Rx Data, the LwM2M Client reports the total KB transmitted/received over IP bearer(s), including all protocol header bytes up to and including the IP header. This does not include lower level retransmissions/optimizations (e.g. RAN, header compression) or SMS messages.
 	 **/
 	@Resource(resourceId = 6, operation = Operation.Execute)
 	public abstract void executeStart(String executeParameter);

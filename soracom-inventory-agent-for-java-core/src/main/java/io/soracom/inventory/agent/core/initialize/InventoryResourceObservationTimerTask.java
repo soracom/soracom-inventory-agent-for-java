@@ -15,23 +15,19 @@
  *******************************************************************************/
 package io.soracom.inventory.agent.core.initialize;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import org.eclipse.californium.core.observe.ObserveRelation;
 import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.californium.core.server.resources.ResourceObserver;
-import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.client.observer.LwM2mClientObserverAdapter;
-import org.eclipse.leshan.client.resource.NotifySender;
-import org.eclipse.leshan.client.servers.DmServerInfo;
+import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.node.LwM2mPath;
+import org.eclipse.leshan.core.request.RegisterRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +54,7 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 
 	private static final Logger log = LoggerFactory.getLogger(InventoryResourceObservationTimerTask.class);
 
-	private Map<LwM2mPath, NotifySender> observedResourceMap = Collections
-			.synchronizedMap(new HashMap<LwM2mPath, NotifySender>());
+	private Set<ObserveRelation> observeRelationSet = Collections.synchronizedSet(new HashSet<ObserveRelation>());
 
 	protected int timerTaskStartDelaySeconds = 10;
 	protected int timerTaskIntervalSeconds = 60;
@@ -105,26 +100,11 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 	 */
 	@Override
 	public void removedObserveRelation(ObserveRelation relation) {
-		LwM2mPath path = new LwM2mPath(relation.getExchange().getCurrentRequest().getOptions().getUriPathString());
-		NotifySender removed = observedResourceMap.remove(path);
-		if (removed != null) {
-			log.info("removed Observe Relation path=" + path.toString());
-		}
+		observeRelationSet.remove(relation);
 	}
 
-	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public void removedChild(Resource child) {
-		List<LwM2mPath> removeKeyList = new ArrayList<>();
-		for (Entry<LwM2mPath, NotifySender> entry : observedResourceMap.entrySet()) {
-			if (entry.getValue() == child || entry.getValue().equals(child)) {
-				removeKeyList.add(entry.getKey());
-			}
-		}
-		for (LwM2mPath path : removeKeyList) {
-			observedResourceMap.remove(path);
-			log.info("removed child path=" + path.toString());
-		}
 	}
 
 	@Override
@@ -142,30 +122,27 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 	@Override
 	public void addedObserveRelation(ObserveRelation relation) {
 		LwM2mPath path = new LwM2mPath(relation.getExchange().getCurrentRequest().getOptions().getUriPathString());
-		Resource resource = relation.getResource();
-		if (resource instanceof NotifySender) {
-			NotifySender notifySender = (NotifySender) resource;
-			observedResourceMap.put(path, notifySender);
-			log.info("added ObserveRelation path=" + path.toString());
-		}
+		observeRelationSet.add(relation);
+		log.info("added ObserveRelation path=" + path.toString());
 	}
 
 	@Override
-	public void onRegistrationSuccess(DmServerInfo server, String registrationID) {
+	public void onRegistrationSuccess(ServerIdentity server, RegisterRequest request, String registrationID) {
 		startObservation();
 	}
 
 	@Override
-	public void onRegistrationFailure(DmServerInfo server, ResponseCode responseCode, String errorMessage) {
+	public void onRegistrationFailure(ServerIdentity server, RegisterRequest request,
+			org.eclipse.leshan.core.ResponseCode responseCode, String errorMessage, Exception cause) {
 		stopObservation();
 	}
 
 	@Override
-	public void onRegistrationTimeout(DmServerInfo server) {
+	public void onRegistrationTimeout(ServerIdentity server, RegisterRequest request) {
 		stopObservation();
 	}
 
-	protected void startObservation() {
+	protected synchronized void startObservation() {
 		if (timer != null) {
 			timer.cancel();
 		}
@@ -173,7 +150,7 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 			log.debug("InventoryResourceObservationTimerTask is disabled.");
 			return;
 		}
-		timer = new Timer();
+		timer = new Timer("ObservationTimer-" + System.currentTimeMillis());
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -185,13 +162,13 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 				+ " observationIntervalSeconds:" + timerTaskIntervalSeconds);
 	}
 
-	protected void startObservationIfRunning() {
+	protected synchronized void startObservationIfRunning() {
 		if (timer != null) {
 			startObservation();
 		}
 	}
 
-	protected void stopObservation() {
+	protected synchronized void stopObservation() {
 		if (timer != null) {
 			timer.cancel();
 			timer = null;
@@ -199,12 +176,9 @@ public class InventoryResourceObservationTimerTask extends LwM2mClientObserverAd
 		}
 	}
 
-	protected void fireResourcesChange() {
-		for (LwM2mPath lwm2mPath : observedResourceMap.keySet()) {
-			final NotifySender sender = observedResourceMap.get(lwm2mPath);
-			final String relationURI = toRelationURI(lwm2mPath);
-			log.debug("send notify to " + relationURI);
-			sender.sendNotify(relationURI);
+	protected synchronized void fireResourcesChange() {
+		for (ObserveRelation relation : observeRelationSet) {
+			relation.notifyObservers();
 		}
 	}
 

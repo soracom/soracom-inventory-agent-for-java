@@ -114,14 +114,14 @@ public abstract class DeviceObject extends AnnotatedLwM2mInstanceEnabler {
 	 * 7=IP connectivity failure
 	 * 8=Peripheral malfunction
 	 * 
-	 * When the single Device Object Instance is initiated, there is only one error code Resource Instance whose value is equal to 0 that means no error. When the first error happens, the LwM2M Client changes error code Resource Instance to any non-zero value to indicate the error type. When any other error happens, a new error code Resource Instance is created.
+	 * When the single Device Object Instance is initiated, there is only one error code Resource Instance whose value is equal to 0 that means no error. When the first error happens, the LwM2M Client changes error code Resource Instance to any non-zero value to indicate the error type. When any other error happens, a new error code Resource Instance is created. When an error associated with a Resource Instance is no longer present, that Resource Instance is deleted. When the single existing error is no longer present, the LwM2M Client returns to the original no error state where Instance 0 has value 0.
 	 * This error code Resource MAY be observed by the LwM2M Server. How to deal with LwM2M Client’s error report depends on the policy of the LwM2M Server.
 	 **/
 	@Resource(resourceId = 11, operation = Operation.Read, multiple = true)
 	public abstract Integer readErrorCode();
 
 	/**
-	 * Delete all error code Resource Instances and create only one zero-value error code that implies no error.
+	 * Delete all error code Resource Instances and create only one zero-value error code that implies no error, then re-evaluate all error conditions and update and create Resources Instances to capture all current error conditions.
 	 **/
 	@Resource(resourceId = 12, operation = Operation.Execute)
 	public void executeResetErrorCode(String executeParameter)	{
@@ -167,13 +167,13 @@ public abstract class DeviceObject extends AnnotatedLwM2mInstanceEnabler {
 	}
 
 	/**
-	 * Indicates which bindings and modes are supported in the LwM2M Client. The possible values of Resource are combination of "U" or "UQ" and "S" or "SQ".
+	 * Indicates which bindings and modes are supported in the LwM2M Client. The possible values are those listed in the LwM2M Core Specification.
 	 **/
 	@Resource(resourceId = 16, operation = Operation.Read)
 	public abstract String readSupportedBindingAndModes();
 
 	/**
-	 * Type of the device (manufacturer specified string: e.g., smart meters / dev Class…)
+	 * Type of the device (manufacturer specified string: e.g. smart meters / dev Class…)
 	 **/
 	@Resource(resourceId = 17, operation = Operation.Read)
 	public String readDeviceType()	{

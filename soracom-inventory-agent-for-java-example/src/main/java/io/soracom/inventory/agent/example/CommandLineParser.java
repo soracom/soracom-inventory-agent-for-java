@@ -22,6 +22,7 @@ public class CommandLineParser {
 	PreSharedKey psk;
 	boolean enableKryptonBootstrap;
 	boolean forceBootstrap;
+	int observationTimerTaskIntervalSeconds;
 
 	public void parseArguments(String[] args) {
 
@@ -30,15 +31,17 @@ public class CommandLineParser {
 		options.addOption("h", "help", false, "Display help information.");
 		options.addOption("e", "endpoint", true,
 				String.format("Set the endpoint name of the Client.\nDefault: generate from network interface."));
-		options.addOption("b", "bootstrap", false, "If this option is enabled, bootstrap is executed even if there is a cedential in local.");
+		options.addOption("b", "bootstrap", false,
+				"If this option is enabled, bootstrap is executed even if there is a cedential in local.");
 		options.addOption("u", true, "Set the LWM2M or Bootstrap server URL.\nDefault: "
 				+ BootstrapConstants.DEFAULT_BOOTSTRAP_SERVER_ADDRESS);
 		options.addOption("i", true,
 				"Set the PSK identity (deviceId) in ascii.\nBootstrap sequence is not executed if the value is set.");
 		options.addOption("p", true,
 				"Set the Pre-Shared-Key (secret key) in hexa.\nBootstrap sequence is not executed if the value is set.");
-		options.addOption("k","krypton", false,
-				"Enable bootstrap by SORACOM Krypton");
+		options.addOption("k", "krypton", false, "Enable bootstrap by SORACOM Krypton");
+		options.addOption(null, "observationTimerTaskIntervalSeconds", true,
+				"Interval seconds for observation (defalt:60)");
 
 		CommandLine cl = null;
 		try {
@@ -90,6 +93,8 @@ public class CommandLineParser {
 
 		forceBootstrap = cl.hasOption("b");
 		enableKryptonBootstrap = cl.hasOption("krypton");
+		observationTimerTaskIntervalSeconds = Integer
+				.parseInt(cl.getOptionValue("observationTimerTaskIntervalSeconds", "60"));
 	}
 
 	protected void printHelp() {

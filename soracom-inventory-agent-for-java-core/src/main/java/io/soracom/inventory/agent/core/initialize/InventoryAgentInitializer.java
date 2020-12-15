@@ -22,14 +22,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.californium.core.server.resources.Resource;
-import org.eclipse.leshan.LwM2mId;
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
+import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
 import org.eclipse.leshan.client.object.Security;
 import org.eclipse.leshan.client.object.Server;
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;
+import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.slf4j.Logger;
@@ -149,8 +150,7 @@ public class InventoryAgentInitializer {
 	/**
 	 * Enable timer task to invoke observed resources continuously.
 	 * 
-	 * @param enableObservationTimerTasks
-	 *            defaul value is true
+	 * @param enableObservationTimerTasks defaul value is true
 	 */
 	public void setEnableObservationTimerTasks(boolean enableObservationTimerTasks) {
 		this.enableObservationTimerTask = enableObservationTimerTasks;
@@ -191,12 +191,19 @@ public class InventoryAgentInitializer {
 		final Map<Integer, LwM2mObjectEnabler> objectEnablerMap = initObjectEnablers(initializer);
 		// Create client
 		final LeshanClientBuilder builder = new LeshanClientBuilder(endpoint);
+
+		final DefaultRegistrationEngineFactory f = new DefaultRegistrationEngineFactory();
+		// f.setRequestTimeoutInMs(5000);
+		// retry interval milllis to try registration again when network is disconnected
+		// f.setRetryWaitingTimeInMs(20000);
+		builder.setRegistrationEngineFactory(f);
+
 		builder.setObjects(new ArrayList<>(objectEnablerMap.values()));
 		final LeshanClient client = builder.build();
 		client.addObserver(new BootstrapObserver(objectEnablerMap, credentialStore));
 		final InventoryResourceObservationTimerTask resourceObserver = buildInventoryResourceObserverTimerTask();
 		client.addObserver(resourceObserver);
-		for (Resource resource : client.getCoapServer().getRoot().getChildren()) {
+		for (Resource resource : client.coap().getServer().getRoot().getChildren()) {
 			resource.addObserver(resourceObserver);
 		}
 		InventoryAgentHelper.addShutdownHoot(client);
@@ -263,23 +270,30 @@ public class InventoryAgentInitializer {
 	}
 
 	private Credentials loadCredentials() {
+		Credentials credentials = null;
 		if (preSharedKey != null) {
 			log.info("load credentials from psk.");
-			Credentials credentials = new Credentials();
+			credentials = new Credentials();
 			credentials.setServerURI(serverUri);
 			credentials.setShortServerId(shortServerId);
 			credentials.setPskId(preSharedKey.getPskIdentityBytes());
 			credentials.setPskKey(preSharedKey.getPskKey());
 			credentials.setBindingMode(BindingMode.U);
-			credentials.setLifetime(60L);
-			return credentials;
 		} else {
-			final Credentials credentials = credentialStore.loadCredentials();
+			credentials = credentialStore.loadCredentials();
 			if (credentials != null) {
 				log.info("load credentials from credential store.");
 			}
-			return credentials;
 		}
+		credentials.setLifetime(calculateLifetimeSec());
+		return credentials;
+	}
+
+	private long calculateLifetimeSec() {
+		int defaultLifetimeSec = 60;
+		// according to
+		// org.eclipse.leshan.client.californium.CaliforniumEndpointsManager.java#getMaxCommunicationPeriodFor
+		return defaultLifetimeSec + 247 + 30;
 	}
 
 	private Security securityObject;

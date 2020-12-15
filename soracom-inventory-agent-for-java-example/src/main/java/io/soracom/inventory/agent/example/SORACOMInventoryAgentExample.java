@@ -28,7 +28,7 @@ public class SORACOMInventoryAgentExample {
 		initializer.setServerUri(parser.serverURI);
 		initializer.setForceBootstrap(parser.forceBootstrap);
 		initializer.setPreSharedKey(parser.psk);
-		initializer.setObservationTimerTaskIntervalSeconds(60);
+		initializer.setObservationTimerTaskIntervalSeconds(parser.observationTimerTaskIntervalSeconds);
 
 		// enable bootstrap by SORACOM Krypton
 		if (parser.enableKryptonBootstrap) {

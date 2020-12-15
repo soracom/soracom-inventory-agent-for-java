@@ -10,13 +10,13 @@ import org.eclipse.leshan.core.node.ObjectLink;
 public abstract class LwM2MAccessControlObject extends AnnotatedLwM2mInstanceEnabler {
 
 	/**
-	 * The Object ID and The Object Instance ID are applied for.
+	 * Resources 0 and 1 point to the Object Instance for which the Instances of the ACL Resource of that Access Control Object Instance are applicable.
 	 **/
 	@Resource(resourceId = 0, operation = Operation.Read)
 	public abstract Integer readObjectID();
 
 	/**
-	 * See Table 20: LwM2M Identifiers.
+	 * See above
 	 **/
 	@Resource(resourceId = 1, operation = Operation.Read)
 	public abstract Integer readObjectInstanceID();
@@ -26,7 +26,7 @@ public abstract class LwM2MAccessControlObject extends AnnotatedLwM2mInstanceEna
 	 * The Resource Instance ID 0 is a specific ID, determining the ACL Instance which contains the default access rights.
 	 * Each bit set in the Resource Instance value, grants an access right to the LwM2M Server to the corresponding operation.
 	 * The bit order is specified as below.
-	 * 1st LSB: R(Read, Observe, Discover, Write-Attributes)
+	 * 1st LSB: R(Read, Observe, Write-Attributes)
 	 * 2nd LSB: W(Write)
 	 * 3rd LSB: E(Execute)
 	 * 4th LSB: D(Delete)

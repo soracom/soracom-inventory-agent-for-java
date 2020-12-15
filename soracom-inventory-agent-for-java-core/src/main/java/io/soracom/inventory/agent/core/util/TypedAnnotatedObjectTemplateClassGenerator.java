@@ -122,7 +122,12 @@ public class TypedAnnotatedObjectTemplateClassGenerator {
 	}
 
 	public void generateTemplateClassFromObjectModel(InputStream modelDefinitionInputStream) {
-		final ObjectModel model = ObjectLoader.loadDdfFile(modelDefinitionInputStream, "");
+		final List<ObjectModel> models = ObjectLoader.loadDdfFile(modelDefinitionInputStream, "");
+		for(ObjectModel model:models) {
+			generateTemplateClassFromObjectModel(model);
+		}
+	}
+	private void generateTemplateClassFromObjectModel(ObjectModel model) {
 		final String className = toJavaName(model.name + "Object");
 
 		FileOutputStream fout = null;

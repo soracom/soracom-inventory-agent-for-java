@@ -15,24 +15,28 @@
  *******************************************************************************/
 package io.soracom.inventory.agent.core.bootstrap;
 
-import static org.eclipse.leshan.LwM2mId.SECURITY;
-import static org.eclipse.leshan.client.request.ServerIdentity.SYSTEM;
+import static org.eclipse.leshan.client.servers.ServerIdentity.SYSTEM;
+import static org.eclipse.leshan.core.LwM2mId.SECURITY;
 import static org.eclipse.leshan.core.model.ResourceModel.Type.INTEGER;
 import static org.eclipse.leshan.core.model.ResourceModel.Type.OPAQUE;
 import static org.eclipse.leshan.core.model.ResourceModel.Type.STRING;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.leshan.client.observer.LwM2mClientObserverAdapter;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.servers.DmServerInfo;
-import org.eclipse.leshan.client.servers.ServerInfo;
+import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.client.servers.ServersInfo;
 import org.eclipse.leshan.client.servers.ServersInfoExtractor;
 import org.eclipse.leshan.core.node.LwM2mObject;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.ReadRequest;
+import org.eclipse.leshan.core.request.RegisterRequest;
+import org.eclipse.leshan.core.request.UpdateRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,33 +64,33 @@ public class BootstrapObserver extends LwM2mClientObserverAdapter {
 	}
 
 	@Override
-	public void onBootstrapSuccess(ServerInfo bsserver) {
+	public void onBootstrapSuccess(ServerIdentity bsserver, BootstrapRequest request) {
 		Credentials c = extractCredentialsInfo();
-		log.info("Bootstrap success: deviceId:" + new String(c.getPskId()));
+		log.info("Bootstrap success: deviceId:" + new String(c.getPskId()) + " server:" + bsserver.toString());
 		credentialStore.saveCredentials(c);
 	}
 
 	@Override
-	public void onRegistrationSuccess(DmServerInfo server, String registrationID) {
+	public void onRegistrationSuccess(ServerIdentity server, RegisterRequest request, String registrationID) {
 		Credentials c = extractCredentialsInfo();
-		log.info("Registration success: deviceId:" + new String(c.getPskId()) + " serverUri:" + server.serverUri
-				+ " lifetime:" + server.lifetime + " registrationID:" + registrationID);
+		log.info("Registration success: deviceId:" + new String(c.getPskId()) + " registrationID:" + registrationID
+				+ " server:" + server.toString());
 		credentialStore.saveCredentials(c);
 	}
 
 	@Override
-	public void onBootstrapTimeout(ServerInfo bsserver) {
-		log.info("Bootstrap timeout: " + bsserver.getFullUri().toString());
+	public void onBootstrapTimeout(ServerIdentity bsserver, BootstrapRequest request) {
+		log.info("Bootstrap timeout: " + bsserver.toString());
 	}
 
 	@Override
-	public void onRegistrationTimeout(DmServerInfo server) {
-		log.info("Registration timeout: " + server.getFullUri().toString());
+	public void onRegistrationTimeout(ServerIdentity server, RegisterRequest request) {
+		log.info("Registration timeout: " + server.toString());
 	}
 
 	@Override
-	public void onUpdateTimeout(DmServerInfo server) {
-		log.info("Update timeout: " + server.getFullUri().toString());
+	public void onUpdateTimeout(ServerIdentity server, UpdateRequest request) {
+		log.info("Update timeout: " + server.toString());
 	}
 
 	private Credentials extractCredentialsInfo() {
@@ -95,7 +99,11 @@ public class BootstrapObserver extends LwM2mClientObserverAdapter {
 			if (si.bootstrap != null) {
 				log.info("Bootstrap server: " + si.bootstrap.toString());
 			}
-			log.info("Device management servers: " + si.deviceMangements.toString());
+			StringBuilder deviceManagementServersLog = new StringBuilder();
+			for (Entry<Long, DmServerInfo> entry : si.deviceManagements.entrySet()) {
+				deviceManagementServersLog.append("\n" + entry.getKey() + " " + entry.toString());
+			}
+			log.info("Device management servers: " + deviceManagementServersLog);
 
 			final LwM2mObjectEnabler oe = objectEnablerMap.get(SECURITY);
 			final LwM2mObject object = (LwM2mObject) oe.read(SYSTEM, new ReadRequest(0)).getContent();
@@ -109,7 +117,7 @@ public class BootstrapObserver extends LwM2mClientObserverAdapter {
 				return null;
 			}
 			final Long shortServerId = getResourceInteger(deviceManagementServer, 10);
-			final DmServerInfo dm = si.deviceMangements.get(shortServerId);
+			final DmServerInfo dm = si.deviceManagements.get(shortServerId);
 
 			Credentials c = new Credentials();
 			c.setServerURI(getResourceString(deviceManagementServer, 0));
