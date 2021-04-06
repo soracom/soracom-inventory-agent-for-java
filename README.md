@@ -141,3 +141,33 @@ export GRGIT_USER=${YOUR_GITHUB_API_TOKEN}
 
 Note: Current tool chain does not support PGP code signing for git commit, so please disable it if you are using it. 
 
+## How to release new version of the library
+To releaser the library with a new version. you can use the tool "Gren".
+
+1 Setup Gren by npm
+
+```sh
+npm install github-release-notes -g
+```
+
+2 Set GitHub credential to your environment variable
+
+```sh
+export GREN_GITHUB_TOKEN=xxxxxx
+```
+
+3 Create new release with new version of tag(e.g 0.0.9 ) on GitHub
+ You can create the release with blank title and details.
+ 
+4 run Gren release --override" command.
+
+
+```sh
+gren release --override
+```
+
+
+
+
+
+
