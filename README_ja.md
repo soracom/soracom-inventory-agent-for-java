@@ -62,7 +62,7 @@ repositories {
   maven { url 'https://soracom.github.io/maven-repository/' }
 }
 
-def INVENTORY_AGENT_VERSION="0.0.8"
+def INVENTORY_AGENT_VERSION="0.1.0"
 
 dependencies {
     compile "io.soracom:soracom-inventory-agent-for-java-core:$INVENTORY_AGENT_VERSION"
