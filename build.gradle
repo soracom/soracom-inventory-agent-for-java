@@ -61,7 +61,7 @@ project(':soracom-inventory-agent-for-java-core') {
         compile "org.eclipse.leshan:leshan-client-cf:${leshanVersion}"
         compile 'org.slf4j:slf4j-api:1.7.30'
         compile 'org.slf4j:slf4j-simple:1.7.30'
-        compile 'io.soracom:soracom-krypton-client-for-java:0.1.0'
+        compile 'io.soracom:soracom-krypton-client-for-java:0.3.0'
     }
 }
 
