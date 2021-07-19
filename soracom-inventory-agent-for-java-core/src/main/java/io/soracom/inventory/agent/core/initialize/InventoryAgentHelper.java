@@ -30,6 +30,7 @@ import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.object.Security;
 import org.eclipse.leshan.client.object.Server;
 import org.eclipse.leshan.core.model.LwM2mModel;
+import org.eclipse.leshan.core.request.BindingMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +64,11 @@ public class InventoryAgentHelper {
 
 	public static Server getServerInfo(Credentials c) {
 		if (c == null) {
-			return null;
+			// set default server infor for Inventory's SIM based bootstrap
+			// https://github.com/eclipse/leshan/blob/master/leshan-client-cf/src/main/java/org/eclipse/leshan/client/californium/LeshanClientBuilder.java#L273
+			// TODO: even the default lifetime sec is set, it will be overwritten by the
+			// server's response value.
+			return new Server(12345, 5 * 60, BindingMode.U, false);
 		} else {
 			return new Server(c.getShortServerId(), c.getLifetime(), c.getBindingMode(), c.isNotifyWhenDisable());
 		}
