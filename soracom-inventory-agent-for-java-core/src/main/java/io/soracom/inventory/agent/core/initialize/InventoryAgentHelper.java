@@ -74,6 +74,17 @@ public class InventoryAgentHelper {
 		}
 	}
 
+	public static long calculateRecommendedLifetimeSec(long lifetimeSec) {
+		return Math.max(lifetimeSec, calculateDefaultLifetimeSec());
+	}
+
+	public static long calculateDefaultLifetimeSec() {
+		final long defaultLifetimeSec = 60;
+		// according to
+		// org.eclipse.leshan.client.californium.CaliforniumEndpointsManager.java#getMaxCommunicationPeriodFor
+		return defaultLifetimeSec + 247 + 30;
+	}
+
 	public static String generateEndpoint() {
 		try {
 			InetAddress localHost = InetAddress.getLocalHost();

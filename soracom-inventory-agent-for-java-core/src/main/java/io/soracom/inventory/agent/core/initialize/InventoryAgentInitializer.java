@@ -285,15 +285,15 @@ public class InventoryAgentInitializer {
 				log.info("load credentials from credential store.");
 			}
 		}
-		credentials.setLifetime(calculateLifetimeSec());
+		setRecommendedLifetime(credentials);
 		return credentials;
 	}
 
-	private long calculateLifetimeSec() {
-		int defaultLifetimeSec = 60;
-		// according to
-		// org.eclipse.leshan.client.californium.CaliforniumEndpointsManager.java#getMaxCommunicationPeriodFor
-		return defaultLifetimeSec + 247 + 30;
+	private void setRecommendedLifetime(Credentials credentials) {
+		if (credentials != null) {
+			long recommendedLifetime = InventoryAgentHelper.calculateRecommendedLifetimeSec(credentials.getLifetime());
+			credentials.setLifetime(recommendedLifetime);
+		}
 	}
 
 	private Security securityObject;
@@ -322,10 +322,8 @@ public class InventoryAgentInitializer {
 		if (objectInstanceMap.containsKey(LwM2mId.SERVER)) {
 			return;
 		}
-		if (credentials != null) {
-			serverObject = InventoryAgentHelper.getServerInfo(credentials);
-			initializer.setInstancesForObject(LwM2mId.SERVER, serverObject);
-		}
+		serverObject = InventoryAgentHelper.getServerInfo(credentials);
+		initializer.setInstancesForObject(LwM2mId.SERVER, serverObject);
 	}
 
 	private void initObjects(ObjectsInitializer initializer) {
