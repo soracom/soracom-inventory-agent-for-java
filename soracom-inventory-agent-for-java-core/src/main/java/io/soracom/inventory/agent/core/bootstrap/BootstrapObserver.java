@@ -21,27 +21,35 @@ import static org.eclipse.leshan.core.model.ResourceModel.Type.INTEGER;
 import static org.eclipse.leshan.core.model.ResourceModel.Type.OPAQUE;
 import static org.eclipse.leshan.core.model.ResourceModel.Type.STRING;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.leshan.client.object.Server;
 import org.eclipse.leshan.client.observer.LwM2mClientObserverAdapter;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
+import org.eclipse.leshan.client.resource.ObjectEnabler;
 import org.eclipse.leshan.client.servers.DmServerInfo;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.client.servers.ServersInfo;
 import org.eclipse.leshan.client.servers.ServersInfoExtractor;
+import org.eclipse.leshan.core.LwM2mId;
+import org.eclipse.leshan.core.node.LwM2mNodeVisitor;
 import org.eclipse.leshan.core.node.LwM2mObject;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.request.RegisterRequest;
 import org.eclipse.leshan.core.request.UpdateRequest;
+import org.eclipse.leshan.core.response.ReadResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.soracom.inventory.agent.core.credential.CredentialStore;
 import io.soracom.inventory.agent.core.credential.Credentials;
+import io.soracom.inventory.agent.core.initialize.InventoryAgentHelper;
 
 /**
  * Observe bootstrap sequence to retrieve and store credential from Security
@@ -65,6 +73,7 @@ public class BootstrapObserver extends LwM2mClientObserverAdapter {
 
 	@Override
 	public void onBootstrapSuccess(ServerIdentity bsserver, BootstrapRequest request) {
+		setRecommendedLifetime();
 		Credentials c = extractCredentialsInfo();
 		log.info("Bootstrap success: deviceId:" + new String(c.getPskId()) + " server:" + bsserver.toString());
 		credentialStore.saveCredentials(c);
@@ -91,6 +100,36 @@ public class BootstrapObserver extends LwM2mClientObserverAdapter {
 	@Override
 	public void onUpdateTimeout(ServerIdentity server, UpdateRequest request) {
 		log.info("Update timeout: " + server.toString());
+	}
+
+	// fix lifetime value if bootstrap server returns too small lifetime to client
+	private void setRecommendedLifetime() {
+		final ObjectEnabler server = (ObjectEnabler) objectEnablerMap.get(LwM2mId.SERVER);
+		final List<Integer> availableInstanceIds = server.getAvailableInstanceIds();
+		for (Integer i : availableInstanceIds) {
+			final Server sv = (Server) server.getInstance(i);
+			final ReadResponse res = sv.read(ServerIdentity.SYSTEM, LwM2mId.SRV_LIFETIME);
+			res.getContent().accept(new LwM2mNodeVisitor() {
+				@Override
+				public void visit(LwM2mResource resource) {
+					final Long lifetime = (Long) resource.getValue();
+					final long calculateRecommendedLifetimeSec = InventoryAgentHelper
+							.calculateRecommendedLifetimeSec(lifetime);
+					final LwM2mSingleResource updatedResource = LwM2mSingleResource
+							.newIntegerResource(LwM2mId.SRV_LIFETIME, calculateRecommendedLifetimeSec);
+					// overwriter lifetime value with recommended value
+					sv.write(ServerIdentity.SYSTEM, updatedResource.getId(), updatedResource);
+				}
+
+				@Override
+				public void visit(LwM2mObjectInstance instance) {
+				}
+
+				@Override
+				public void visit(LwM2mObject object) {
+				}
+			});
+		}
 	}
 
 	private Credentials extractCredentialsInfo() {
