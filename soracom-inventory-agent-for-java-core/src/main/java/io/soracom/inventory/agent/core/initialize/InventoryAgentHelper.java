@@ -78,7 +78,7 @@ public class InventoryAgentHelper {
 		return Math.max(lifetimeSec, calculateDefaultLifetimeSec());
 	}
 
-	public static long calculateDefaultLifetimeSec() {
+	private static long calculateDefaultLifetimeSec() {
 		// according to
 		// org.eclipse.leshan.client.californium.CaliforniumEndpointsManager.java#getMaxCommunicationPeriodFor
 		return 247 + 30;
