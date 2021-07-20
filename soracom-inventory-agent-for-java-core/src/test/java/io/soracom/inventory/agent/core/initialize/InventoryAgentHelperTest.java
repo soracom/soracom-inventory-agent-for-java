@@ -7,11 +7,6 @@ import org.junit.Test;
 public class InventoryAgentHelperTest {
 
 	@Test
-	public void testCalculateDefaultLifetimeSec() {
-		assertEquals(247 + 30, InventoryAgentHelper.calculateDefaultLifetimeSec());
-	}
-
-	@Test
 	public void calculateRecommendedLifetimeSec() {
 		assertEquals(247 + 30, InventoryAgentHelper.calculateRecommendedLifetimeSec(0));
 		assertEquals(247 + 30, InventoryAgentHelper.calculateRecommendedLifetimeSec(60));
