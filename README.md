@@ -166,7 +166,7 @@ export GREN_GITHUB_TOKEN=xxxxxx
 gren release --override
 ```
 
-
+5 upload jar file and zip file for the release
 
 
 
